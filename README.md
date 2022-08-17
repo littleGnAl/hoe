@@ -1,2 +1,6 @@
 # hoe
-A CLI tool that make my development more delightful
+A CLI tool just make my development more delightful
+
+## License
+
+The project is under the MIT license.
