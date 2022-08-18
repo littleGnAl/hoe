@@ -53,7 +53,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
   String get description => 'Build agora_rtc_engine example';
 
   @override
-  String get name => 'build-agora-rtc-engine';
+  String get name => 'build-agora-flutter-example';
 
   @override
   Future<void> run() async {
@@ -69,7 +69,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final originalScriptsPath = path.join(
         fileSystem
             .file(Platform.script.toFilePath(windows: Platform.isWindows))
-            .parent
+            .parent 
             .parent
             .parent
             .absolute
@@ -125,9 +125,9 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       }
     }
 
-    if (isProcessBuild) {
-      _outputUploadLog();
-    }
+    // if (isProcessBuild) {
+    //   _outputUploadLog();
+    // }
   }
 
   Future<void> _setupAndroidDev(String localIrisPath) async {
