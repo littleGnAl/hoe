@@ -43,8 +43,9 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     argParser.addFlag('process-build');
     argParser.addOption('apple-package-name');
     argParser.addOption('flutter-package-name');
+    argParser.addOption('project-dir');
 
-    _workspace = fileSystem.currentDirectory;
+    // _workspace = fileSystem.currentDirectory;
   }
 
   late final Directory _workspace;
@@ -65,6 +66,9 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final bool isProcessBuild = argResults?['process-build'] ?? false;
     final String applePackageName = argResults?['apple-package-name'] ?? '';
     final String flutterPackageName = argResults?['flutter-package-name'] ?? '';
+    final String projectDir = argResults?['project-dir'] ?? '';
+
+    _workspace = fileSystem.directory(projectDir);
 
     final originalScriptsPath = path.join(
         fileSystem
