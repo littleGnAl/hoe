@@ -44,6 +44,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     argParser.addOption('apple-package-name');
     argParser.addOption('flutter-package-name');
     argParser.addOption('project-dir');
+    argParser.addOption('artifacts-output-dir');
 
     // _workspace = fileSystem.currentDirectory;
   }
@@ -67,13 +68,14 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final String applePackageName = argResults?['apple-package-name'] ?? '';
     final String flutterPackageName = argResults?['flutter-package-name'] ?? '';
     final String projectDir = argResults?['project-dir'] ?? '';
+    final String artifactsOutputDir = argResults?['artifacts-output-dir'] ?? '';
 
     _workspace = fileSystem.directory(projectDir);
 
     final originalScriptsPath = path.join(
         fileSystem
             .file(Platform.script.toFilePath(windows: Platform.isWindows))
-            .parent 
+            .parent
             .parent
             .parent
             .absolute
@@ -111,7 +113,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           }
 
           if (isProcessBuild) {
-            await _processBuildAndroid(flutterPackageName, originalScriptsPath);
+            await _processBuildAndroid(
+                flutterPackageName, originalScriptsPath, artifactsOutputDir);
           }
           break;
         case 'windows':
@@ -416,19 +419,42 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
   }
 
   /// bash $MY_PATH/build-internal-testing-android.sh agora_rtc_engine_example
-  Future<void> _processBuildAndroid(
-      String flutterPackageName, String originalScriptsPath) async {
+  Future<void> _processBuildAndroid(String flutterPackageName,
+      String originalScriptsPath, String artifactsOutputDirPath) async {
     _runFlutterClean(path.join(_workspace.absolute.path, 'example'));
     _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
-    final buildScriptPath = path.join(
-      originalScriptsPath,
-      'build-internal-testing-android.sh',
-    );
-    processManager.runSyncWithOutput(
-      ['bash', buildScriptPath, flutterPackageName],
-      runInShell: true,
-      workingDirectory: _workspace.absolute.path,
-    );
+
+    final archiveDirPath =
+        _createArchiveOutputDir(_workspace.absolute.path, 'android');
+
+    _flutterBuild(path.join(_workspace.absolute.path, 'example'), 'apk');
+
+    final flutterApk = fileSystem.file(path.join(
+        _workspace.absolute.path,
+        'example',
+        'build',
+        'app',
+        'outputs',
+        'flutter-apk',
+        'app-release.apk'));
+    flutterApk.copySync(path.join(archiveDirPath, '$flutterPackageName.apk'));
+
+    final outputZipPath = path.join(artifactsOutputDirPath,
+        _createOutputZipPath(flutterPackageName, 'android'));
+
+    await _zipDirs([archiveDirPath], outputZipPath);
+  }
+
+  String _createArchiveOutputDir(String projectDir, String platform) {
+    final outputDir = fileSystem.directory(path.join(_workspace.absolute.path,
+        'example', 'build', 'internal_testing_artifacts', platform));
+    if (outputDir.existsSync()) {
+      outputDir.deleteSync(recursive: true);
+    }
+
+    outputDir.createSync(recursive: true);
+
+    return outputDir.absolute.path;
   }
 
   File _createPList(
@@ -616,6 +642,54 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     // );
   }
 
+  Future<String> _zipDir(
+      String zipPath, String flutterPackageName, String platform) async {
+    final today = DateTime.now();
+    String dateSlug =
+        "${today.year.toString()}${today.month.toString().padLeft(2, '0')}${today.day.toString().padLeft(2, '0')}${today.hour.toString().padLeft(2, '0')}${today.minute.toString().padLeft(2, '0')}${today.second.toString().padLeft(2, '0')}";
+    final internalTestingArtifactsWindowsZipBaseName =
+        '${flutterPackageName}_${platform}_$dateSlug.zip';
+
+    final outputZipPath =
+        path.join(zipPath, internalTestingArtifactsWindowsZipBaseName);
+
+    // Zip a directory to out.zip using the zipDirectory convenience method
+    var encoder = ZipFileEncoder();
+    encoder.create(outputZipPath);
+    await encoder.addDirectory(fileSystem.directory(zipPath));
+    // encoder.zipDirectory(internalTestingArtifactsWindowsDir,
+    //     filename: internalTestingArtifactsWindowsZipBaseName);
+
+    encoder.close();
+
+    return outputZipPath;
+  }
+
+  String _createOutputZipPath(String flutterPackageName, String platform) {
+    final today = DateTime.now();
+    String dateSlug =
+        "${today.year.toString()}${today.month.toString().padLeft(2, '0')}${today.day.toString().padLeft(2, '0')}${today.hour.toString().padLeft(2, '0')}${today.minute.toString().padLeft(2, '0')}${today.second.toString().padLeft(2, '0')}";
+    final internalTestingArtifactsWindowsZipBaseName =
+        '${flutterPackageName}_${platform}_$dateSlug.zip';
+    return internalTestingArtifactsWindowsZipBaseName;
+  }
+
+  Future<void> _zipDirs(List<String> zipDirPaths, String outputZipPath) async {
+    // Zip a directory to out.zip using the zipDirectory convenience method
+    var encoder = ZipFileEncoder();
+    encoder.create(outputZipPath);
+    for (final p in zipDirPaths) {
+      await encoder.addDirectory(fileSystem.directory(p));
+    }
+
+    // encoder.zipDirectory(internalTestingArtifactsWindowsDir,
+    //     filename: internalTestingArtifactsWindowsZipBaseName);
+
+    encoder.close();
+
+    // return outputZipPath;
+  }
+
   void _runFlutterPackagesGet(String packagePath) {
     processManager.runSyncWithOutput(
       ['flutter', 'packages', 'get'],
@@ -674,6 +748,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         'TEST_CHANNEL_ID="${globalConfig.testChannelId}"'
       ],
       runInShell: true,
+      // includeParentEnvironment: false,
       workingDirectory: workingDirectory,
     );
   }
