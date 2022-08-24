@@ -18,6 +18,8 @@ jobs:
   build_android:
     name: Build Android
     runs-on: ubuntu-latest
+    env:
+      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
     steps:
       - uses: actions/checkout@v3
 
