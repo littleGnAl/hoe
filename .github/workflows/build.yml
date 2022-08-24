@@ -42,8 +42,9 @@ jobs:
         run: |
           ls
           pwd
+          mkdir -p output
           dart pub get
-          dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --platforms=android --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
+          dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=android --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
   # build_windows:
   #   name: Build agora_rtc_ng example Windows
   #   runs-on: windows-2019
