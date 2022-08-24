@@ -71,6 +71,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final String artifactsOutputDir = argResults?['artifacts-output-dir'] ?? '';
 
     _workspace = fileSystem.directory(projectDir);
+    stdout.writeln(_workspace.absolute.path);
 
     final originalScriptsPath = path.join(
         fileSystem
