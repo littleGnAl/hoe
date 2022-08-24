@@ -26,7 +26,7 @@ jobs:
         with:
           repository: AgoraIO/Agora-Flutter-SDK
           ref: ${{ inputs.build_branch }}
-          path: build_project
+          path: Agora-Flutter-SDK
 
       - uses: actions/setup-java@v1
         with:
@@ -42,7 +42,7 @@ jobs:
           pwd
           ls build_project
           dart pub get
-          dart run bin/hoe.dart build-agora-flutter-example --project-dir=build_project/Agora-Flutter-SDK --platforms=android --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
+          dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --platforms=android --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
   # build_windows:
   #   name: Build agora_rtc_ng example Windows
   #   runs-on: windows-2019
