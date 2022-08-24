@@ -19,23 +19,28 @@ jobs:
     name: Build Android
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Check out my other private repo
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
+      - name: Check out build project
+        uses: actions/checkout@v3
         with:
           repository: AgoraIO/Agora-Flutter-SDK
           ref: ${{ inputs.build_branch }}
+          path: build_project
+
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
+
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: '3.0.0'
+          
       - name: Run build android
         run: |
           ls
           pwd
-          dart run hoe/bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --platforms=android --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
+          dart run hoe/bin/hoe.dart build-agora-flutter-example --project-dir=build_project/Agora-Flutter-SDK --platforms=android --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
   # build_windows:
   #   name: Build agora_rtc_ng example Windows
   #   runs-on: windows-2019
