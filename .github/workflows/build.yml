@@ -34,6 +34,7 @@ jobs:
       - name: Run build android
         run: |
           ls
+          pwd
           dart run hoe/bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --platforms=android --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
   # build_windows:
   #   name: Build agora_rtc_ng example Windows
