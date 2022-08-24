@@ -5,8 +5,8 @@ class GlobalConfig {
     // flutter build windows --dart-define TEST_APP_ID="$TEST_APP_ID" --dart-define TEST_TOKEN="$TEST_TOKEN" --dart-define TEST_CHANNEL_ID="$TEST_CHANNEL_ID"
     final envVarMap = Platform.environment;
     _testAppId = envVarMap['TEST_APP_ID']!;
-    _testToken = envVarMap['TEST_TOKEN']!;
-    _testChannelId = envVarMap['TEST_CHANNEL_ID']!;
+    _testToken = envVarMap['TEST_TOKEN'] ?? '';
+    _testChannelId = envVarMap['TEST_CHANNEL_ID'] ?? 'testapi';
     // stdout.writeln('user: $user');
 
     // final pwd = envVarMap[
