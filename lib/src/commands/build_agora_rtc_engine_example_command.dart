@@ -439,6 +439,11 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         'app-release.apk'));
     flutterApk.copySync(path.join(archiveDirPath, '$flutterPackageName.apk'));
 
+    final artifactsOutputDir = fileSystem.directory(artifactsOutputDirPath);
+    if (!artifactsOutputDir.existsSync()) {
+      artifactsOutputDir.createSync(recursive: true);
+    }
+
     final outputZipPath = path.join(artifactsOutputDirPath,
         _createOutputZipPath(flutterPackageName, 'android'));
 
