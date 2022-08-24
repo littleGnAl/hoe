@@ -3,8 +3,9 @@ name: Build agora_rtc_ng example
 on: 
   workflow_dispatch:
     inputs:
-      agora_rtc_ng_branch:
+      build_branch:
         description: agora_rtc_ng branch
+        type: string
         required: true
         default: 'main'
 
@@ -14,18 +15,36 @@ on:
 
 
 jobs:
-  build_windows:
-    name: Build agora_rtc_ng example Windows
-    runs-on: windows-2019
+  build_android:
+    name: Flutter codestyle/analyze check
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Check out my other private repo
+        uses: actions/checkout@v2
+        with:
+          repository: AgoraIO/Agora-Flutter-SDK
+          ref: ${{ inputs.build_branch }}
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: '3.0.0'
-      - run: flutter pub get
-      - name: Run flutter build apk
-        run: flutter build apk
-        working-directory: example
+        run: |
+          dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --platforms=android --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
+  # build_windows:
+  #   name: Build agora_rtc_ng example Windows
+  #   runs-on: windows-2019
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-java@v1
+  #       with:
+  #         java-version: '11'
+  #     - uses: subosito/flutter-action@v1
+  #       with:
+  #         flutter-version: '3.0.0'
+  #     - run: flutter pub get
+  #     - name: Run flutter build apk
+  #       run: flutter build apk
+  #       working-directory: example
