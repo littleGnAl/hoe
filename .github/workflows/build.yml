@@ -56,7 +56,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          name: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          tag_name: agora_rtc_engine_example_${{ steps.date.outputs.date }}
           files: "output/*.zip"
   # build_windows:
   #   name: Build agora_rtc_ng example Windows
