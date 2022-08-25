@@ -38,6 +38,14 @@ jobs:
         with:
           flutter-version: '3.0.0'
 
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+      - name: Test with environment variables
+        run: echo $BUILD_NAME
+        env:
+          BUILD_NAME: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+
       - name: Run build android
         run: |
           ls
@@ -45,6 +53,11 @@ jobs:
           mkdir -p output
           dart pub get
           dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=android --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "output/*.zip"
   # build_windows:
   #   name: Build agora_rtc_ng example Windows
   #   runs-on: windows-2019

@@ -449,6 +449,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         _createOutputZipPath(flutterPackageName, 'android'));
 
     await _zipDirs([archiveDirPath], outputZipPath);
+
+    stdout.writeln('Created $outputZipPath');
   }
 
   String _createArchiveOutputDir(String projectDir, String platform) {
