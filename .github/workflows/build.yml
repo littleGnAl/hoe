@@ -79,10 +79,48 @@ jobs:
         with:
           flutter-version: '3.0.0'
 
-      - name: Run build android
+      - name: Run build macos
         run: |
           dart pub get
           dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=macos --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+      - name: Test with environment variables
+        run: echo $BUILD_NAME
+        env:
+          BUILD_NAME: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          files: "output/*.zip"
+
+  build_windows:
+    name: Build macos
+    runs-on: windows-2019
+    timeout-minutes: 60
+    env:
+      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check out build project
+        uses: actions/checkout@v3
+        with:
+          repository: AgoraIO/Agora-Flutter-SDK
+          ref: ${{ inputs.build_branch }}
+          path: Agora-Flutter-SDK
+
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.0.0'
+
+      - name: Run build windows
+        run: |
+          dart pub get
+          dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=windows --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"

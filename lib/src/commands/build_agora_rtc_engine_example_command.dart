@@ -125,7 +125,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           }
 
           if (isProcessBuild) {
-            await _processBuildWindows(flutterPackageName, originalScriptsPath);
+            await _processBuildWindows(
+                flutterPackageName, originalScriptsPath, artifactsOutputDir);
           }
           break;
 
@@ -617,76 +618,32 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
   Future<void> _processBuildWindows(
     String flutterPackageName,
     String originalScriptsPath,
+    String artifactsOutputDirPath,
   ) async {
     _runFlutterClean(path.join(_workspace.absolute.path, 'example'));
     _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
-    // final buildScriptPath = path.join(
-    //   originalScriptsPath,
-    //   'build-internal-testing-windows.sh',
-    // );
-    // processManager.runSyncWithOutput(
-    //   ['bash', buildScriptPath],
-    //   runInShell: true,
-    //   workingDirectory: _workspace.absolute.path,
-    // );
 
-    _flutterBuild(_workspace.absolute.path, 'windows');
+    final archiveDirPath =
+        _createArchiveOutputDir(_workspace.absolute.path, 'windows');
 
-    final internalTestingArtifactsDir = fileSystem.directory(
-      path.join(
-        _workspace.absolute.path,
-        'example',
-        'build',
-        'internal_testing_artifacts',
-      ),
-    );
+    _flutterBuild(path.join(_workspace.absolute.path, 'example'), 'windows');
 
-    final internalTestingArtifactsWindowsDir = fileSystem.directory(
-      path.join(internalTestingArtifactsDir.absolute.path, 'windows'),
-    );
+    _copyDirectory(
+        fileSystem.directory(path.join(_workspace.absolute.path, 'example',
+            'build', 'windows', 'runner', 'Release')),
+        fileSystem.directory(archiveDirPath));
 
-// dt=$(date '+%Y%m%d%H%M%S')
-    final today = DateTime.now();
-    String dateSlug =
-        "${today.year.toString()}${today.month.toString().padLeft(2, '0')}${today.day.toString().padLeft(2, '0')}${today.hour.toString().padLeft(2, '0')}${today.minute.toString().padLeft(2, '0')}${today.second.toString().padLeft(2, '0')}";
-    final internalTestingArtifactsWindowsZipBaseName =
-        '${flutterPackageName}_windows_$dateSlug.zip';
+    final artifactsOutputDir = fileSystem.directory(artifactsOutputDirPath);
+    if (!artifactsOutputDir.existsSync()) {
+      artifactsOutputDir.createSync(recursive: true);
+    }
 
-    // Zip a directory to out.zip using the zipDirectory convenience method
-    var encoder = ZipFileEncoder();
-    encoder.create(path.join(internalTestingArtifactsDir.absolute.path,
-        internalTestingArtifactsWindowsZipBaseName));
-    await encoder.addDirectory(internalTestingArtifactsWindowsDir);
-    // encoder.zipDirectory(internalTestingArtifactsWindowsDir,
-    //     filename: internalTestingArtifactsWindowsZipBaseName);
+    final outputZipPath = path.join(artifactsOutputDirPath,
+        _createOutputZipPath(flutterPackageName, 'windows'));
 
-    encoder.close();
+    await _zipDirs([archiveDirPath], outputZipPath);
 
-    // processManager.runSyncWithOutput(
-    //   [
-    //     'bash',
-    //     path.join(originalScriptsPath, 'upload-jenkins.sh'),
-    //     path.join(
-    //       internalTestingArtifactsDir.absolute.path,
-    //       internalTestingArtifactsWindowsZipBaseName,
-    //     )
-    //   ],
-    //   runInShell: true,
-    //   includeParentEnvironment: true,
-    //   workingDirectory: _workspace.absolute.path,
-    // );
-
-    // // notify-wecom.sh
-    // processManager.runSyncWithOutput(
-    //   [
-    //     'bash',
-    //     path.join(originalScriptsPath, 'notify-wecom.sh'),
-    //     internalTestingArtifactsWindowsZipBaseName
-    //   ],
-    //   runInShell: true,
-    //   includeParentEnvironment: true,
-    //   workingDirectory: _workspace.absolute.path,
-    // );
+    stdout.writeln('Created $outputZipPath');
   }
 
   Future<String> _zipDir(
