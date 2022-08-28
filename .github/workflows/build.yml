@@ -1,10 +1,10 @@
-name: Build agora_rtc_ng example
+name: Build flutter project example
 
 on: 
   workflow_dispatch:
     inputs:
       build_branch:
-        description: agora_rtc_ng branch
+        description: flutter project branch
         type: string
         required: true
         default: 'main'
@@ -98,7 +98,7 @@ jobs:
           files: "output/*.zip"
 
   build_windows:
-    name: Build macos
+    name: Build windows
     runs-on: windows-2019
     timeout-minutes: 60
     env:
