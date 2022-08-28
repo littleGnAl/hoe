@@ -105,7 +105,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           }
 
           if (isProcessBuild) {
-            await _processBuildMacOS(flutterPackageName, originalScriptsPath);
+            await _processBuildMacOS(
+                flutterPackageName, originalScriptsPath, artifactsOutputDir);
           }
           break;
         case 'android':
@@ -557,22 +558,60 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     }
   }
 
-  /// bash $MY_PATH/build-internal-testing-macos.sh agora_rtc_engine_example
   Future<void> _processBuildMacOS(
     String flutterPackageName,
     String originalScriptsPath,
+    String artifactsOutputDirPath,
   ) async {
     _runFlutterClean(path.join(_workspace.absolute.path, 'example'));
     _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
-    final buildScriptPath = path.join(
-      originalScriptsPath,
-      'build-internal-testing-macos.sh',
-    );
-    processManager.runSyncWithOutput(
-      ['bash', buildScriptPath, flutterPackageName],
-      runInShell: true,
-      workingDirectory: _workspace.absolute.path,
-    );
+
+    final archiveDirPath =
+        _createArchiveOutputDir(_workspace.absolute.path, 'macos');
+
+    _flutterBuild(path.join(_workspace.absolute.path, 'example'), 'macos');
+
+    final macosArtifactPath = path.join(_workspace.absolute.path, 'example',
+        'build', 'macos', 'Build', 'Products', 'Release');
+
+    fileSystem
+        .directory(
+            path.join(archiveDirPath, '${flutterPackageName}_example.app'))
+        .createSync();
+    _copyDirectory(
+        fileSystem.directory(
+            path.join(macosArtifactPath, '${flutterPackageName}_example.app')),
+        fileSystem.directory(
+            path.join(archiveDirPath, '${flutterPackageName}_example.app')));
+
+    fileSystem.directory(path.join(archiveDirPath, 'dSYMs')).createSync();
+    final macosPluginDsymsDir = fileSystem.directory(path.join(
+        macosArtifactPath,
+        flutterPackageName,
+        '$flutterPackageName.framework.dSYM'));
+    _copyDirectory(
+        macosPluginDsymsDir,
+        fileSystem.directory(path.join(
+            archiveDirPath, 'dSYMs', '$flutterPackageName.framework.dSYM')));
+
+    final macosAppDsymsDir = fileSystem.directory(
+        path.join(macosArtifactPath, '${flutterPackageName}_example.app.dSYM'));
+    _copyDirectory(
+        macosAppDsymsDir,
+        fileSystem.directory(path.join(archiveDirPath, 'dSYMs',
+            '${flutterPackageName}_example.app.dSYM')));
+
+    final artifactsOutputDir = fileSystem.directory(artifactsOutputDirPath);
+    if (!artifactsOutputDir.existsSync()) {
+      artifactsOutputDir.createSync(recursive: true);
+    }
+
+    final outputZipPath = path.join(artifactsOutputDirPath,
+        _createOutputZipPath(flutterPackageName, 'macos'));
+
+    await _zipDirs([archiveDirPath], outputZipPath);
+
+    stdout.writeln('Created $outputZipPath');
   }
 
   Future<void> _processBuildWindows(
@@ -723,6 +762,9 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
   }
 
   void _copyDirectory(Directory source, Directory destination) {
+    if (!destination.existsSync()) {
+      destination.createSync(recursive: true);
+    }
     source.listSync(recursive: false).forEach((var entity) {
       if (entity is Directory) {
         var newDirectory = fileSystem.directory(
