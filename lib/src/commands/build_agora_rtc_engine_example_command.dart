@@ -7,6 +7,7 @@ import 'package:hoe/src/base/base_command.dart';
 import 'package:hoe/src/base/process_manager_ext.dart';
 import 'package:hoe/src/common/default_file_downloader.dart';
 import 'package:hoe/src/common/global_config.dart';
+import 'package:hoe/src/common/ios_plist_config.dart';
 import 'package:path/path.dart' as path;
 import 'package:process/process.dart';
 import 'package:archive/archive.dart';
@@ -92,11 +93,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           }
 
           if (isProcessBuild) {
-            await _processBuildIOS(
-              applePackageName,
-              flutterPackageName,
-              originalScriptsPath,
-            );
+            await _processBuildIOS(applePackageName, flutterPackageName,
+                originalScriptsPath, artifactsOutputDir);
           }
           break;
         case 'macos':
@@ -503,60 +501,90 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
   /// bash $MY_PATH/build-internal-testing-ios.sh agora_rtc_engine_example io.agora.agoraRtcEngineExampleTest io.agora.agoraRtcEngineExampleLab io.agora.agoraRtcEngineExampleQA io.agora.agoraRtcEngineExample
   Future<void> _processBuildIOS(
-    String applePackageName,
-    String flutterPackageName,
-    String originalScriptsPath,
-  ) async {
+      String applePackageName,
+      String flutterPackageName,
+      String originalScriptsPath,
+      String artifactsOutputDirPath) async {
     _runFlutterClean(path.join(_workspace.absolute.path, 'example'));
     _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
-    final buildScriptPath = path.join(
-      originalScriptsPath,
-      'build-internal-testing-ios.sh',
-    );
+    final examplePath = path.join(_workspace.absolute.path, 'example');
+    final globalConfig = GlobalConfig();
 
-    final plistDirPath =
-        path.join(_workspace.absolute.path, 'example', 'ios', 'plists');
-    final plistDir = fileSystem.directory(plistDirPath);
-    if (plistDir.existsSync()) {
-      plistDir.deleteSync(recursive: true);
-    }
-    plistDir.createSync();
+    // final plistDirPath =
+    //     path.join(_workspace.absolute.path, 'example', 'ios', 'plists');
+    // final plistDir = fileSystem.directory(plistDirPath);
+    // if (plistDir.existsSync()) {
+    //   plistDir.deleteSync(recursive: true);
+    // }
+    // plistDir.createSync();
 
-    List<File> plistFiles = [];
+    final archiveDirPath =
+        _createArchiveOutputDir(_workspace.absolute.path, 'ios');
 
-    plistFiles.add(_createPList(
-      '${applePackageName}Test',
-      'AgoraTest2020',
-      path.join(plistDirPath, '${flutterPackageName}_test.plist'),
-    ));
-    plistFiles.add(_createPList(
-      '${applePackageName}Lab',
-      'AgoraLab2020',
-      path.join(plistDirPath, '${flutterPackageName}_lab.plist'),
-    ));
-    plistFiles.add(_createPList(
-      '${applePackageName}QA',
-      'AgoraQA2021',
-      path.join(plistDirPath, '${flutterPackageName}_qa.plist'),
-    ));
-
-    processManager.runSyncWithOutput(
-      [
-        'bash',
-        buildScriptPath,
+    final pListConfigTest =
+        PListConfig('${applePackageName}Test', 'AgoraTest2020');
+    _buildIOSIpa(
+        examplePath,
         flutterPackageName,
-        '${applePackageName}Test',
-        '${applePackageName}Lab',
-        '${applePackageName}QA',
-        applePackageName,
-      ],
-      runInShell: true,
-      workingDirectory: _workspace.absolute.path,
-    );
+        path.join(examplePath, 'ios', 'Runner.xcodeproj'),
+        pListConfigTest.applePackageName,
+        globalConfig.appleTeamIdTest,
+        pListConfigTest.profileName,
+        globalConfig.appleCodeSignIdentityTest,
+        false,
+        pListConfigTest,
+        {
+          'Runner': '${applePackageName}Test',
+          'ScreenSharing': '${applePackageName}Test.ScreenSharing',
+        },
+        archiveDirPath);
 
-    for (final f in plistFiles) {
-      f.deleteSync(recursive: true);
+    final pListConfigLab =
+        PListConfig('${applePackageName}Lab', 'AgoraLab2020');
+    _buildIOSIpa(
+        examplePath,
+        flutterPackageName,
+        path.join(examplePath, 'ios', 'Runner.xcodeproj'),
+        pListConfigLab.applePackageName,
+        globalConfig.appleTeamIdLab,
+        pListConfigLab.profileName,
+        globalConfig.appleCodeSignIdentityLab,
+        false,
+        pListConfigLab,
+        {
+          'Runner': '${applePackageName}Lab',
+          'ScreenSharing': '${applePackageName}Lab.ScreenSharing',
+        },
+        archiveDirPath);
+
+    final pListConfigQA = PListConfig('${applePackageName}QA', 'AgoraQA2021');
+    _buildIOSIpa(
+        examplePath,
+        flutterPackageName,
+        path.join(examplePath, 'ios', 'Runner.xcodeproj'),
+        pListConfigQA.applePackageName,
+        globalConfig.appleTeamIdQa,
+        pListConfigQA.profileName,
+        globalConfig.appleCodeSignIdentityQa,
+        false,
+        pListConfigQA,
+        {
+          'Runner': '${applePackageName}QA',
+          'ScreenSharing': '${applePackageName}QA.ScreenSharing',
+        },
+        archiveDirPath);
+
+    final artifactsOutputDir = fileSystem.directory(artifactsOutputDirPath);
+    if (!artifactsOutputDir.existsSync()) {
+      artifactsOutputDir.createSync(recursive: true);
     }
+
+    final outputZipPath = path.join(artifactsOutputDirPath,
+        _createOutputZipPath(flutterPackageName, 'ios'));
+
+    await _zipDirs([archiveDirPath], outputZipPath);
+
+    stdout.writeln('Created $outputZipPath');
   }
 
   Future<void> _processBuildMacOS(
@@ -738,8 +766,9 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
   void _flutterBuild(
     String workingDirectory,
-    String platform,
-  ) {
+    String platform, {
+    List<String> extraArgs = const [],
+  }) {
     // flutter build windows --dart-define TEST_APP_ID="$TEST_APP_ID" --dart-define TEST_TOKEN="$TEST_TOKEN" --dart-define TEST_CHANNEL_ID="$TEST_CHANNEL_ID"
     final globalConfig = GlobalConfig();
     processManager.runSyncWithOutput(
@@ -752,11 +781,111 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         '--dart-define',
         'TEST_TOKEN="${globalConfig.testToken}"',
         '--dart-define',
-        'TEST_CHANNEL_ID="${globalConfig.testChannelId}"'
+        'TEST_CHANNEL_ID="${globalConfig.testChannelId}"',
+        ...extraArgs,
       ],
       runInShell: true,
       // includeParentEnvironment: false,
       workingDirectory: workingDirectory,
     );
+  }
+
+  void _buildIOSIpa(
+    String workingDirectory,
+    String flutterPackageName,
+    String xcodeprojPath,
+    String bundleIdentifier,
+    String teamId,
+    String profileName,
+    String codeSignIdentity,
+    bool automaticSigning,
+    PListConfig pListConfig,
+    Map<String, String> targetsRunners,
+    String outputPath,
+  ) {
+    final plistFile = _createPList(
+      pListConfig.applePackageName,
+      pListConfig.profileName,
+      path.join(workingDirectory, '${pListConfig.profileName}.plist'),
+    );
+
+    stdout.writeln(plistFile.absolute.path);
+// flutter build ipa --dart-define TEST_APP_ID="$TEST_APP_ID" --dart-define TEST_TOKEN="$TEST_TOKEN" --dart-define TEST_CHANNEL_ID="$TEST_CHANNEL_ID" --export-options-plist $exportPList
+    _updateCodeSigningSettings(
+      path.join(workingDirectory, 'ios'),
+      xcodeprojPath,
+      bundleIdentifier,
+      teamId,
+      profileName,
+      codeSignIdentity,
+      automaticSigning,
+      targetsRunners,
+    );
+    stdout.writeln('Building ipa ${plistFile.absolute.path}');
+    _flutterBuild(
+      workingDirectory,
+      'ipa',
+      extraArgs: ['--export-options-plist', plistFile.absolute.path],
+    );
+
+    final iosArtifactPath =
+        path.join(workingDirectory, 'build', 'ios', 'ipa');
+
+    fileSystem.directory(path.join(outputPath, profileName)).createSync();
+
+    // ${PACKAGE_NAME}_example.ipa
+    stdout.writeln('Copying ipa');
+    fileSystem
+        .file(path.join(iosArtifactPath, '${flutterPackageName}_example.ipa'))
+        .copySync(path.join(
+            outputPath, profileName, '${flutterPackageName}_example.ipa'));
+    // _copyDirectory(
+    //     fileSystem.directory(
+    //         path.join(iosArtifactPath, '${flutterPackageName}_example.ipa')),
+    //     fileSystem.directory(path.join(
+    //         outputPath, profileName, '${flutterPackageName}_example.ipa')));
+
+    _copyDirectory(
+        fileSystem.directory(path.join(
+          workingDirectory,
+          'build',
+          'ios',
+          'archive',
+          'Runner.xcarchive',
+          'dSYMs',
+        )),
+        fileSystem.directory(path.join(outputPath, profileName)));
+  }
+
+  void _updateCodeSigningSettings(
+    String workingDirectory,
+    String xcodeprojPath,
+    String bundleIdentifier,
+    String teamId,
+    String profileName,
+    String codeSignIdentity,
+    bool automaticSigning,
+    Map<String, String> targetsRunners,
+  ) {
+    // fastlane run update_code_signing_settings use_automatic_signing:$(boolean "${automatic_signing}") path:"$EXAMPLE_PATH/ios/Runner.xcodeproj" bundle_identifier:"$bundle_identifier" team_id:"$team_id" profile_name:"$profile_name" code_sign_identity:"$code_sign_identity" targets:"$targets_runner"
+    for (final target in targetsRunners.keys) {
+      final bi = targetsRunners[target]!;
+      processManager.runSyncWithOutput(
+        [
+          'fastlane',
+          'run',
+          'update_code_signing_settings',
+          'use_automatic_signing:$automaticSigning',
+          'path:$xcodeprojPath',
+          'bundle_identifier:$bi',
+          'team_id:$teamId',
+          'profile_name:$profileName',
+          'code_sign_identity:$codeSignIdentity',
+          'targets:$target',
+        ],
+        runInShell: true,
+        workingDirectory: workingDirectory,
+      );
+    }
   }
 }
