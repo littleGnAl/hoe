@@ -12,8 +12,6 @@ IS_IRIS_NATIVE_NEEDED=$6
 
 MY_PATH=$(dirname "$0")
 
-# JENKINS_UPLOAD_POD_URL=http://10.80.1.18:8080/job/GA/job/Pod_Package_Test
-
 curl -X POST -L $JENKINS_UPLOAD_POD_URL/buildWithParameters \
     --data AGORA_SDK_VERSION=${AGORA_SDK_VERSION} \
     --data RTC_SDK_URL=${RTC_SDK_URL} \
