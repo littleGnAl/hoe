@@ -25,8 +25,9 @@ extension ProcessManagerExt on ProcessManager {
     );
 
     if (result.exitCode != 0) {
-      stderr.writeln(result.stderr);
-      throwToolExit(result.stderr ?? '', exitCode: result.exitCode);
+      final message = result.stderr ?? result.stdout ?? '';
+      stderr.writeln(message);
+      throwToolExit(message, exitCode: result.exitCode);
     }
 
     stdout.writeln(result.stdout);
