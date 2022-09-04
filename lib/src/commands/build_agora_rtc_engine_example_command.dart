@@ -695,7 +695,17 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final outputZipPath = path.join(artifactsOutputDirPath,
         _createOutputZipPath(flutterPackageName, 'macos'));
 
-    await _zipDirs([archiveDirPath], outputZipPath);
+    // _zipDirs will cause the mac app not runnable after decompress, so use base `zip` command here
+    processManager.runSyncWithOutput(
+      [
+        'zip',
+        '-r',
+        '-y',
+        outputZipPath,
+        'macos',
+      ],
+      workingDirectory: fileSystem.file(archiveDirPath).parent.absolute.path,
+    );
 
     stdout.writeln('Created $outputZipPath');
   }
