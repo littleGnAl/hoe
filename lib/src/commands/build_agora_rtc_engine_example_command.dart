@@ -719,10 +719,10 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
     fileSystem
         .file(outputZipPath)
-        .copySync(path.join(artifactsOutputDirPath, outputZipPath));
+        .copySync(path.join(artifactsOutputDirPath, zipFileBaseName));
 
     stdout
-        .writeln('Created ${path.join(artifactsOutputDirPath, outputZipPath)}');
+        .writeln('Created ${path.join(artifactsOutputDirPath, zipFileBaseName)}');
   }
 
   Future<void> _processBuildWindows(
