@@ -975,6 +975,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
     processManager.runSyncWithOutput([
       'bash',
+      path.join(certPath, 'install_apple_certificate.sh'),
       p12Base64,
       p12Pwd,
       p12OutputPath,
