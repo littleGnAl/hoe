@@ -141,6 +141,17 @@ jobs:
     timeout-minutes: 60
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      AGORALAB2020_P12_BASE64: ${{ secrets.AGORALAB2020_P12_BASE64 }}
+      AGORALAB2020_P12_PWD: ${{ secrets.AGORALAB2020_P12_PWD }}
+      AGORALAB2020_PP_GPG_PWD: ${{ secrets.AGORALAB2020_PP_GPG_PWD }}
+      BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+      AGORALAB2020_KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      TEAM_LAB: ${{ secrets.TEAM_LAB }}
+      TEAM_QA: ${{ secrets.TEAM_QA }}
+      TEAM_TEST: ${{ secrets.TEAM_TEST }}
+      CODE_SIGN_IDENTITY_LAB: ${{ secrets.CODE_SIGN_IDENTITY_LAB }}
+      CODE_SIGN_IDENTITY_QA: ${{ secrets.CODE_SIGN_IDENTITY_QA }}
+      CODE_SIGN_IDENTITY_TEST: ${{ secrets.CODE_SIGN_IDENTITY_TEST }}
     steps:
       - uses: actions/checkout@v3
 
@@ -156,18 +167,6 @@ jobs:
           flutter-version: '3.0.0'
 
       - name: Install the Apple certificate and provisioning profile
-        env:
-          AGORALAB2020_P12_BASE64: ${{ secrets.AGORALAB2020_P12_BASE64 }}
-          AGORALAB2020_P12_PWD: ${{ secrets.AGORALAB2020_P12_PWD }}
-          AGORALAB2020_PP_GPG_PWD: ${{ secrets.AGORALAB2020_PP_GPG_PWD }}
-          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
-          AGORALAB2020_KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-          TEAM_LAB: ${{ secrets.TEAM_LAB }}
-          TEAM_QA: ${{ secrets.TEAM_QA }}
-          TEAM_TEST: ${{ secrets.TEAM_TEST }}
-          CODE_SIGN_IDENTITY_LAB: ${{ secrets.CODE_SIGN_IDENTITY_LAB }}
-          CODE_SIGN_IDENTITY_QA: ${{ secrets.CODE_SIGN_IDENTITY_QA }}
-          CODE_SIGN_IDENTITY_TEST: ${{ secrets.CODE_SIGN_IDENTITY_TEST }}
         run: |
           # create variables
           AGORALAB2020_P12_PATH=$RUNNER_TEMP/agoralab2020.p12
