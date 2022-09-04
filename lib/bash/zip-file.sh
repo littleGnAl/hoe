@@ -8,7 +8,5 @@ OUTPUT_ZIP_PATH=$2
 ZIP_DIR=$3
 
 pushd ${WORKING_DIR}
-ls 
-ls "${ZIP_DIR}"
 zip -r -y "${OUTPUT_ZIP_PATH}" "${ZIP_DIR}"
 popd

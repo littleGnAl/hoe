@@ -692,9 +692,6 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       artifactsOutputDir.createSync(recursive: true);
     }
 
-    final outputZipPath = path.join(artifactsOutputDirPath,
-        _createOutputZipPath(flutterPackageName, 'macos'));
-
     final libPath = path.join(
         fileSystem
             .file(Platform.script.toFilePath(windows: Platform.isWindows))
@@ -704,20 +701,28 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
             .path,
         'lib');
 
+    final zipFileBaseName = _createOutputZipPath(flutterPackageName, 'macos');
+    final outputZipPath = path.join(archiveDirPath, zipFileBaseName);
+
     // _zipDirs will cause the mac app not runnable after decompress, so use base `zip` command here
     processManager.runSyncWithOutput(
       [
         'bash',
         path.join(libPath, 'bash', 'zip-file.sh'),
         fileSystem.file(archiveDirPath).parent.absolute.path,
-        path.join(fileSystem.file(archiveDirPath).parent.absolute.path, '123.zip'),
+        outputZipPath,
         'macos/',
       ],
       runInShell: true,
       workingDirectory: fileSystem.file(archiveDirPath).parent.absolute.path,
     );
 
-    stdout.writeln('Created $outputZipPath');
+    fileSystem
+        .file(outputZipPath)
+        .copySync(path.join(artifactsOutputDirPath, outputZipPath));
+
+    stdout
+        .writeln('Created ${path.join(artifactsOutputDirPath, outputZipPath)}');
   }
 
   Future<void> _processBuildWindows(
