@@ -695,12 +695,21 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final outputZipPath = path.join(artifactsOutputDirPath,
         _createOutputZipPath(flutterPackageName, 'macos'));
 
+    final libPath = path.join(
+        fileSystem
+            .file(Platform.script.toFilePath(windows: Platform.isWindows))
+            .parent
+            .parent
+            .absolute
+            .path,
+        'lib');
+
     // _zipDirs will cause the mac app not runnable after decompress, so use base `zip` command here
     processManager.runSyncWithOutput(
       [
-        'zip',
-        '-r',
-        '-y',
+        'bash',
+        path.join(libPath, 'bash', 'zip-file.sh'),
+        fileSystem.file(archiveDirPath).parent.absolute.path,
         outputZipPath,
         'macos',
       ],
@@ -993,22 +1002,5 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       keychainOutputPath,
       keychainPwd,
     ]);
-
-    //     AGORALAB2020_P12_PATH=$RUNNER_TEMP/agoralab2020.p12
-    // AGORALAB2020_PP_PATH=$RUNNER_TEMP/agoralab2020_pp.mobileprovision
-    // AGORALAB2020_KEYCHAIN_PATH=$RUNNER_TEMP/agoralab2020-app-signing.keychain-db
-
-    // bash lib/cert/decrypt_secret.sh \
-    //   ${AGORALAB2020_PP_PATH} \
-    //   lib/cert/lab/AgoraLab2020.mobileprovision.gpg \
-    //   ${AGORALAB2020_PP_GPG_PWD}
-
-    // bash lib/cert/install_apple_certificate.sh \
-    //   ${AGORALAB2020_P12_BASE64} \
-    //   ${AGORALAB2020_P12_PWD} \
-    //   ${AGORALAB2020_P12_PATH} \
-    //   ${AGORALAB2020_PP_PATH} \
-    //   ${AGORALAB2020_KEYCHAIN_PATH} \
-    //   ${AGORALAB2020_KEYCHAIN_PASSWORD}
   }
 }
