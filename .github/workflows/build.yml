@@ -230,6 +230,8 @@ jobs:
             ${AGORATEST2020_KEYCHAIN_PATH} \
             ${AGORATEST2020_KEYCHAIN_PASSWORD}
 
+          ls ~/Library/MobileDevice/Provisioning\ Profiles
+
       - name: Run build ios
         run: |
           dart pub get
