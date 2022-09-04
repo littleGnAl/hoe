@@ -168,7 +168,7 @@ jobs:
           AGORALAB2020_PP_PATH=$RUNNER_TEMP/agoralab2020_pp.mobileprovision
           AGORALAB2020_KEYCHAIN_PATH=$RUNNER_TEMP/agoralab2020-app-signing.keychain-db
 
-          bash bash lib/cert/decrypt_secret.sh \
+          bash lib/cert/decrypt_secret.sh \
             ${AGORALAB2020_PP_PATH} \
             lib/cert/lab/AgoraLab2020.mobileprovision.gpg \
             ${AGORALAB2020_PP_GPG_PWD}
