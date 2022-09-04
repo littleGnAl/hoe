@@ -202,7 +202,7 @@ jobs:
 
           bash lib/cert/decrypt_secret.sh \
             ${AGORAQA2021_PP_PATH} \
-            lib/cert/lab/AgoraQA2021.mobileprovision.gpg \
+            lib/cert/qa/AgoraQA2021.mobileprovision.gpg \
             ${AGORAQA2021_PP_GPG_PWD}
 
           bash lib/cert/install_apple_certificate.sh \
@@ -219,7 +219,7 @@ jobs:
 
           bash lib/cert/decrypt_secret.sh \
             ${AGORATEST2020_PP_PATH} \
-            lib/cert/lab/AgoraTest2020.mobileprovision.gpg \
+            lib/cert/test/AgoraTest2020.mobileprovision.gpg \
             ${AGORATEST2020_PP_GPG_PWD}
 
           bash lib/cert/install_apple_certificate.sh \
