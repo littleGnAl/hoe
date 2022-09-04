@@ -711,7 +711,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         path.join(libPath, 'bash', 'zip-file.sh'),
         fileSystem.file(archiveDirPath).parent.absolute.path,
         outputZipPath,
-        'macos',
+        'macos/',
       ],
       workingDirectory: fileSystem.file(archiveDirPath).parent.absolute.path,
     );
