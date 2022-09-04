@@ -521,23 +521,23 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final archiveDirPath =
         _createArchiveOutputDir(_workspace.absolute.path, 'ios');
 
-    // final pListConfigTest =
-    //     PListConfig('${applePackageName}Test', 'AgoraTest2020');
-    // _buildIOSIpa(
-    //     examplePath,
-    //     flutterPackageName,
-    //     path.join(examplePath, 'ios', 'Runner.xcodeproj'),
-    //     pListConfigTest.applePackageName,
-    //     globalConfig.appleTeamIdTest,
-    //     pListConfigTest.profileName,
-    //     globalConfig.appleCodeSignIdentityTest,
-    //     false,
-    //     pListConfigTest,
-    //     {
-    //       'Runner': '${applePackageName}Test',
-    //       'ScreenSharing': '${applePackageName}Test.ScreenSharing',
-    //     },
-    //     archiveDirPath);
+    final pListConfigTest =
+        PListConfig('${applePackageName}Test', 'AgoraTest2020');
+    _buildIOSIpa(
+        examplePath,
+        flutterPackageName,
+        path.join(examplePath, 'ios', 'Runner.xcodeproj'),
+        pListConfigTest.applePackageName,
+        globalConfig.appleTeamIdTest,
+        pListConfigTest.profileName,
+        globalConfig.appleCodeSignIdentityTest,
+        false,
+        pListConfigTest,
+        {
+          'Runner': '${applePackageName}Test',
+          'ScreenSharing': '${applePackageName}Test.ScreenSharing',
+        },
+        archiveDirPath);
 
     final pListConfigLab =
         PListConfig('${applePackageName}Lab', 'AgoraLab2020');
@@ -557,22 +557,22 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         },
         archiveDirPath);
 
-    // final pListConfigQA = PListConfig('${applePackageName}QA', 'AgoraQA2021');
-    // _buildIOSIpa(
-    //     examplePath,
-    //     flutterPackageName,
-    //     path.join(examplePath, 'ios', 'Runner.xcodeproj'),
-    //     pListConfigQA.applePackageName,
-    //     globalConfig.appleTeamIdQa,
-    //     pListConfigQA.profileName,
-    //     globalConfig.appleCodeSignIdentityQa,
-    //     false,
-    //     pListConfigQA,
-    //     {
-    //       'Runner': '${applePackageName}QA',
-    //       'ScreenSharing': '${applePackageName}QA.ScreenSharing',
-    //     },
-    //     archiveDirPath);
+    final pListConfigQA = PListConfig('${applePackageName}QA', 'AgoraQA2021');
+    _buildIOSIpa(
+        examplePath,
+        flutterPackageName,
+        path.join(examplePath, 'ios', 'Runner.xcodeproj'),
+        pListConfigQA.applePackageName,
+        globalConfig.appleTeamIdQa,
+        pListConfigQA.profileName,
+        globalConfig.appleCodeSignIdentityQa,
+        false,
+        pListConfigQA,
+        {
+          'Runner': '${applePackageName}QA',
+          'ScreenSharing': '${applePackageName}QA.ScreenSharing',
+        },
+        archiveDirPath);
 
     final artifactsOutputDir = fileSystem.directory(artifactsOutputDirPath);
     if (!artifactsOutputDir.existsSync()) {
