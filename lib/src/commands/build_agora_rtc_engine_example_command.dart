@@ -714,6 +714,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           outputZipPath,
           'macos/',
         ],
+        runInShell: true,
         workingDirectory: fileSystem.file(archiveDirPath).parent.absolute.path,
       );
     } catch (e) {}
