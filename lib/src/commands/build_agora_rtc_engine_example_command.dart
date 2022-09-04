@@ -955,13 +955,14 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     required String p12Pwd,
     required String keychainPwd,
   }) {
-    final libPath = fileSystem
-        .file(Platform.script.toFilePath(windows: Platform.isWindows))
-        .parent
-        .parent
-        .parent
-        .absolute
-        .path;
+    final libPath = path.join(
+        fileSystem
+            .file(Platform.script.toFilePath(windows: Platform.isWindows))
+            .parent
+            .parent
+            .absolute
+            .path,
+        'lib');
     final certPath = path.join(libPath, 'cert');
 
     processManager.runSyncWithOutput([
