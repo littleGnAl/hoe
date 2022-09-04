@@ -521,6 +521,25 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final archiveDirPath =
         _createArchiveOutputDir(_workspace.absolute.path, 'ios');
 
+    _installAppleCertificate(
+        p12OutputPath: path.join(
+          globalConfig.githubActionRunnerTemp,
+          'agoratest2020.p12',
+        ),
+        provisionOutputPath: path.join(
+          globalConfig.githubActionRunnerTemp,
+          'agoratest2020_pp.mobileprovision',
+        ),
+        keychainOutputPath: path.join(
+          globalConfig.githubActionRunnerTemp,
+          'agoratest2020-app-signing.keychain-db',
+        ),
+        gpgProvisionName: 'AgoraTest2020.mobileprovision.gpg',
+        gpgProvisionPwd: globalConfig.agoratest2020PPGpgPwd,
+        p12Base64: globalConfig.agoratest2020P12Base64,
+        p12Pwd: globalConfig.agoratest2020P12Pwd,
+        keychainPwd: globalConfig.agoratest2020KeychainPassword);
+
     final pListConfigTest =
         PListConfig('${applePackageName}Test', 'AgoraTest2020');
     _buildIOSIpa(
@@ -539,6 +558,25 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         },
         archiveDirPath);
 
+    _installAppleCertificate(
+        p12OutputPath: path.join(
+          globalConfig.githubActionRunnerTemp,
+          'agoralab2020.p12',
+        ),
+        provisionOutputPath: path.join(
+          globalConfig.githubActionRunnerTemp,
+          'agoralab2020_pp.mobileprovision',
+        ),
+        keychainOutputPath: path.join(
+          globalConfig.githubActionRunnerTemp,
+          'agoralab2020-app-signing.keychain-db',
+        ),
+        gpgProvisionName: 'AgoraLab2020.mobileprovision.gpg',
+        gpgProvisionPwd: globalConfig.agoralab2020PPGpgPwd,
+        p12Base64: globalConfig.agoralab2020P12Base64,
+        p12Pwd: globalConfig.agoralab2020P12Pwd,
+        keychainPwd: globalConfig.agoralab2020KeychainPassword);
+
     final pListConfigLab =
         PListConfig('${applePackageName}Lab', 'AgoraLab2020');
     _buildIOSIpa(
@@ -556,6 +594,25 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           'ScreenSharing': '${applePackageName}Lab.ScreenSharing',
         },
         archiveDirPath);
+
+    _installAppleCertificate(
+        p12OutputPath: path.join(
+          globalConfig.githubActionRunnerTemp,
+          'agoraqa2021.p12',
+        ),
+        provisionOutputPath: path.join(
+          globalConfig.githubActionRunnerTemp,
+          'agoraqa2021_pp.mobileprovision',
+        ),
+        keychainOutputPath: path.join(
+          globalConfig.githubActionRunnerTemp,
+          'agoraqa2021-app-signing.keychain-db',
+        ),
+        gpgProvisionName: 'AgoraQA2021.mobileprovision.gpg',
+        gpgProvisionPwd: globalConfig.agoraqa2021PPGpgPwd,
+        p12Base64: globalConfig.agoraqa2021P12Base64,
+        p12Pwd: globalConfig.agoraqa2021P12Pwd,
+        keychainPwd: globalConfig.agoraqa2021KeychainPassword);
 
     final pListConfigQA = PListConfig('${applePackageName}QA', 'AgoraQA2021');
     _buildIOSIpa(
@@ -828,8 +885,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       extraArgs: ['--export-options-plist', plistFile.absolute.path],
     );
 
-    final iosArtifactPath =
-        path.join(workingDirectory, 'build', 'ios', 'ipa');
+    final iosArtifactPath = path.join(workingDirectory, 'build', 'ios', 'ipa');
 
     fileSystem.directory(path.join(outputPath, profileName)).createSync();
 
@@ -887,5 +943,60 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         workingDirectory: workingDirectory,
       );
     }
+  }
+
+  void _installAppleCertificate({
+    required String p12OutputPath,
+    required String provisionOutputPath,
+    required String keychainOutputPath,
+    required String gpgProvisionName,
+    required String gpgProvisionPwd,
+    required String p12Base64,
+    required String p12Pwd,
+    required String keychainPwd,
+  }) {
+    final libPath = fileSystem
+        .file(Platform.script.toFilePath(windows: Platform.isWindows))
+        .parent
+        .parent
+        .parent
+        .absolute
+        .path;
+    final certPath = path.join(libPath, 'cert');
+
+    processManager.runSyncWithOutput([
+      'bash',
+      path.join(certPath, 'decrypt_secret.sh'),
+      provisionOutputPath,
+      path.join(certPath, gpgProvisionName),
+      gpgProvisionPwd
+    ]);
+
+    processManager.runSyncWithOutput([
+      'bash',
+      p12Base64,
+      p12Pwd,
+      p12OutputPath,
+      provisionOutputPath,
+      keychainOutputPath,
+      keychainPwd,
+    ]);
+
+    //     AGORALAB2020_P12_PATH=$RUNNER_TEMP/agoralab2020.p12
+    // AGORALAB2020_PP_PATH=$RUNNER_TEMP/agoralab2020_pp.mobileprovision
+    // AGORALAB2020_KEYCHAIN_PATH=$RUNNER_TEMP/agoralab2020-app-signing.keychain-db
+
+    // bash lib/cert/decrypt_secret.sh \
+    //   ${AGORALAB2020_PP_PATH} \
+    //   lib/cert/lab/AgoraLab2020.mobileprovision.gpg \
+    //   ${AGORALAB2020_PP_GPG_PWD}
+
+    // bash lib/cert/install_apple_certificate.sh \
+    //   ${AGORALAB2020_P12_BASE64} \
+    //   ${AGORALAB2020_P12_PWD} \
+    //   ${AGORALAB2020_P12_PATH} \
+    //   ${AGORALAB2020_PP_PATH} \
+    //   ${AGORALAB2020_KEYCHAIN_PATH} \
+    //   ${AGORALAB2020_KEYCHAIN_PASSWORD}
   }
 }
