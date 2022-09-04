@@ -134,3 +134,68 @@ jobs:
         with:
           tag_name: agora_rtc_engine_example_${{ steps.date.outputs.date }}
           files: "output/*.zip"
+
+  build_ios:
+    name: Build ios
+    runs-on: macos-11
+    timeout-minutes: 60
+    env:
+      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check out build project
+        uses: actions/checkout@v3
+        with:
+          repository: AgoraIO/Agora-Flutter-SDK
+          ref: ${{ inputs.build_branch }}
+          path: Agora-Flutter-SDK
+
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.0.0'
+
+      - name: Install the Apple certificate and provisioning profile
+        env:
+          AGORALAB2020_P12_BASE64: ${{ secrets.AGORALAB2020_P12_BASE64 }}
+          AGORALAB2020_P12_PWD: ${{ secrets.AGORALAB2020_P12_PWD }}
+          AGORALAB2020_PP_GPG_PWD: ${{ secrets.AGORALAB2020_PP_GPG_PWD }}
+          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+          AGORALAB2020_KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # create variables
+          AGORALAB2020_P12_PATH=$RUNNER_TEMP/agoralab2020.p12
+          AGORALAB2020_PP_PATH=$RUNNER_TEMP/agoralab2020_pp.mobileprovision
+          AGORALAB2020_KEYCHAIN_PATH=$RUNNER_TEMP/agoralab2020-app-signing.keychain-db
+
+          bash bash lib/cert/decrypt_secret.sh \
+            ${AGORALAB2020_PP_PATH} \
+            lib/cert/lab/AgoraLab2020.mobileprovision.gpg \
+            ${AGORALAB2020_PP_GPG_PWD}
+
+
+          bash lib/cert/install_apple_certificate.sh \
+            ${AGORALAB2020_P12_BASE64} \
+            ${AGORALAB2020_P12_PWD} \
+            ${AGORALAB2020_P12_PATH} \
+            ${AGORALAB2020_PP_PATH} \
+            ${AGORALAB2020_KEYCHAIN_PATH} \
+            ${AGORALAB2020_KEYCHAIN_PASSWORD}
+
+      - name: Run build ios
+        run: |
+          dart pub get
+          dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=ios --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+      - name: Test with environment variables
+        run: echo $BUILD_NAME
+        env:
+          BUILD_NAME: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          files: "output/*.zip"
