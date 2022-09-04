@@ -40,3 +40,6 @@ security list-keychain -d user -s $KEYCHAIN_PATH
 # apply provisioning profile
 mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
 cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+
+UUID=`/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin <<< $(security cms -D -i $PP_PATH)`
+cp "${$PP_PATH}" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision"
