@@ -710,7 +710,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         'bash',
         path.join(libPath, 'bash', 'zip-file.sh'),
         fileSystem.file(archiveDirPath).parent.absolute.path,
-        outputZipPath,
+        path.join(fileSystem.file(archiveDirPath).parent.absolute.path, '123.zip'),
         'macos/',
       ],
       runInShell: true,
