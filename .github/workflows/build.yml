@@ -162,6 +162,12 @@ jobs:
           AGORALAB2020_PP_GPG_PWD: ${{ secrets.AGORALAB2020_PP_GPG_PWD }}
           BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
           AGORALAB2020_KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          TEAM_LAB: ${{ secrets.TEAM_LAB }}
+          TEAM_QA: ${{ secrets.TEAM_QA }}
+          TEAM_TEST: ${{ secrets.TEAM_TEST }}
+          CODE_SIGN_IDENTITY_LAB: ${{ secrets.CODE_SIGN_IDENTITY_LAB }}
+          CODE_SIGN_IDENTITY_QA: ${{ secrets.CODE_SIGN_IDENTITY_QA }}
+          CODE_SIGN_IDENTITY_TEST: ${{ secrets.CODE_SIGN_IDENTITY_TEST }}
         run: |
           # create variables
           AGORALAB2020_P12_PATH=$RUNNER_TEMP/agoralab2020.p12
