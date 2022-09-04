@@ -705,19 +705,17 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         'lib');
 
     // _zipDirs will cause the mac app not runnable after decompress, so use base `zip` command here
-    try {
-      processManager.runSyncWithOutput(
-        [
-          'bash',
-          path.join(libPath, 'bash', 'zip-file.sh'),
-          fileSystem.file(archiveDirPath).parent.absolute.path,
-          outputZipPath,
-          'macos/',
-        ],
-        runInShell: true,
-        workingDirectory: fileSystem.file(archiveDirPath).parent.absolute.path,
-      );
-    } catch (e) {}
+    processManager.runSyncWithOutput(
+      [
+        'bash',
+        path.join(libPath, 'bash', 'zip-file.sh'),
+        fileSystem.file(archiveDirPath).parent.absolute.path,
+        outputZipPath,
+        'macos/',
+      ],
+      runInShell: true,
+      workingDirectory: fileSystem.file(archiveDirPath).parent.absolute.path,
+    );
 
     stdout.writeln('Created $outputZipPath');
   }
