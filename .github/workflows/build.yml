@@ -51,7 +51,7 @@ jobs:
           IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
           echo ${IS_SETUP_LOCAL_DEV}
           EXTRA_ARGS=""
-          if [ ${{ github.event.inputs.setup-local-dev == 'true' }} ]; then
+          if ${IS_SETUP_LOCAL_DEV} ; then
             EXTRA_ARGS=" --setup-local-dev"
           fi
 
