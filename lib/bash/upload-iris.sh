@@ -43,8 +43,8 @@ bash $MY_PATH/upload-cocoapods.sh ${JENKINS_UPLOAD_POD_URL} $RELEASE_VERSION "${
 bash $MY_PATH/notify-wecom.sh ${WECOM_URL} "AgoraIrisRTC_iOS has been uploaded to cocoapods:\n'AgoraIrisRTC_iOS', '${RELEASE_VERSION}'"
 
 bash $MY_PATH/upload-manual-cdn-url.sh ${IRIS_MACOS_UPLOAD_CDN_URL}
-bash $MY_PATH/upload-cocoapods.sh ${JENKINS_UPLOAD_POD_URL} $RELEASE_VERSION "${SDK_CDN_BASE_URL}/${IRIS_MACOS_NAME}" "AgoraRtcEngine_macOS" 0 1
-bash $MY_PATH/notify-wecom.sh ${WECOM_URL} "AgoraRtcEngine_macOS has been uploaded to cocoapods:\n'AgoraRtcEngine_macOS', '${RELEASE_VERSION}'"
+bash $MY_PATH/upload-cocoapods.sh ${JENKINS_UPLOAD_POD_URL} $RELEASE_VERSION "${SDK_CDN_BASE_URL}/${IRIS_MACOS_NAME}" "AgoraIrisRtc_macOS" 0 1
+bash $MY_PATH/notify-wecom.sh ${WECOM_URL} "AgoraIrisRtc_macOS has been uploaded to cocoapods:\n'AgoraIrisRtc_macOS', '${RELEASE_VERSION}'"
 
 bash $MY_PATH/upload-manual-cdn-url.sh ${IRIS_WINDOWS_UPLOAD_CDN_URL}
 bash $MY_PATH/notify-wecom.sh ${WECOM_URL} "iris Rtc Windows has been uploaded to cdn:\n${SDK_CDN_BASE_URL}/${IRIS_WINDOWS_NAME}"

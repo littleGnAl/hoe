@@ -40,6 +40,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     argParser.addOption('platforms');
     argParser.addFlag('setup-local-dev');
     argParser.addOption('local-iris-path');
+    argParser.addOption('iris-macos-cdn-url');
     argParser.addOption('iris-windows-download-url');
     argParser.addFlag('process-build');
     argParser.addOption('apple-package-name');
@@ -63,6 +64,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final String platforms = argResults?['platforms'] ?? '';
     final bool isSetupDev = argResults?['setup-local-dev'] ?? false;
     final String localIrisPath = argResults?['local-iris-path'] ?? '';
+    final String irisMacosCDNUrl = argResults?['iris-macos-cdn-url'] ?? '';
     final String irisWindowsDownloadUrl =
         argResults?['iris-windows-download-url'] ?? '';
     final bool isProcessBuild = argResults?['process-build'] ?? false;
@@ -99,7 +101,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           break;
         case 'macos':
           if (isSetupDev) {
-            await _setupMacOSDev(localIrisPath);
+            await _setupMacOSDev(localIrisPath, irisMacosCDNUrl);
           }
 
           if (isProcessBuild) {
@@ -204,41 +206,72 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         path.join(_workspace.absolute.path, 'integration_test_app', 'ios'));
   }
 
-  Future<void> _setupMacOSDev(String localIrisPath) async {
-    final iosModulePath = path.join(_workspace.absolute.path, 'macos');
-    final iosModuleDir = fileSystem.directory(iosModulePath);
+  Future<void> _setupMacOSDev(
+    String localIrisPath,
+    String irisMacosCDNUrl,
+  ) async {
+    final macosModulePath = path.join(_workspace.absolute.path, 'macos');
+    final macosModuleDir = fileSystem.directory(macosModulePath);
 
-    final irisFrameworkPath =
-        path.join(iosModulePath, 'AgoraRtcWrapper.framework');
-    final irisFramework = fileSystem.directory(irisFrameworkPath);
-    if (!irisFramework.existsSync()) {
-      processManager.runSyncWithOutput(
-        ['bash', 'scripts/build-iris-macos.sh', 'Release', localIrisPath],
-        runInShell: true,
-        workingDirectory: _workspace.absolute.path,
-      );
+    if (localIrisPath.isNotEmpty) {
+      final irisFrameworkPath =
+          path.join(macosModulePath, 'AgoraRtcWrapper.framework');
+      final irisFramework = fileSystem.directory(irisFrameworkPath);
+      if (!irisFramework.existsSync()) {
+        processManager.runSyncWithOutput(
+          ['bash', 'scripts/build-iris-macos.sh', 'Release', localIrisPath],
+          runInShell: true,
+          workingDirectory: _workspace.absolute.path,
+        );
+      }
     }
 
+    if (irisMacosCDNUrl.isNotEmpty) {
+      final unzipFilePath =
+          await _downloadAndUnzip(irisMacosCDNUrl, macosModulePath, true);
+      // /Users/fenglang/codes/aw/Agora-Flutter-SDK/macos/libs
+      _copyDirectory(
+          fileSystem.directory(path.join(
+            unzipFilePath,
+            'DCG',
+            'Agora_Native_SDK_for_Mac_FULL',
+            'libs',
+          )),
+          fileSystem.directory(path.join(macosModulePath, 'libs')));
+// AgoraRtcWrapper.framework
+      _copyDirectory(
+          fileSystem.directory(path.join(
+            unzipFilePath,
+            'MAC',
+            'Release',
+            'AgoraRtcWrapper.framework',
+          )),
+          fileSystem.directory(
+              path.join(macosModulePath, 'AgoraRtcWrapper.framework')));
+    }
+
+    fileSystem.file(path.join(macosModulePath, '.plugin_dev')).createSync();
+
     final podspecFilePath =
-        path.join(iosModulePath, 'agora_rtc_engine.podspec');
-    _createAgoraRtcWrapperPodSpecFile(iosModuleDir);
+        path.join(macosModulePath, 'agora_rtc_engine.podspec');
+    _createAgoraRtcWrapperPodSpecFile(macosModuleDir);
     _modifyPodSpecFile(podspecFilePath, true);
-    _modifyPodFile(
-      path.join(_workspace.absolute.path, 'example', 'macos', 'Podfile'),
-      true,
-    );
-    _modifyPodFile(
-      path.join(
-          _workspace.absolute.path, 'integration_test_app', 'macos', 'Podfile'),
-      true,
-    );
+    // _modifyPodFile(
+    //   path.join(_workspace.absolute.path, 'example', 'macos', 'Podfile'),
+    //   true,
+    // );
+    // _modifyPodFile(
+    //   path.join(
+    //       _workspace.absolute.path, 'integration_test_app', 'macos', 'Podfile'),
+    //   true,
+    // );
 
     _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
     _runPodInstall(path.join(_workspace.absolute.path, 'example', 'macos'));
-    _runFlutterPackagesGet(
-        path.join(_workspace.absolute.path, 'integration_test_app'));
-    _runPodInstall(
-        path.join(_workspace.absolute.path, 'integration_test_app', 'macos'));
+    // _runFlutterPackagesGet(
+    //     path.join(_workspace.absolute.path, 'integration_test_app'));
+    // _runPodInstall(
+    //     path.join(_workspace.absolute.path, 'integration_test_app', 'macos'));
   }
 
   Future<void> _setupWindowsDev(
@@ -721,8 +754,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         .file(outputZipPath)
         .copySync(path.join(artifactsOutputDirPath, zipFileBaseName));
 
-    stdout
-        .writeln('Created ${path.join(artifactsOutputDirPath, zipFileBaseName)}');
+    stdout.writeln(
+        'Created ${path.join(artifactsOutputDirPath, zipFileBaseName)}');
   }
 
   Future<void> _processBuildWindows(
@@ -802,6 +835,73 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     encoder.close();
 
     // return outputZipPath;
+  }
+
+  Future<void> _unzip(String zipFilePath, String outputPath) async {
+    // Use an InputFileStream to access the zip file without storing it in memory.
+    final inputStream = InputFileStream(zipFilePath);
+// Decode the zip from the InputFileStream. The archive will have the contents of the
+// zip, without having stored the data in memory.
+    final archive = ZipDecoder().decodeBuffer(inputStream);
+    extractArchiveToDisk(archive, outputPath);
+    inputStream.close();
+  }
+
+  void _unzipSymlinks(String zipFilePath, String outputPath) {
+    // unzip iris_artifact/iris_artifact.zip -d iris_artifact
+    processManager.runSyncWithOutput([
+      'unzip',
+      zipFilePath,
+      '-d',
+      outputPath,
+    ]);
+
+    // Use an InputFileStream to access the zip file without storing it in memory.
+//     final inputStream = InputFileStream(zipFilePath);
+// // Decode the zip from the InputFileStream. The archive will have the contents of the
+// // zip, without having stored the data in memory.
+//     final archive = ZipDecoder().decodeBuffer(inputStream);
+//     extractArchiveToDisk(archive, outputPath);
+//     inputStream.close();
+  }
+
+  Future<String> _downloadAndUnzip(
+      String zipFileUrl, String unzipOutputPath, bool isUnzipSymlinks) async {
+    final zipDownloadPath = path.join(unzipOutputPath, 'zip_download_path');
+    final zipDownloadDir = fileSystem.directory(zipDownloadPath);
+    zipDownloadDir.createSync();
+
+    final zipFileBaseName = Uri.parse(zipFileUrl).pathSegments.last;
+
+    final fileDownloader = DefaultFileDownloader();
+    await fileDownloader.downloadFile(
+      zipFileUrl,
+      path.join(zipDownloadPath, zipFileBaseName),
+    );
+
+    if (isUnzipSymlinks) {
+      _unzipSymlinks(
+          path.join(zipDownloadPath, zipFileBaseName), zipDownloadPath);
+    } else {
+      _unzip(path.join(zipDownloadPath, zipFileBaseName), zipDownloadPath);
+    }
+
+    // fileSystem.file(path.join(zipDownloadPath, zipFileBaseName)).deleteSync();
+
+    // iris_4.0.0_DCG_Mac_20220905_1020
+
+    final unzipFilePath = zipDownloadDir
+        .listSync()
+        .firstWhere((element) => !element.absolute.path.endsWith('.zip'))
+        .absolute
+        .path;
+
+    // _copyDirectory(fileSystem.directory(unzipFilePath),
+    //     fileSystem.directory(unzipOutputPath));
+
+    // fileSystem.directory(zipDownloadPath).deleteSync(recursive: true);
+
+    return unzipFilePath;
   }
 
   void _runFlutterPackagesGet(String packagePath) {
