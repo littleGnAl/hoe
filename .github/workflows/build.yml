@@ -49,14 +49,18 @@ jobs:
       - name: Run build android
         run: |
           IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
-          echo ${IS_SETUP_LOCAL_DEV}
+          echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
           EXTRA_ARGS=""
           if ${IS_SETUP_LOCAL_DEV} ; then
             EXTRA_ARGS=" --setup-local-dev"
           fi
 
-          EXTRA_ARGS="${EXTRA_ARGS} --iris-android-cdn-url=${{ github.event.inputs.iris-android-cdn-url }}"
-          echo ${EXTRA_ARGS}
+          IRIS_ANDROID_CDN_URL=${{ github.event.inputs.iris-android-cdn-url }}
+          if [ ! -z "${IRIS_ANDROID_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-android-cdn-url=${IRIS_ANDROID_CDN_URL}"
+          fi
+
+          echo "Extra args: ${EXTRA_ARGS}"
 
           mkdir -p output
           dart pub get
