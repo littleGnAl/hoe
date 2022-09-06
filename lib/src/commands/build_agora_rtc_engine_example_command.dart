@@ -172,7 +172,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
     if (irisAndroidCDNUrl.isNotEmpty) {
       final unzipFilePath =
-          await _downloadAndUnzip(irisAndroidCDNUrl, androidModulePath, true);
+          await _downloadAndUnzip(irisAndroidCDNUrl, androidModulePath, false);
 
 // DCG/Agora_Native_SDK_for_Android_FULL/rtc/sdk
       _copyDirectory(
