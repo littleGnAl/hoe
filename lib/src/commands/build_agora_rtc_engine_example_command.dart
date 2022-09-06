@@ -432,13 +432,19 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final podspecFile = fileSystem.file(podspecFilePath);
     final lines = podspecFile.readAsLinesSync();
     final newOutput = StringBuffer();
+    bool meetAgoraDependency = false;
     for (final line in lines) {
       final trimLine = line.trim();
 
       if (forDev) {
-        if (trimLine.startsWith('s.dependency \'AgoraIrisRTC')) {
+        if (trimLine.startsWith('s.dependency \'Agora')) {
+          if (!meetAgoraDependency) {
+            newOutput.writeln('  s.dependency \'AgoraRtcWrapper\'');
+          }
+
+          meetAgoraDependency = true;
           newOutput.writeln('  # $line');
-          newOutput.writeln('  s.dependency \'AgoraRtcWrapper\'');
+
           continue;
         }
       } else {
