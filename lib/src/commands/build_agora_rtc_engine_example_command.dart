@@ -40,6 +40,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     argParser.addOption('platforms');
     argParser.addFlag('setup-local-dev');
     argParser.addOption('local-iris-path');
+    argParser.addOption('iris-android-cdn-url');
     argParser.addOption('iris-macos-cdn-url');
     argParser.addOption('iris-windows-download-url');
     argParser.addFlag('process-build');
@@ -64,6 +65,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final String platforms = argResults?['platforms'] ?? '';
     final bool isSetupDev = argResults?['setup-local-dev'] ?? false;
     final String localIrisPath = argResults?['local-iris-path'] ?? '';
+    final String irisAndroidCDNUrl = argResults?['iris-android-cdn-url'] ?? '';
     final String irisMacosCDNUrl = argResults?['iris-macos-cdn-url'] ?? '';
     final String irisWindowsDownloadUrl =
         argResults?['iris-windows-download-url'] ?? '';
@@ -111,7 +113,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           break;
         case 'android':
           if (isSetupDev) {
-            await _setupAndroidDev(localIrisPath);
+            await _setupAndroidDev(localIrisPath, irisAndroidCDNUrl);
           }
 
           if (isProcessBuild) {
@@ -140,9 +142,9 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     // }
   }
 
-  Future<void> _setupAndroidDev(String localIrisPath) async {
-    final androidModulePath =
-        path.join(fileSystem.currentDirectory.absolute.path, 'android');
+  Future<void> _setupAndroidDev(
+      String localIrisPath, String irisAndroidCDNUrl) async {
+    final androidModulePath = path.join(_workspace.absolute.path, 'android');
     final devFilePath = path.join(androidModulePath, '.plugin_dev');
     final devFile = fileSystem.file(devFilePath);
     if (!devFile.existsSync()) {
@@ -154,14 +156,44 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     if (!irisLibsDir.existsSync()) {
       irisLibsDir.createSync();
     }
-    final agoraWrapperJarPath = path.join(irisLibsPath, 'AgoraRtcWrapper.jar');
-    final agoraWrapperJar = fileSystem.file(agoraWrapperJarPath);
-    if (!agoraWrapperJar.existsSync()) {
-      processManager.runSyncWithOutput(
-        ['bash', 'scripts/build-iris-android.sh', localIrisPath, 'Debug'],
-        runInShell: true,
-        workingDirectory: _workspace.absolute.path,
-      );
+
+    if (localIrisPath.isNotEmpty) {
+      final agoraWrapperJarPath =
+          path.join(irisLibsPath, 'AgoraRtcWrapper.jar');
+      final agoraWrapperJar = fileSystem.file(agoraWrapperJarPath);
+      if (!agoraWrapperJar.existsSync()) {
+        processManager.runSyncWithOutput(
+          ['bash', 'scripts/build-iris-android.sh', localIrisPath, 'Debug'],
+          runInShell: true,
+          workingDirectory: _workspace.absolute.path,
+        );
+      }
+    }
+
+    if (irisAndroidCDNUrl.isNotEmpty) {
+      final unzipFilePath =
+          await _downloadAndUnzip(irisAndroidCDNUrl, androidModulePath, true);
+
+// DCG/Agora_Native_SDK_for_Android_FULL/rtc/sdk
+      _copyDirectory(
+          fileSystem.directory(path.join(unzipFilePath, 'DCG',
+              'Agora_Native_SDK_for_Android_FULL', 'rtc', 'sdk')),
+          fileSystem.directory(path.join(androidModulePath, 'libs')));
+
+      fileSystem
+          .file(path.join(unzipFilePath, 'ALL_ARCHITECTURE', 'Release',
+              'AgoraRtcWrapper.jar'))
+          .copySync(
+              path.join(androidModulePath, 'libs', 'AgoraRtcWrapper.jar'));
+
+      final abis = ['arm64-v8a', 'armeabi-v7a', 'x86_64'];
+      for (final abi in abis) {
+        fileSystem
+            .file(path.join(unzipFilePath, 'ALL_ARCHITECTURE', 'Release', abi,
+                'libAgoraRtcWrapper.so'))
+            .copySync(path.join(
+                androidModulePath, 'libs', abi, 'libAgoraRtcWrapper.so'));
+      }
     }
   }
 
@@ -229,25 +261,29 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     if (irisMacosCDNUrl.isNotEmpty) {
       final unzipFilePath =
           await _downloadAndUnzip(irisMacosCDNUrl, macosModulePath, true);
-      // /Users/fenglang/codes/aw/Agora-Flutter-SDK/macos/libs
-      _copyDirectory(
-          fileSystem.directory(path.join(
-            unzipFilePath,
-            'DCG',
-            'Agora_Native_SDK_for_Mac_FULL',
-            'libs',
-          )),
-          fileSystem.directory(path.join(macosModulePath, 'libs')));
-// AgoraRtcWrapper.framework
-      _copyDirectory(
-          fileSystem.directory(path.join(
-            unzipFilePath,
-            'MAC',
-            'Release',
-            'AgoraRtcWrapper.framework',
-          )),
-          fileSystem.directory(
-              path.join(macosModulePath, 'AgoraRtcWrapper.framework')));
+
+      processManager.runSyncWithOutput([
+        'cp',
+        '-RP',
+        path.join(
+          unzipFilePath,
+          'DCG',
+          'Agora_Native_SDK_for_Mac_FULL',
+          'libs/',
+        ),
+        path.join(macosModulePath, 'libs')
+      ]);
+      processManager.runSyncWithOutput([
+        'cp',
+        '-RP',
+        path.join(
+          unzipFilePath,
+          'MAC',
+          'Release',
+          'AgoraRtcWrapper.framework',
+        ),
+        macosModulePath
+      ]);
     }
 
     fileSystem.file(path.join(macosModulePath, '.plugin_dev')).createSync();
@@ -256,22 +292,9 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         path.join(macosModulePath, 'agora_rtc_engine.podspec');
     _createAgoraRtcWrapperPodSpecFile(macosModuleDir);
     _modifyPodSpecFile(podspecFilePath, true);
-    // _modifyPodFile(
-    //   path.join(_workspace.absolute.path, 'example', 'macos', 'Podfile'),
-    //   true,
-    // );
-    // _modifyPodFile(
-    //   path.join(
-    //       _workspace.absolute.path, 'integration_test_app', 'macos', 'Podfile'),
-    //   true,
-    // );
 
     _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
     _runPodInstall(path.join(_workspace.absolute.path, 'example', 'macos'));
-    // _runFlutterPackagesGet(
-    //     path.join(_workspace.absolute.path, 'integration_test_app'));
-    // _runPodInstall(
-    //     path.join(_workspace.absolute.path, 'integration_test_app', 'macos'));
   }
 
   Future<void> _setupWindowsDev(
@@ -850,9 +873,10 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
   void _unzipSymlinks(String zipFilePath, String outputPath) {
     // unzip iris_artifact/iris_artifact.zip -d iris_artifact
     processManager.runSyncWithOutput([
-      'unzip',
+      'ditto',
+      '-x',
+      '-k',
       zipFilePath,
-      '-d',
       outputPath,
     ]);
 

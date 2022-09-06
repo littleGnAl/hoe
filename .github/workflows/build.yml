@@ -9,9 +9,17 @@ on:
         required: true
         default: 'main'
 
-      iris_windows_url:
-        description: Iris windows url 
-        required: true
+      setup-local-dev:
+        type: boolean
+        description: Is setup local dev
+
+      iris-macos-cdn-url:
+        description: iris macos cdn url
+        type: string
+
+      iris-android-cdn-url:
+        description: iris android cdn url
+        type: string
 
 jobs:
   build_android:
@@ -39,11 +47,22 @@ jobs:
 
       - name: Run build android
         run: |
-          ls
-          pwd
+          EXTRA_ARGS=""
+          if [ ${{ github.event.inputs.setup-local-dev == 'true' }} ]; then
+            EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          EXTRA_ARGS="${EXTRA_ARGS} --iris-android-cdn-url=${{ github.event.inputs.iris-android-cdn-url }}"
+
           mkdir -p output
           dart pub get
-          dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=android --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
+          dart run bin/hoe.dart build-agora-flutter-example \
+            --project-dir=Agora-Flutter-SDK \
+            --artifacts-output-dir=output \
+            --platforms=android --process-build \
+            --apple-package-name=io.agora.agoraRtcEngineExample \
+            --flutter-package-name=agora_rtc_engine \
+            ${EXTRA_ARGS}
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
