@@ -48,6 +48,8 @@ jobs:
 
       - name: Run build android
         run: |
+          IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
+          echo ${IS_SETUP_LOCAL_DEV}
           EXTRA_ARGS=""
           if [ ${{ github.event.inputs.setup-local-dev == 'true' }} ]; then
             EXTRA_ARGS=" --setup-local-dev"
