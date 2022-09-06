@@ -18,6 +18,10 @@ on:
         description: iris macos cdn url
         type: string
 
+      iris-ios-cdn-url:
+        description: iris ios cdn url
+        type: string
+
       iris-android-cdn-url:
         description: iris android cdn url
         type: string
@@ -107,8 +111,29 @@ jobs:
 
       - name: Run build macos
         run: |
+          IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
+          echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
+          EXTRA_ARGS=""
+          if ${IS_SETUP_LOCAL_DEV} ; then
+            EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          IRIS_MACOS_CDN_URL=${{ github.event.inputs.iris-macos-cdn-url }}
+          if [ ! -z "${IRIS_MACOS_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-macos-cdn-url=${IRIS_MACOS_CDN_URL}"
+          fi
+
+          echo "Extra args: ${EXTRA_ARGS}"
+
           dart pub get
-          dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=macos --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
+          dart run bin/hoe.dart build-agora-flutter-example \
+            --project-dir=Agora-Flutter-SDK \
+            --artifacts-output-dir=output \
+            --platforms=macos \
+            --process-build \
+            --apple-package-name=io.agora.agoraRtcEngineExample \
+            --flutter-package-name=agora_rtc_engine \
+            ${EXTRA_ARGS}
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
@@ -204,8 +229,29 @@ jobs:
 
       - name: Run build ios
         run: |
+          IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
+          echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
+          EXTRA_ARGS=""
+          if ${IS_SETUP_LOCAL_DEV} ; then
+            EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          IRIS_IOS_CDN_URL=${{ github.event.inputs.iris-ios-cdn-url }}
+          if [ ! -z "${IRIS_IOS_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-ios-cdn-url=${IRIS_IOS_CDN_URL}"
+          fi
+
+          echo "Extra args: ${EXTRA_ARGS}"
+
           dart pub get
-          dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=ios --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
+          dart run bin/hoe.dart build-agora-flutter-example \
+            --project-dir=Agora-Flutter-SDK \
+            --artifacts-output-dir=output \
+            --platforms=ios \
+            --process-build \
+            --apple-package-name=io.agora.agoraRtcEngineExample \
+            --flutter-package-name=agora_rtc_engine \
+            ${EXTRA_ARGS}
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"

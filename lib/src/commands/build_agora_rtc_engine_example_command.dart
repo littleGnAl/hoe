@@ -42,6 +42,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     argParser.addOption('local-iris-path');
     argParser.addOption('iris-android-cdn-url');
     argParser.addOption('iris-macos-cdn-url');
+    argParser.addOption('iris-ios-cdn-url');
     argParser.addOption('iris-windows-download-url');
     argParser.addFlag('process-build');
     argParser.addOption('apple-package-name');
@@ -67,6 +68,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final String localIrisPath = argResults?['local-iris-path'] ?? '';
     final String irisAndroidCDNUrl = argResults?['iris-android-cdn-url'] ?? '';
     final String irisMacosCDNUrl = argResults?['iris-macos-cdn-url'] ?? '';
+    final String irisIOSCDNUrl = argResults?['iris-ios-cdn-url'] ?? '';
     final String irisWindowsDownloadUrl =
         argResults?['iris-windows-download-url'] ?? '';
     final bool isProcessBuild = argResults?['process-build'] ?? false;
@@ -93,7 +95,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       switch (platform) {
         case 'ios':
           if (isSetupDev) {
-            await _setupIOSDev(flutterPackageName, localIrisPath);
+            await _setupIOSDev(
+                flutterPackageName, localIrisPath, irisIOSCDNUrl);
           }
 
           if (isProcessBuild) {
@@ -197,45 +200,88 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     }
   }
 
-  Future<void> _setupIOSDev(
-      String flutterPackageName, String localIrisPath) async {
+  Future<void> _setupIOSDev(String flutterPackageName, String localIrisPath,
+      String irisIOSCDNUrl) async {
     final iosModulePath = path.join(_workspace.absolute.path, 'ios');
     final iosModuleDir = fileSystem.directory(iosModulePath);
 
-    final irisFrameworkPath =
-        path.join(iosModulePath, 'AgoraRtcWrapper.xcframework');
-    final irisFramework = fileSystem.directory(irisFrameworkPath);
-    if (!irisFramework.existsSync()) {
-      stdout.writeln('irisFrameworkPath not exist: $irisFrameworkPath');
-      processManager.runSyncWithOutput(
-        ['bash', 'scripts/build-iris-ios.sh', 'Release', localIrisPath],
-        runInShell: true,
-        workingDirectory: _workspace.absolute.path,
-      );
+    if (localIrisPath.isNotEmpty) {
+      final irisFrameworkPath =
+          path.join(iosModulePath, 'AgoraRtcWrapper.xcframework');
+      final irisFramework = fileSystem.directory(irisFrameworkPath);
+      if (!irisFramework.existsSync()) {
+        stdout.writeln('irisFrameworkPath not exist: $irisFrameworkPath');
+        processManager.runSyncWithOutput(
+          ['bash', 'scripts/build-iris-ios.sh', 'Release', localIrisPath],
+          runInShell: true,
+          workingDirectory: _workspace.absolute.path,
+        );
 
-      stdout.writeln('startWithOutput done');
+        stdout.writeln('startWithOutput done');
+      }
     }
+
+    if (irisIOSCDNUrl.isNotEmpty) {
+      final unzipFilePath =
+          await _downloadAndUnzip(irisIOSCDNUrl, iosModulePath, true);
+
+      fileSystem
+          .directory(path.join(
+            unzipFilePath,
+            'DCG',
+            'Agora_Native_SDK_for_iOS_FULL',
+            'libs',
+            'ALL_ARCHITECTURE',
+          ))
+          .deleteSync(recursive: true);
+
+      processManager.runSyncWithOutput([
+        'cp',
+        '-RP',
+        path.join(
+          unzipFilePath,
+          'DCG',
+          'Agora_Native_SDK_for_iOS_FULL',
+          'libs/',
+        ),
+        path.join(iosModulePath, 'libs')
+      ]);
+
+      processManager.runSyncWithOutput([
+        'cp',
+        '-RP',
+        path.join(
+          unzipFilePath,
+          'ALL_ARCHITECTURE',
+          'Release',
+          'AgoraRtcWrapper.xcframework',
+        ),
+        iosModulePath
+      ]);
+    }
+
+    fileSystem.file(path.join(iosModulePath, '.plugin_dev')).createSync();
 
     final podspecFilePath =
         path.join(iosModulePath, '$flutterPackageName.podspec');
     _createAgoraRtcWrapperPodSpecFile(iosModuleDir, isXCFramework: true);
     _modifyPodSpecFile(podspecFilePath, true);
-    _modifyPodFile(
-      path.join(_workspace.absolute.path, 'example', 'ios', 'Podfile'),
-      true,
-    );
-    _modifyPodFile(
-      path.join(
-          _workspace.absolute.path, 'integration_test_app', 'ios', 'Podfile'),
-      true,
-    );
+    // _modifyPodFile(
+    //   path.join(_workspace.absolute.path, 'example', 'ios', 'Podfile'),
+    //   true,
+    // );
+    // _modifyPodFile(
+    //   path.join(
+    //       _workspace.absolute.path, 'integration_test_app', 'ios', 'Podfile'),
+    //   true,
+    // );
 
     _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
     _runPodInstall(path.join(_workspace.absolute.path, 'example', 'ios'));
-    _runFlutterPackagesGet(
-        path.join(_workspace.absolute.path, 'integration_test_app'));
-    _runPodInstall(
-        path.join(_workspace.absolute.path, 'integration_test_app', 'ios'));
+    // _runFlutterPackagesGet(
+    //     path.join(_workspace.absolute.path, 'integration_test_app'));
+    // _runPodInstall(
+    //     path.join(_workspace.absolute.path, 'integration_test_app', 'ios'));
   }
 
   Future<void> _setupMacOSDev(
