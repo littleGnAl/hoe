@@ -577,12 +577,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final archiveDirPath =
         _createArchiveOutputDir(_workspace.absolute.path, 'ios');
 
-    processManager.runSyncWithOutput(['pod', 'repo', 'update'],
-        workingDirectory: path.join(
-          _workspace.absolute.path,
-          'example',
-          'ios',
-        ));
+    processManager.runSyncWithOutput(['pod', 'repo', 'update']);
 
     _installAppleCertificate(
         p12OutputPath: path.join(
@@ -718,12 +713,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final archiveDirPath =
         _createArchiveOutputDir(_workspace.absolute.path, 'macos');
 
-    processManager.runSyncWithOutput(['pod', 'repo', 'update'],
-        workingDirectory: path.join(
-          _workspace.absolute.path,
-          'example',
-          'macos',
-        ));
+    processManager.runSyncWithOutput(['pod', 'repo', 'update']);
 
     _flutterBuild(path.join(_workspace.absolute.path, 'example'), 'macos');
 
