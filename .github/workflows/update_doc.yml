@@ -16,25 +16,25 @@ on:
         default: 'main'
 
       config:
-        description: iris macos cdn url
+        description: The language config
         type: string
         required: true
         default: 'fmt_config/fmt_dart.yaml'
 
       language:
-        description: iris ios cdn url
+        description: The language
         type: string
         required: true
         default: 'dart'
 
       template-url:
-        description: iris android cdn url
+        description: The template url
         type: string
         required: true
         default: 'https://github.com/AgoraIO/agora_doc_source/releases/download/main/flutter_ng_json_template_cn.json'
 
       export-file-path:
-        description: iris android cdn url
+        description: The export file path
         type: string
         required: true
         default: 'https://github.com/AgoraIO/agora_doc_source/releases/download/main/flutter_ng_json_template_cn.json'
@@ -67,7 +67,7 @@ jobs:
           python3 -m pip install -r requirements.txt
 
           python3 iris-doc/iris_doc.py \
-                  --config=${{ inputs.config }} \
+                  --config=${{ inputs.target_repo }}/${{ inputs.config }} \
                   --language=${{ inputs.language }} \
                   --template-url=${{ inputs.template-url }} \
                   --export-file-path=${{ inputs.target_repo }}/${{ inputs.export-file-path }}
