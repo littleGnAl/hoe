@@ -99,6 +99,4 @@ jobs:
           base: ${{ inputs.target_branch }}
           delete-branch: true
           title: '[TEST] Update doc'
-          body: |
-            Update doc
           draft: false
