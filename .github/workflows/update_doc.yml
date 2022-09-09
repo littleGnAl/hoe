@@ -7,7 +7,7 @@ on:
         description: pull request target branch
         type: string
         required: true
-        default: 'AgoraIO/Agora-Flutter-SDK'
+        default: 'AgoraIO-Extensions/Agora-Flutter-SDK'
 
       target_branch:
         description: pull request target branch
