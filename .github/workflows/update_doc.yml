@@ -55,7 +55,7 @@ jobs:
       - name: Check out build project
         uses: actions/checkout@v3
         with:
-          # token: ${{ secrets.ACTION_PAT }}
+          token: ${{ secrets.ACTION_PAT }}
           repository: ${{ inputs.target_repo }}
           ref: ${{ inputs.target_branch }}
           path: ${{ inputs.target_repo }}
