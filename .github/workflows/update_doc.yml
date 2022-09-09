@@ -62,12 +62,12 @@ jobs:
       - name: Run build macos
         run: |
           TARGET_REPO=${{ inputs.target_repo }}
-          cd ${TARGET_REPO}
+          cd iris-doc
 
           python3 -m pip install -r requirements.txt
 
-          python3 iris-doc/iris_doc.py \
-                  --config=${{ inputs.target_repo }}/${{ inputs.config }} \
+          python3 iris_doc.py \
+                  --config=${{ inputs.config }} \
                   --language=${{ inputs.language }} \
                   --template-url=${{ inputs.template-url }} \
                   --export-file-path=${{ inputs.target_repo }}/${{ inputs.export-file-path }}
