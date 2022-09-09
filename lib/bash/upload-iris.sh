@@ -18,6 +18,7 @@ IRIS_IOS_URL=$2
 IRIS_MACOS_URL=$3
 IRIS_WINDOWS_URL=$4
 RELEASE_VERSION=$5
+IS_IRIS_NATIVE_NEEDED=$6 # 0 or 1
 
 IRIS_ANDROID_UPLOAD_CDN_URL="${IRIS_ANDROID_URL/-api.bj2/}"
 IRIS_IOS_UPLOAD_CDN_URL="${IRIS_IOS_URL/-api.bj2/}"
@@ -35,15 +36,15 @@ JENKINS_UPLOAD_MAVEN_URL=${JENKINS_JOB_IRIS_UPLOAD_MAVEN_URL}
 JENKINS_UPLOAD_POD_URL=${JENKINS_JOB_IRIS_UPLOAD_POD_URL}
 
 bash $MY_PATH/upload-manual-cdn-url.sh ${IRIS_ANDROID_UPLOAD_CDN_URL}
-bash $MY_PATH/upload-maven.sh ${JENKINS_UPLOAD_MAVEN_URL} $RELEASE_VERSION "${SDK_CDN_BASE_URL}/${IRIS_ANDROID_NAME}" "all.so" "iris-rtc" 1
+bash $MY_PATH/upload-maven.sh ${JENKINS_UPLOAD_MAVEN_URL} $RELEASE_VERSION "${SDK_CDN_BASE_URL}/${IRIS_ANDROID_NAME}" "all.so" "iris-rtc" ${IS_IRIS_NATIVE_NEEDED}
 bash $MY_PATH/notify-wecom.sh ${WECOM_URL} "iris-rtc has been uploaded to maven:\nimplementation 'io.agora.rtc:iris-rtc:${RELEASE_VERSION}'"
 
 bash $MY_PATH/upload-manual-cdn-url.sh ${IRIS_IOS_UPLOAD_CDN_URL}
-bash $MY_PATH/upload-cocoapods.sh ${JENKINS_UPLOAD_POD_URL} $RELEASE_VERSION "${SDK_CDN_BASE_URL}/${IRIS_IOS_NAME}" "AgoraIrisRTC_iOS" 1 1
+bash $MY_PATH/upload-cocoapods.sh ${JENKINS_UPLOAD_POD_URL} $RELEASE_VERSION "${SDK_CDN_BASE_URL}/${IRIS_IOS_NAME}" "AgoraIrisRTC_iOS" 1 ${IS_IRIS_NATIVE_NEEDED}
 bash $MY_PATH/notify-wecom.sh ${WECOM_URL} "AgoraIrisRTC_iOS has been uploaded to cocoapods:\n'AgoraIrisRTC_iOS', '${RELEASE_VERSION}'"
 
 bash $MY_PATH/upload-manual-cdn-url.sh ${IRIS_MACOS_UPLOAD_CDN_URL}
-bash $MY_PATH/upload-cocoapods.sh ${JENKINS_UPLOAD_POD_URL} $RELEASE_VERSION "${SDK_CDN_BASE_URL}/${IRIS_MACOS_NAME}" "AgoraIrisRtc_macOS" 0 1
+bash $MY_PATH/upload-cocoapods.sh ${JENKINS_UPLOAD_POD_URL} $RELEASE_VERSION "${SDK_CDN_BASE_URL}/${IRIS_MACOS_NAME}" "AgoraIrisRtc_macOS" 0 ${IS_IRIS_NATIVE_NEEDED}
 bash $MY_PATH/notify-wecom.sh ${WECOM_URL} "AgoraIrisRtc_macOS has been uploaded to cocoapods:\n'AgoraIrisRtc_macOS', '${RELEASE_VERSION}'"
 
 bash $MY_PATH/upload-manual-cdn-url.sh ${IRIS_WINDOWS_UPLOAD_CDN_URL}

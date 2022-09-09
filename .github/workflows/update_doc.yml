@@ -1,0 +1,92 @@
+name: Build flutter project example
+
+on: 
+  workflow_dispatch:
+    inputs:
+      target_repo:
+        description: pull request target branch
+        type: string
+        required: true
+        default: 'AgoraIO/Agora-Flutter-SDK'
+
+      target_branch:
+        description: pull request target branch
+        type: string
+        required: true
+        default: 'main'
+
+      config:
+        description: iris macos cdn url
+        type: string
+        required: true
+        default: 'fmt_config/fmt_dart.yaml'
+
+      language:
+        description: iris ios cdn url
+        type: string
+        required: true
+        default: 'dart'
+
+      template-url:
+        description: iris android cdn url
+        type: string
+        required: true
+        default: 'https://github.com/AgoraIO/agora_doc_source/releases/download/main/flutter_ng_json_template_cn.json'
+
+      export-file-path:
+        description: iris android cdn url
+        type: string
+        required: true
+        default: 'https://github.com/AgoraIO/agora_doc_source/releases/download/main/flutter_ng_json_template_cn.json'
+
+jobs:
+  update_doc:
+    name: Updating DOC
+    runs-on: macos-11
+    timeout-minutes: 60
+    env:
+      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+    steps:
+        - name: Check out iris_doc
+        uses: actions/checkout@v3
+        with:
+          repository: littleGnAl/iris-doc
+          ref: main
+          path: iris-doc
+
+      - name: Check out build project
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ inputs.target_repo }}
+          ref: ${{ inputs.target_branch }}
+          path: ${{ inputs.target_repo }}
+
+      - name: Run build macos
+        run: |
+          TARGET_REPO=${{ inputs.target_repo }}
+          cd ${TARGET_REPO}
+
+          python3 -m pip install -r requirements.txt
+
+          python3 iris-doc/iris_doc.py \
+                  --config=${{ inputs.config }} \
+                  --language=${{ inputs.language }} \
+                  --template-url=${{ inputs.template-url }} \
+                  --export-file-path=${{ inputs.target_repo }}/${{ inputs.export-file-path }}
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ inputs.target_repo }}
+          commit-message: Update doc
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: ${{ inputs.target_branch }}
+          delete-branch: true
+          title: '[TEST] Update doc'
+          body: |
+            Update doc
+          draft: false
