@@ -1,4 +1,4 @@
-name: Build flutter project example
+name: Update doc
 
 on: 
   workflow_dispatch:
