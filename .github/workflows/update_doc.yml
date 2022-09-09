@@ -59,6 +59,10 @@ jobs:
           ref: ${{ inputs.target_branch }}
           path: ${{ inputs.target_repo }}
 
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.0.0'
+
       - name: Run build macos
         run: |
           TARGET_REPO=${{ inputs.target_repo }}
