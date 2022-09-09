@@ -37,7 +37,7 @@ on:
         description: The export file path
         type: string
         required: true
-        default: 'https://github.com/AgoraIO/agora_doc_source/releases/download/main/flutter_ng_json_template_cn.json'
+        default: 'lib/agora_rtc_engine.dart'
 
 jobs:
   update_doc:
