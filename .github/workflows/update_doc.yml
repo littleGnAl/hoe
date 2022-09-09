@@ -87,7 +87,8 @@ jobs:
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: false
-          branch: ${{ inputs.target_branch }}
+          branch: "${{ inputs.target_branch }}-doc"
+          base: ${{ inputs.target_branch }}
           delete-branch: true
           title: '[TEST] Update doc'
           body: |
