@@ -31,7 +31,7 @@ on:
         description: The template url
         type: string
         required: true
-        default: 'https://github.com/AgoraIO/agora_doc_source/releases/download/main/flutter_ng_json_template_cn.json'
+        default: 'https://github.com/AgoraIO/agora_doc_source/releases/download/main/flutter_ng_json_template_en.json'
 
       export-file-path:
         description: The export file path
@@ -77,14 +77,6 @@ jobs:
                   --language=${{ inputs.language }} \
                   --template-url=${{ inputs.template-url }} \
                   --export-file-path=${ROOT_PATH}/${{ inputs.target_repo }}/${{ inputs.export-file-path }}
-      # - name: Create commits
-      #   run: |
-      #     cd ${{ inputs.target_repo }}
-      #     USER_NAME=${{ github.actor }}
-      #     git config user.name "${USER_NAME}"
-      #     git config user.email "${USER_NAME}@users.noreply.github.com"
-      #     git commit -am "Update doc"
-      #     git log
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v4
@@ -98,5 +90,5 @@ jobs:
           branch: "${{ inputs.target_branch }}-doc"
           base: ${{ inputs.target_branch }}
           delete-branch: true
-          title: '[TEST] Update doc'
+          title: 'Update doc'
           draft: false
