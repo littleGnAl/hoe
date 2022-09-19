@@ -31,6 +31,8 @@ class GlobalConfig {
   late final String _testChannelId;
   String get testChannelId => _testChannelId;
 
+  String get musicCenterAppid => Platform.environment['MUSIC_CENTER_APPID']!;
+
   late final String _appleTeamIdTest;
   String get appleTeamIdTest => _appleTeamIdTest;
 

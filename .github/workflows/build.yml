@@ -32,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
     steps:
       - uses: actions/checkout@v3
 
@@ -95,6 +96,7 @@ jobs:
     timeout-minutes: 60
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
     steps:
       - uses: actions/checkout@v3
 
@@ -154,6 +156,7 @@ jobs:
     timeout-minutes: 60
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
     steps:
       - uses: actions/checkout@v3
 
@@ -192,6 +195,7 @@ jobs:
     timeout-minutes: 60
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
       # AgoraLab2020
       AGORALAB2020_P12_BASE64: ${{ secrets.AGORALAB2020_P12_BASE64 }}
       AGORALAB2020_P12_PWD: ${{ secrets.AGORALAB2020_P12_PWD }}
