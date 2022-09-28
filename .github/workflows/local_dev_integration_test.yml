@@ -72,7 +72,7 @@ jobs:
           dart run bin/hoe.dart build-agora-flutter-example \
             --project-dir=Agora-Flutter-SDK \
             --artifacts-output-dir=output \
-            --platforms=android --process-build \
+            --platforms=android \
             --apple-package-name=io.agora.agoraRtcEngineExample \
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
@@ -126,7 +126,6 @@ jobs:
             --project-dir=Agora-Flutter-SDK \
             --artifacts-output-dir=output \
             --platforms=macos \
-            --process-build \
             --apple-package-name=io.agora.agoraRtcEngineExample \
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
@@ -157,7 +156,7 @@ jobs:
       - name: Run build windows
         run: |
           dart pub get
-          dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=windows --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
+          dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=windows --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
       - run: flutter config --enable-windows-desktop
       - run: bash Agora-Flutter-SDK/ci/run_flutter_windows_integration_test.sh
 
@@ -204,7 +203,6 @@ jobs:
             --project-dir=Agora-Flutter-SDK \
             --artifacts-output-dir=output \
             --platforms=ios \
-            --process-build \
             --apple-package-name=io.agora.agoraRtcEngineExample \
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
