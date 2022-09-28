@@ -82,8 +82,9 @@ jobs:
           api-level: 31
           arch: x86_64
           profile: Nexus 6
-          script: bash ci/run_flutter_integration_test_android.sh
-        working-directory: Agora-Flutter-SDK
+          script: |
+            cd Agora-Flutter-SDK
+            bash ci/run_flutter_integration_test_android.sh
 
   build_macos:
     name: Build macos
@@ -216,3 +217,4 @@ jobs:
         with:
           model: 'iPhone 13 Pro Max'
       - run: bash ci/run_flutter_integration_test_ios.sh
+        working-directory: Agora-Flutter-SDK
