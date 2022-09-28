@@ -82,9 +82,7 @@ jobs:
           api-level: 31
           arch: x86_64
           profile: Nexus 6
-          script: |
-            cd Agora-Flutter-SDK
-            bash ci/run_flutter_integration_test_android.sh
+          script: bash ci/run_flutter_integration_test_android.sh
 
   build_macos:
     name: Build macos
@@ -134,7 +132,6 @@ jobs:
             ${EXTRA_ARGS}
       - run: flutter config --enable-macos-desktop 
       - run: bash ci/run_flutter_macos_integration_test.sh
-        working-directory: Agora-Flutter-SDK
 
   build_windows:
     name: Build windows
@@ -163,8 +160,6 @@ jobs:
           dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=windows --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
       - run: flutter config --enable-windows-desktop
       - run: bash ci/run_flutter_windows_integration_test.sh
-        working-directory: Agora-Flutter-SDK
-
 
   build_ios:
     name: Build ios
@@ -217,4 +212,3 @@ jobs:
         with:
           model: 'iPhone 13 Pro Max'
       - run: bash ci/run_flutter_integration_test_ios.sh
-        working-directory: Agora-Flutter-SDK
