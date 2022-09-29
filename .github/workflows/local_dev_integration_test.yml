@@ -82,7 +82,9 @@ jobs:
           api-level: 31
           arch: x86_64
           profile: Nexus 6
-          disk-size: 4096M
+          ram-size: 2048M
+          heap-size: 4096M
+          disk-size: 8192M
           script: bash Agora-Flutter-SDK/ci/run_flutter_integration_test_android.sh
 
   build_macos:
