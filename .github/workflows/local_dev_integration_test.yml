@@ -76,6 +76,7 @@ jobs:
             --apple-package-name=io.agora.agoraRtcEngineExample \
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
+      - run: flutter config --enable-macos-desktop 
       - name: run flutter android integration tests
         uses: reactivecircus/android-emulator-runner@v2.26.0
         with:
@@ -212,4 +213,5 @@ jobs:
       - uses: futureware-tech/simulator-action@v1
         with:
           model: 'iPhone 13 Pro Max'
+      - run: flutter config --enable-macos-desktop 
       - run: bash Agora-Flutter-SDK/ci/run_flutter_integration_test_ios.sh
