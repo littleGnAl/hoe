@@ -171,6 +171,7 @@ jobs:
         with:
           flutter-version: '3.0.0'
       - name: Engine version
+        shell: bash
         run: |
           FLUTTER_PATH=$(which flutter)
           cat ${FLUTTER_PATH}/../internal/engine.version
