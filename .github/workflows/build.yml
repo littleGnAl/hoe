@@ -173,8 +173,7 @@ jobs:
       - name: Engine version
         shell: bash
         run: |
-          FLUTTER_PATH=$(which flutter)
-          cat ${FLUTTER_PATH}/../internal/engine.version
+          cat ${FLUTTER_ROOT}/bin/internal/engine.version
 
       - name: Run build windows
         run: |
