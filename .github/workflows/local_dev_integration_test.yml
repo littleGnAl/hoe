@@ -65,6 +65,11 @@ jobs:
             EXTRA_ARGS="${EXTRA_ARGS} --iris-android-cdn-url=${IRIS_ANDROID_CDN_URL}"
           fi
 
+          IRIS_MACOS_CDN_URL=${{ github.event.inputs.iris-macos-cdn-url }}
+          if [ ! -z "${IRIS_MACOS_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-macos-cdn-url=${IRIS_MACOS_CDN_URL}"
+          fi
+
           echo "Extra args: ${EXTRA_ARGS}"
 
           mkdir -p output
@@ -72,7 +77,7 @@ jobs:
           dart run bin/hoe.dart build-agora-flutter-example \
             --project-dir=Agora-Flutter-SDK \
             --artifacts-output-dir=output \
-            --platforms=android \
+            --platforms=android,macos \
             --apple-package-name=io.agora.agoraRtcEngineExample \
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
@@ -213,5 +218,4 @@ jobs:
       - uses: futureware-tech/simulator-action@v1
         with:
           model: 'iPhone 13 Pro Max'
-      - run: flutter config --enable-macos-desktop 
       - run: bash Agora-Flutter-SDK/ci/run_flutter_integration_test_ios.sh
