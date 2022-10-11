@@ -5,51 +5,46 @@ class GlobalConfig {
     // flutter build windows --dart-define TEST_APP_ID="$TEST_APP_ID" --dart-define TEST_TOKEN="$TEST_TOKEN" --dart-define TEST_CHANNEL_ID="$TEST_CHANNEL_ID"
     final envVarMap = Platform.environment;
 
-    _testAppId = envVarMap['TEST_APP_ID']!;
-    _testToken = envVarMap['TEST_TOKEN'] ?? '';
-    _testChannelId = envVarMap['TEST_CHANNEL_ID'] ?? 'testapi';
-    // stdout.writeln('user: $user');
+    // _testAppId = envVarMap['TEST_APP_ID']!;
+    // _testToken = envVarMap['TEST_TOKEN'] ?? '';
+    // _testChannelId = envVarMap['TEST_CHANNEL_ID'] ?? 'testapi';
+    // // stdout.writeln('user: $user');
 
-    _appleTeamIdTest = envVarMap['TEAM_TEST'] ?? '';
-    _appleCodeSignIdentityTest = envVarMap['CODE_SIGN_IDENTITY_TEST'] ?? '';
+    // _appleTeamIdTest = envVarMap['TEAM_TEST'] ?? '';
+    // _appleCodeSignIdentityTest = envVarMap['CODE_SIGN_IDENTITY_TEST'] ?? '';
 
-    _appleTeamIdLab = envVarMap['TEAM_LAB'] ?? '';
-    _appleCodeSignIdentityLab = envVarMap['CODE_SIGN_IDENTITY_LAB'] ?? '';
+    // _appleTeamIdLab = envVarMap['TEAM_LAB'] ?? '';
+    // _appleCodeSignIdentityLab = envVarMap['CODE_SIGN_IDENTITY_LAB'] ?? '';
 
-    _appleTeamIdQa = envVarMap['TEAM_QA'] ?? '';
-    _appleCodeSignIdentityQa = envVarMap['CODE_SIGN_IDENTITY_QA'] ?? '';
+    // _appleTeamIdQa = envVarMap['TEAM_QA'] ?? '';
+    // _appleCodeSignIdentityQa = envVarMap['CODE_SIGN_IDENTITY_QA'] ?? '';
   }
 
   String get githubActionRunnerTemp => Platform.environment['RUNNER_TEMP']!;
 
-  late final String _testAppId;
-  String get testAppId => _testAppId;
+  String get testAppId => Platform.environment['TEST_APP_ID']!;
 
-  late final String _testToken;
-  String get testToken => _testToken;
+  String get testToken => Platform.environment['TEST_TOKEN'] ?? '';
 
-  late final String _testChannelId;
-  String get testChannelId => _testChannelId;
+  String get testChannelId =>
+      Platform.environment['TEST_CHANNEL_ID'] ?? 'testapi';
 
   String get musicCenterAppid => Platform.environment['MUSIC_CENTER_APPID']!;
 
-  late final String _appleTeamIdTest;
-  String get appleTeamIdTest => _appleTeamIdTest;
+  String get appleTeamIdTest => Platform.environment['TEAM_TEST'] ?? '';
 
-  late final String _appleCodeSignIdentityTest;
-  String get appleCodeSignIdentityTest => _appleCodeSignIdentityTest;
+  String get appleCodeSignIdentityTest =>
+      Platform.environment['CODE_SIGN_IDENTITY_TEST'] ?? '';
 
-  late final String _appleTeamIdLab;
-  String get appleTeamIdLab => _appleTeamIdLab;
+  String get appleTeamIdLab => Platform.environment['TEAM_LAB'] ?? '';
 
-  late final String _appleCodeSignIdentityLab;
-  String get appleCodeSignIdentityLab => _appleCodeSignIdentityLab;
+  String get appleCodeSignIdentityLab =>
+      Platform.environment['CODE_SIGN_IDENTITY_LAB'] ?? '';
 
-  late final String _appleTeamIdQa;
-  String get appleTeamIdQa => _appleTeamIdQa;
+  String get appleTeamIdQa => Platform.environment['TEAM_QA'] ?? '';
 
-  late final String _appleCodeSignIdentityQa;
-  String get appleCodeSignIdentityQa => _appleCodeSignIdentityQa;
+  String get appleCodeSignIdentityQa =>
+      Platform.environment['CODE_SIGN_IDENTITY_QA'] ?? '';
 
   String get agoralab2020PPGpgPwd =>
       Platform.environment['AGORALAB2020_PP_GPG_PWD']!;
@@ -85,4 +80,10 @@ class GlobalConfig {
 
   String get agoratest2020KeychainPassword =>
       Platform.environment['AGORATEST2020_KEYCHAIN_PASSWORD']!;
+
+  String get agoraArtifactoryUser =>
+      Platform.environment['AGORA_ARTIFACTORY_USER']!;
+
+  String get agoraArtifactoryPwd =>
+      Platform.environment['AGORA_ARTIFACTORY_PWD']!;
 }

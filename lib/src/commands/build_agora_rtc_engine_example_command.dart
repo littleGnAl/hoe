@@ -10,7 +10,6 @@ import 'package:hoe/src/common/global_config.dart';
 import 'package:hoe/src/common/ios_plist_config.dart';
 import 'package:path/path.dart' as path;
 import 'package:process/process.dart';
-import 'package:archive/archive.dart';
 
 const String _agoraRtcWrapperPodSpecFileTemplate = '''
 #
@@ -49,11 +48,11 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     argParser.addOption('flutter-package-name');
     argParser.addOption('project-dir');
     argParser.addOption('artifacts-output-dir');
-
-    // _workspace = fileSystem.currentDirectory;
   }
 
   late final Directory _workspace;
+
+  final GlobalConfig _globalConfig = GlobalConfig();
 
   @override
   String get description => 'Build agora_rtc_engine example';
@@ -139,10 +138,6 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           throw Exception('Unsupported platform: $platform');
       }
     }
-
-    // if (isProcessBuild) {
-    //   _outputUploadLog();
-    // }
   }
 
   Future<void> _setupAndroidDev(
@@ -177,7 +172,6 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       final unzipFilePath =
           await _downloadAndUnzip(irisAndroidCDNUrl, androidModulePath, false);
 
-// DCG/Agora_Native_SDK_for_Android_FULL/rtc/sdk
       _copyDirectory(
           fileSystem.directory(path.join(unzipFilePath, 'DCG',
               'Agora_Native_SDK_for_Android_FULL', 'rtc', 'sdk')),
@@ -369,7 +363,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
     final irisWindowsZipFile = fileSystem
         .file(path.join(irisWindowsDir.absolute.path, 'iris_windows.zip'));
-    final fileDownloader = DefaultFileDownloader();
+    final fileDownloader = DefaultFileDownloader(_globalConfig);
     await fileDownloader.downloadFile(
       irisWindowsDownloadUrl,
       irisWindowsZipFile.absolute.path,
@@ -616,7 +610,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     _runFlutterClean(path.join(_workspace.absolute.path, 'example'));
     _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
     final examplePath = path.join(_workspace.absolute.path, 'example');
-    final globalConfig = GlobalConfig();
+    // final globalConfig = GlobalConfig();
 
     // final plistDirPath =
     //     path.join(_workspace.absolute.path, 'example', 'ios', 'plists');
@@ -633,22 +627,22 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
     _installAppleCertificate(
         p12OutputPath: path.join(
-          globalConfig.githubActionRunnerTemp,
+          _globalConfig.githubActionRunnerTemp,
           'agoratest2020.p12',
         ),
         provisionOutputPath: path.join(
-          globalConfig.githubActionRunnerTemp,
+          _globalConfig.githubActionRunnerTemp,
           'agoratest2020_pp.mobileprovision',
         ),
         keychainOutputPath: path.join(
-          globalConfig.githubActionRunnerTemp,
+          _globalConfig.githubActionRunnerTemp,
           'agoratest2020-app-signing.keychain-db',
         ),
         gpgProvisionName: 'AgoraTest2020.mobileprovision.gpg',
-        gpgProvisionPwd: globalConfig.agoratest2020PPGpgPwd,
-        p12Base64: globalConfig.agoratest2020P12Base64,
-        p12Pwd: globalConfig.agoratest2020P12Pwd,
-        keychainPwd: globalConfig.agoratest2020KeychainPassword);
+        gpgProvisionPwd: _globalConfig.agoratest2020PPGpgPwd,
+        p12Base64: _globalConfig.agoratest2020P12Base64,
+        p12Pwd: _globalConfig.agoratest2020P12Pwd,
+        keychainPwd: _globalConfig.agoratest2020KeychainPassword);
 
     final pListConfigTest =
         PListConfig('${applePackageName}Test', 'AgoraTest2020');
@@ -657,9 +651,9 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         flutterPackageName,
         path.join(examplePath, 'ios', 'Runner.xcodeproj'),
         pListConfigTest.applePackageName,
-        globalConfig.appleTeamIdTest,
+        _globalConfig.appleTeamIdTest,
         pListConfigTest.profileName,
-        globalConfig.appleCodeSignIdentityTest,
+        _globalConfig.appleCodeSignIdentityTest,
         false,
         pListConfigTest,
         {
@@ -670,22 +664,22 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
     _installAppleCertificate(
         p12OutputPath: path.join(
-          globalConfig.githubActionRunnerTemp,
+          _globalConfig.githubActionRunnerTemp,
           'agoralab2020.p12',
         ),
         provisionOutputPath: path.join(
-          globalConfig.githubActionRunnerTemp,
+          _globalConfig.githubActionRunnerTemp,
           'agoralab2020_pp.mobileprovision',
         ),
         keychainOutputPath: path.join(
-          globalConfig.githubActionRunnerTemp,
+          _globalConfig.githubActionRunnerTemp,
           'agoralab2020-app-signing.keychain-db',
         ),
         gpgProvisionName: 'AgoraLab2020.mobileprovision.gpg',
-        gpgProvisionPwd: globalConfig.agoralab2020PPGpgPwd,
-        p12Base64: globalConfig.agoralab2020P12Base64,
-        p12Pwd: globalConfig.agoralab2020P12Pwd,
-        keychainPwd: globalConfig.agoralab2020KeychainPassword);
+        gpgProvisionPwd: _globalConfig.agoralab2020PPGpgPwd,
+        p12Base64: _globalConfig.agoralab2020P12Base64,
+        p12Pwd: _globalConfig.agoralab2020P12Pwd,
+        keychainPwd: _globalConfig.agoralab2020KeychainPassword);
 
     final pListConfigLab =
         PListConfig('${applePackageName}Lab', 'AgoraLab2020');
@@ -694,9 +688,9 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         flutterPackageName,
         path.join(examplePath, 'ios', 'Runner.xcodeproj'),
         pListConfigLab.applePackageName,
-        globalConfig.appleTeamIdLab,
+        _globalConfig.appleTeamIdLab,
         pListConfigLab.profileName,
-        globalConfig.appleCodeSignIdentityLab,
+        _globalConfig.appleCodeSignIdentityLab,
         false,
         pListConfigLab,
         {
@@ -707,22 +701,22 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
     _installAppleCertificate(
         p12OutputPath: path.join(
-          globalConfig.githubActionRunnerTemp,
+          _globalConfig.githubActionRunnerTemp,
           'agoraqa2021.p12',
         ),
         provisionOutputPath: path.join(
-          globalConfig.githubActionRunnerTemp,
+          _globalConfig.githubActionRunnerTemp,
           'agoraqa2021_pp.mobileprovision',
         ),
         keychainOutputPath: path.join(
-          globalConfig.githubActionRunnerTemp,
+          _globalConfig.githubActionRunnerTemp,
           'agoraqa2021-app-signing.keychain-db',
         ),
         gpgProvisionName: 'AgoraQA2021.mobileprovision.gpg',
-        gpgProvisionPwd: globalConfig.agoraqa2021PPGpgPwd,
-        p12Base64: globalConfig.agoraqa2021P12Base64,
-        p12Pwd: globalConfig.agoraqa2021P12Pwd,
-        keychainPwd: globalConfig.agoraqa2021KeychainPassword);
+        gpgProvisionPwd: _globalConfig.agoraqa2021PPGpgPwd,
+        p12Base64: _globalConfig.agoraqa2021P12Base64,
+        p12Pwd: _globalConfig.agoraqa2021P12Pwd,
+        keychainPwd: _globalConfig.agoraqa2021KeychainPassword);
 
     final pListConfigQA = PListConfig('${applePackageName}QA', 'AgoraQA2021');
     _buildIOSIpa(
@@ -730,9 +724,9 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         flutterPackageName,
         path.join(examplePath, 'ios', 'Runner.xcodeproj'),
         pListConfigQA.applePackageName,
-        globalConfig.appleTeamIdQa,
+        _globalConfig.appleTeamIdQa,
         pListConfigQA.profileName,
-        globalConfig.appleCodeSignIdentityQa,
+        _globalConfig.appleCodeSignIdentityQa,
         false,
         pListConfigQA,
         {
@@ -953,7 +947,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
     final zipFileBaseName = Uri.parse(zipFileUrl).pathSegments.last;
 
-    final fileDownloader = DefaultFileDownloader();
+    final fileDownloader = DefaultFileDownloader(_globalConfig);
     await fileDownloader.downloadFile(
       zipFileUrl,
       path.join(zipDownloadPath, zipFileBaseName),
@@ -1032,20 +1026,19 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     List<String> extraArgs = const [],
   }) {
     // flutter build windows --dart-define TEST_APP_ID="$TEST_APP_ID" --dart-define TEST_TOKEN="$TEST_TOKEN" --dart-define TEST_CHANNEL_ID="$TEST_CHANNEL_ID"
-    final globalConfig = GlobalConfig();
     processManager.runSyncWithOutput(
       [
         'flutter',
         'build',
         platform,
         '--dart-define',
-        'TEST_APP_ID=${globalConfig.testAppId}',
+        'TEST_APP_ID=${_globalConfig.testAppId}',
         '--dart-define',
-        'TEST_TOKEN=${globalConfig.testToken}',
+        'TEST_TOKEN=${_globalConfig.testToken}',
         '--dart-define',
-        'TEST_CHANNEL_ID=${globalConfig.testChannelId}',
+        'TEST_CHANNEL_ID=${_globalConfig.testChannelId}',
         '--dart-define',
-        'MUSIC_CENTER_APPID=${globalConfig.musicCenterAppid}',
+        'MUSIC_CENTER_APPID=${_globalConfig.musicCenterAppid}',
         ...extraArgs,
       ],
       runInShell: true,
