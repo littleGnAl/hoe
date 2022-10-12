@@ -60,8 +60,7 @@ jobs:
       - name: Clone iris
         run: |
           IRIS_BRANCH=${{ github.event.inputs.iris-branch }}
-          git clone ${BITBUCKET_IRIS_GIT_URL} iris
-          git checkout -b ${IRIS_BRANCH} origin/${IRIS_BRANCH}
+          git clone ${BITBUCKET_IRIS_GIT_URL} --branch ${IRIS_BRANCH}
 
       - uses: actions/setup-java@v1
         with:
