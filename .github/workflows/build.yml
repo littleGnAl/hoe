@@ -79,6 +79,11 @@ jobs:
             EXTRA_ARGS=" --setup-local-dev"
           fi
 
+          IRIS_BRANCH=${{ github.event.inputs.iris-branch }}
+          if [ ! -z "${IRIS_BRANCH}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --local-iris-path=iris"
+          fi
+
           IRIS_ANDROID_CDN_URL=${{ github.event.inputs.iris-android-cdn-url }}
           if [ ! -z "${IRIS_ANDROID_CDN_URL}" ]; then
             EXTRA_ARGS="${EXTRA_ARGS} --iris-android-cdn-url=${IRIS_ANDROID_CDN_URL}"
