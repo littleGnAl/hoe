@@ -81,7 +81,7 @@ jobs:
 
           IRIS_BRANCH=${{ github.event.inputs.iris-branch }}
           if [ ! -z "${IRIS_BRANCH}" ]; then
-            EXTRA_ARGS="${EXTRA_ARGS} --local-iris-path=iris"
+            EXTRA_ARGS="${EXTRA_ARGS} --local-iris-path=Iris"
           fi
 
           IRIS_ANDROID_CDN_URL=${{ github.event.inputs.iris-android-cdn-url }}
