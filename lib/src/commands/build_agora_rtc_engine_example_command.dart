@@ -161,14 +161,18 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       final agoraWrapperJar = fileSystem.file(agoraWrapperJarPath);
       if (!agoraWrapperJar.existsSync()) {
         processManager.runSyncWithOutput(
-          ['bash', 'scripts/build-iris-android.sh', localIrisPath, 'Debug'],
+          [
+            'bash',
+            'scripts/build-iris-android.sh',
+            localIrisPath,
+            'Release',
+            'Agora_Native_SDK_for_Android_FULL',
+          ],
           runInShell: true,
           workingDirectory: _workspace.absolute.path,
         );
       }
-    }
-
-    if (irisAndroidCDNUrl.isNotEmpty) {
+    } else if (irisAndroidCDNUrl.isNotEmpty) {
       final unzipFilePath =
           await _downloadAndUnzip(irisAndroidCDNUrl, androidModulePath, false);
 

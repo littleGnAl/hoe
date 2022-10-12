@@ -14,12 +14,12 @@ on:
         description: Is setup local dev
         default: false
 
-      iris-macos-cdn-url:
-        description: iris macos cdn url
-        type: string
-
       iris-branch:
         description: iris branch
+        type: string
+
+      iris-macos-cdn-url:
+        description: iris macos cdn url
         type: string
 
       iris-ios-cdn-url:
@@ -33,7 +33,7 @@ on:
 jobs:
   build_android:
     name: Build Android
-    runs-on: ubuntu-latest
+    runs-on: macos-11
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
