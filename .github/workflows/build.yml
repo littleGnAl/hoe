@@ -18,6 +18,10 @@ on:
         description: iris macos cdn url
         type: string
 
+      iris-branch:
+        description: iris branch
+        type: string
+
       iris-ios-cdn-url:
         description: iris ios cdn url
         type: string
@@ -35,6 +39,7 @@ jobs:
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
       AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
       AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
+      BITBUCKET_IRIS_GIT_URL: ${{ secrets.BITBUCKET_IRIS_GIT_URL }}
     steps:
       - uses: actions/checkout@v3
 
@@ -44,6 +49,19 @@ jobs:
           repository: AgoraIO/Agora-Flutter-SDK
           ref: ${{ inputs.build_branch }}
           path: Agora-Flutter-SDK
+
+      - name: Install bitbucket SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.BITBUCKET_SSH_KEY }}
+          name: id_rsa # optional
+          known_hosts: ${{ secrets.BITBUCKET_SSH_KNOWN_HOSTS }}
+          if_key_exists: fail # replace / ignore / fail; optional (defaults to fail)
+      - name: Clone iris
+        run: |
+          IRIS_BRANCH=${{ github.event.inputs.iris-branch }}
+          git clone ${BITBUCKET_IRIS_GIT_URL} iris
+          git checkout -b ${IRIS_BRANCH} origin/${IRIS_BRANCH}
 
       - uses: actions/setup-java@v1
         with:
