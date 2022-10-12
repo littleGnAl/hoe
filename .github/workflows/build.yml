@@ -91,6 +91,8 @@ jobs:
 
           echo "Extra args: ${EXTRA_ARGS}"
 
+          ls
+
           mkdir -p output
           dart pub get
           dart run bin/hoe.dart build-agora-flutter-example \
