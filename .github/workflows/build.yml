@@ -81,7 +81,7 @@ jobs:
 
           IRIS_BRANCH=${{ github.event.inputs.iris-branch }}
           if [ ! -z "${IRIS_BRANCH}" ]; then
-            EXTRA_ARGS="${EXTRA_ARGS} --local-iris-path=Iris"
+            EXTRA_ARGS="${EXTRA_ARGS} --local-iris-path=iris"
           fi
 
           IRIS_ANDROID_CDN_URL=${{ github.event.inputs.iris-android-cdn-url }}
@@ -125,6 +125,7 @@ jobs:
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
       AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
       AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
+      BITBUCKET_IRIS_GIT_URL: ${{ secrets.BITBUCKET_IRIS_GIT_URL }}
     steps:
       - uses: actions/checkout@v3
 
@@ -134,6 +135,19 @@ jobs:
           repository: AgoraIO/Agora-Flutter-SDK
           ref: ${{ inputs.build_branch }}
           path: Agora-Flutter-SDK
+
+      - name: Install bitbucket SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.BITBUCKET_SSH_KEY }}
+          name: id_rsa # optional
+          known_hosts: ${{ secrets.BITBUCKET_SSH_KNOWN_HOSTS }}
+          if_key_exists: fail # replace / ignore / fail; optional (defaults to fail)
+
+      - name: Clone iris
+        run: |
+          IRIS_BRANCH=${{ github.event.inputs.iris-branch }}
+          git clone ${BITBUCKET_IRIS_GIT_URL} --branch ${IRIS_BRANCH}
 
       - uses: subosito/flutter-action@v1
         with:
@@ -146,6 +160,11 @@ jobs:
           EXTRA_ARGS=""
           if ${IS_SETUP_LOCAL_DEV} ; then
             EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          IRIS_BRANCH=${{ github.event.inputs.iris-branch }}
+          if [ ! -z "${IRIS_BRANCH}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --local-iris-path=iris"
           fi
 
           IRIS_MACOS_CDN_URL=${{ github.event.inputs.iris-macos-cdn-url }}
