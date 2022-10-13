@@ -295,7 +295,13 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       final irisFramework = fileSystem.directory(irisFrameworkPath);
       if (!irisFramework.existsSync()) {
         processManager.runSyncWithOutput(
-          ['bash', 'scripts/build-iris-macos.sh', 'Release', localIrisPath],
+          [
+            'bash',
+            'scripts/build-iris-macos.sh',
+            localIrisPath,
+            'Release',
+            'Agora_Native_SDK_for_Mac_FULL',
+          ],
           runInShell: true,
           workingDirectory: _workspace.absolute.path,
         );
