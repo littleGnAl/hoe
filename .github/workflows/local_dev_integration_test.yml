@@ -33,6 +33,8 @@ jobs:
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
+      AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
+      AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
     steps:
       - uses: actions/checkout@v3
 
@@ -100,6 +102,8 @@ jobs:
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
+      AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
+      AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
     steps:
       - uses: actions/checkout@v3
 
@@ -148,6 +152,8 @@ jobs:
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
+      AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
+      AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
     steps:
       - uses: actions/checkout@v3
 
@@ -176,6 +182,8 @@ jobs:
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
+      AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
+      AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
       
     steps:
       - uses: actions/checkout@v3
