@@ -194,6 +194,21 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
                 'libAgoraRtcWrapper.so'))
             .copySync(path.join(
                 androidModulePath, 'libs', abi, 'libAgoraRtcWrapper.so'));
+
+        fileSystem
+            .file(path.join(unzipFilePath, 'ALL_ARCHITECTURE', 'Release', abi,
+                'libIrisDebugger.so'))
+            .copySync(
+              path.join(
+                _workspace.absolute.path,
+                'test_shard',
+                'iris_tester',
+                'android',
+                'libs',
+                abi,
+                'libIrisDebugger.so',
+              ),
+            );
       }
     }
   }
@@ -256,6 +271,19 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         ),
         iosModulePath
       ]);
+
+      processManager.runSyncWithOutput([
+        'cp',
+        '-RP',
+        path.join(
+          unzipFilePath,
+          'ALL_ARCHITECTURE',
+          'Release',
+          'Release',
+          'IrisDebugger.xcframework',
+        ),
+        path.join(_workspace.absolute.path, 'test_shard', 'iris_tester', 'ios'),
+      ]);
     }
 
     fileSystem.file(path.join(iosModulePath, '.plugin_dev')).createSync();
@@ -264,22 +292,9 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         path.join(iosModulePath, '$flutterPackageName.podspec');
     _createAgoraRtcWrapperPodSpecFile(iosModuleDir, isXCFramework: true);
     _modifyPodSpecFile(podspecFilePath, true);
-    // _modifyPodFile(
-    //   path.join(_workspace.absolute.path, 'example', 'ios', 'Podfile'),
-    //   true,
-    // );
-    // _modifyPodFile(
-    //   path.join(
-    //       _workspace.absolute.path, 'integration_test_app', 'ios', 'Podfile'),
-    //   true,
-    // );
 
     _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
     _runPodInstall(path.join(_workspace.absolute.path, 'example', 'ios'));
-    // _runFlutterPackagesGet(
-    //     path.join(_workspace.absolute.path, 'integration_test_app'));
-    // _runPodInstall(
-    //     path.join(_workspace.absolute.path, 'integration_test_app', 'ios'));
   }
 
   Future<void> _setupMacOSDev(
@@ -334,6 +349,19 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         ),
         macosModulePath
       ]);
+      processManager.runSyncWithOutput([
+        'cp',
+        '-RP',
+        path.join(
+          unzipFilePath,
+          'MAC',
+          'Release',
+          'Release',
+          'IrisDebugger.framework',
+        ),
+        path.join(
+            _workspace.absolute.path, 'test_shard', 'iris_tester', 'macos'),
+      ]);
     }
 
     fileSystem.file(path.join(macosModulePath, '.plugin_dev')).createSync();
@@ -349,66 +377,82 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
   Future<void> _setupWindowsDev(
       String irisWindowsDownloadUrl, String originalScriptsPath) async {
-    final downloadWindowsScriptPath =
-        path.join(originalScriptsPath, 'download-iris-windows.sh');
+    // final downloadWindowsScriptPath =
+    //     path.join(originalScriptsPath, 'download-iris-windows.sh');
     final windowsModulePath = path.join(
       _workspace.absolute.path,
       'windows',
     );
 
+    if (irisWindowsDownloadUrl.isNotEmpty) {
+      final thirdPartyDir =
+          fileSystem.directory(path.join(windowsModulePath, 'third_party'));
+      if (thirdPartyDir.existsSync()) {
+        thirdPartyDir.deleteSync(recursive: true);
+      }
+
+      thirdPartyDir.createSync();
+      final thirdPartyIrisDir =
+          fileSystem.directory(path.join(thirdPartyDir.absolute.path, 'iris'));
+      thirdPartyIrisDir.createSync();
+
+      final unzipFilePath = await _downloadAndUnzip(
+          irisWindowsDownloadUrl, windowsModulePath, true);
+    }
+
 // iris_windows
-    final irisWindowsPath = path.join(windowsModulePath, 'iris_windows');
-    final irisWindowsDir = fileSystem.directory(irisWindowsPath);
-    final irisWindowsTmpDir =
-        fileSystem.directory(path.join(irisWindowsPath, 'tmp'));
-    final irisWindowsIrisSDKDir = fileSystem.directory(
-        path.join(irisWindowsPath, 'Agora_Native_SDK_for_Windows_IRIS'));
-    if (irisWindowsDir.existsSync()) {
-      irisWindowsDir.deleteSync(recursive: true);
-    }
+//     final irisWindowsPath = path.join(windowsModulePath, 'iris_windows');
+//     final irisWindowsDir = fileSystem.directory(irisWindowsPath);
+//     final irisWindowsTmpDir =
+//         fileSystem.directory(path.join(irisWindowsPath, 'tmp'));
+//     final irisWindowsIrisSDKDir = fileSystem.directory(
+//         path.join(irisWindowsPath, 'Agora_Native_SDK_for_Windows_IRIS'));
+//     if (irisWindowsDir.existsSync()) {
+//       irisWindowsDir.deleteSync(recursive: true);
+//     }
 
-    irisWindowsDir.createSync();
-    irisWindowsIrisSDKDir.createSync();
-    irisWindowsTmpDir.createSync();
+//     irisWindowsDir.createSync();
+//     irisWindowsIrisSDKDir.createSync();
+//     irisWindowsTmpDir.createSync();
 
-    final irisWindowsZipFile = fileSystem
-        .file(path.join(irisWindowsDir.absolute.path, 'iris_windows.zip'));
-    final fileDownloader = DefaultFileDownloader(_globalConfig);
-    await fileDownloader.downloadFile(
-      irisWindowsDownloadUrl,
-      irisWindowsZipFile.absolute.path,
-    );
+//     final irisWindowsZipFile = fileSystem
+//         .file(path.join(irisWindowsDir.absolute.path, 'iris_windows.zip'));
+//     final fileDownloader = DefaultFileDownloader(_globalConfig);
+//     await fileDownloader.downloadFile(
+//       irisWindowsDownloadUrl,
+//       irisWindowsZipFile.absolute.path,
+//     );
 
-// Use an InputFileStream to access the zip file without storing it in memory.
-    final inputStream = InputFileStream(irisWindowsZipFile.absolute.path);
-// Decode the zip from the InputFileStream. The archive will have the contents of the
-// zip, without having stored the data in memory.
-    final archive = ZipDecoder().decodeBuffer(inputStream);
-    extractArchiveToDisk(archive, irisWindowsTmpDir.absolute.path);
-    inputStream.close();
+// // Use an InputFileStream to access the zip file without storing it in memory.
+//     final inputStream = InputFileStream(irisWindowsZipFile.absolute.path);
+// // Decode the zip from the InputFileStream. The archive will have the contents of the
+// // zip, without having stored the data in memory.
+//     final archive = ZipDecoder().decodeBuffer(inputStream);
+//     extractArchiveToDisk(archive, irisWindowsTmpDir.absolute.path);
+//     inputStream.close();
 
-    inputStream.close();
+//     inputStream.close();
 
-    // final tmpDir = fileSystem.directory(path.join(irisWindowsPath, 'tmp'));
-    final extractPath = irisWindowsTmpDir.listSync()[0].path;
-    _copyDirectory(fileSystem.directory(extractPath), irisWindowsIrisSDKDir);
+//     // final tmpDir = fileSystem.directory(path.join(irisWindowsPath, 'tmp'));
+//     final extractPath = irisWindowsTmpDir.listSync()[0].path;
+//     _copyDirectory(fileSystem.directory(extractPath), irisWindowsIrisSDKDir);
 
-    irisWindowsZipFile.deleteSync(recursive: true);
-    irisWindowsTmpDir.deleteSync(recursive: true);
+//     irisWindowsZipFile.deleteSync(recursive: true);
+//     irisWindowsTmpDir.deleteSync(recursive: true);
 
-    final thirdPartyDir =
-        fileSystem.directory(path.join(windowsModulePath, 'third_party'));
-    if (thirdPartyDir.existsSync()) {
-      thirdPartyDir.deleteSync(recursive: true);
-    }
+//     final thirdPartyDir =
+//         fileSystem.directory(path.join(windowsModulePath, 'third_party'));
+//     if (thirdPartyDir.existsSync()) {
+//       thirdPartyDir.deleteSync(recursive: true);
+//     }
 
-    thirdPartyDir.createSync();
-    final thirdPartyIrisDir =
-        fileSystem.directory(path.join(thirdPartyDir.absolute.path, 'iris'));
-    thirdPartyIrisDir.createSync();
+//     thirdPartyDir.createSync();
+//     final thirdPartyIrisDir =
+//         fileSystem.directory(path.join(thirdPartyDir.absolute.path, 'iris'));
+//     thirdPartyIrisDir.createSync();
 
-    _copyDirectory(irisWindowsDir, thirdPartyIrisDir);
-    irisWindowsDir.deleteSync(recursive: true);
+//     _copyDirectory(irisWindowsDir, thirdPartyIrisDir);
+//     irisWindowsDir.deleteSync(recursive: true);
 
     final devFilePath = path.join(windowsModulePath, '.plugin_dev');
     final devFile = fileSystem.file(devFilePath);
