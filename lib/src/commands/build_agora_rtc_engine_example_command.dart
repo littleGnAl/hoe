@@ -195,16 +195,23 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
             .copySync(path.join(
                 androidModulePath, 'libs', abi, 'libAgoraRtcWrapper.so'));
 
+        final irisTesterLibsPath = path.join(
+          _workspace.absolute.path,
+          'test_shard',
+          'iris_tester',
+          'android',
+          'libs',
+        );
+        if (!fileSystem.directory(irisTesterLibsPath).existsSync()) {
+          fileSystem.directory(irisTesterLibsPath).createSync(recursive: true);
+        }
+
         fileSystem
             .file(path.join(unzipFilePath, 'ALL_ARCHITECTURE', 'Release', abi,
                 'libIrisDebugger.so'))
             .copySync(
               path.join(
-                _workspace.absolute.path,
-                'test_shard',
-                'iris_tester',
-                'android',
-                'libs',
+                irisTesterLibsPath,
                 abi,
                 'libIrisDebugger.so',
               ),
