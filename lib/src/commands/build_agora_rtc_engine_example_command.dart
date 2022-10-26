@@ -206,16 +206,16 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           fileSystem.directory(irisTesterLibsPath).createSync(recursive: true);
         }
 
-        fileSystem
-            .file(path.join(unzipFilePath, 'ALL_ARCHITECTURE', 'Release', abi,
-                'libIrisDebugger.so'))
-            .copySync(
-              path.join(
-                irisTesterLibsPath,
-                abi,
-                'libIrisDebugger.so',
-              ),
-            );
+        // fileSystem
+        //     .file(path.join(unzipFilePath, 'ALL_ARCHITECTURE', 'Release', abi,
+        //         'libIrisDebugger.so'))
+        //     .copySync(
+        //       path.join(
+        //         irisTesterLibsPath,
+        //         abi,
+        //         'libIrisDebugger.so',
+        //       ),
+        //     );
       }
     }
   }
