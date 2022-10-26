@@ -229,6 +229,7 @@ jobs:
           cat ${FLUTTER_ROOT}/bin/internal/engine.version
 
       - name: Run build windows
+        shell: bash
         run: |
           dart pub get
           dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=windows --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
