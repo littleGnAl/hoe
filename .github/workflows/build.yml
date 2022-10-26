@@ -234,6 +234,7 @@ jobs:
           dart pub get
           dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=windows --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
       - name: ls file
+        if: always()
         shell: bash
         run: |
           ls C:\hostedtoolcache\windows\flutter\3.0.0-stable\x64\.pub-cache\git\RawDataPluginSample-cd85645d41079cb48fb57049a26845af5835602a\frameworks\flutter\video_raw_data_example_plugin
