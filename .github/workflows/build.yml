@@ -237,7 +237,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          ls C:\hostedtoolcache\windows\flutter\3.0.0-stable\x64\.pub-cache\git\RawDataPluginSample-cd85645d41079cb48fb57049a26845af5835602a\frameworks\flutter\video_raw_data_example_plugin
+          ls C:\\hostedtoolcache\\windows\\flutter\\3.0.0-stable\\x64\\.pub-cache\\git\\RawDataPluginSample-cd85645d41079cb48fb57049a26845af5835602a\\frameworks\\flutter\\video_raw_data_example_plugin
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
