@@ -60,7 +60,9 @@ jobs:
       - name: Clone iris
         run: |
           IRIS_BRANCH=${{ github.event.inputs.iris-branch }}
-          git clone ${BITBUCKET_IRIS_GIT_URL} --branch ${IRIS_BRANCH}
+          if [ ! -z "${IRIS_BRANCH}" ]; then
+            git clone ${BITBUCKET_IRIS_GIT_URL} --branch ${IRIS_BRANCH}
+          fi
 
       - uses: actions/setup-java@v1
         with:
@@ -147,7 +149,9 @@ jobs:
       - name: Clone iris
         run: |
           IRIS_BRANCH=${{ github.event.inputs.iris-branch }}
-          git clone ${BITBUCKET_IRIS_GIT_URL} --branch ${IRIS_BRANCH}
+          if [ ! -z "${IRIS_BRANCH}" ]; then
+            git clone ${BITBUCKET_IRIS_GIT_URL} --branch ${IRIS_BRANCH}
+          fi
 
       - uses: subosito/flutter-action@v1
         with:
