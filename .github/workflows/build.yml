@@ -231,9 +231,10 @@ jobs:
       - name: Run build windows
         shell: bash
         run: |
+          git config --system core.longpaths true
           dart pub get
           dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=windows --process-build --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
-          
+
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
