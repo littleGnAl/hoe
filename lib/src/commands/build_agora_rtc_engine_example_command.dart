@@ -414,7 +414,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       thirdPartyIrisDir.createSync();
 
       final unzipFilePath = await _downloadAndUnzip(
-          irisWindowsDownloadUrl, windowsModulePath, true);
+          irisWindowsDownloadUrl, windowsModulePath, false);
     }
 
 // iris_windows
