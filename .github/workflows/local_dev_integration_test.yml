@@ -26,6 +26,10 @@ on:
         description: iris android cdn url
         type: string
 
+      iris-windows-cdn-url:
+        description: iris windows cdn url
+        type: string
+
 jobs:
   build_android:
     name: Build Android
@@ -170,8 +174,29 @@ jobs:
 
       - name: Run build windows
         run: |
+          IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
+          echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
+          EXTRA_ARGS=""
+          if ${IS_SETUP_LOCAL_DEV} ; then
+            EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          IRIS_WINDOWS_CDN_URL=${{ github.event.inputs.iris-windows-cdn-url }}
+          if [ ! -z "${IRIS_WINDOWS_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-windows-cdn-url=${IRIS_WINDOWS_CDN_URL}"
+          fi
+
+          echo "Extra args: ${EXTRA_ARGS}"
+
           dart pub get
-          dart run bin/hoe.dart build-agora-flutter-example --project-dir=Agora-Flutter-SDK --artifacts-output-dir=output --platforms=windows --apple-package-name=io.agora.agoraRtcEngineExample --flutter-package-name=agora_rtc_engine
+          dart run bin/hoe.dart build-agora-flutter-example \
+            --project-dir=Agora-Flutter-SDK \
+            --artifacts-output-dir=output \
+            --platforms=windows \
+            --apple-package-name=io.agora.agoraRtcEngineExample \
+            --flutter-package-name=agora_rtc_engine \
+            ${EXTRA_ARGS}
+
       - run: flutter config --enable-windows-desktop
       - run: bash Agora-Flutter-SDK/ci/run_flutter_windows_integration_test.sh
 
