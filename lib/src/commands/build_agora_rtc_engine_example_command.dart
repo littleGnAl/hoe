@@ -195,23 +195,27 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
             .copySync(path.join(
                 androidModulePath, 'libs', abi, 'libAgoraRtcWrapper.so'));
 
-        final irisTesterLibsAbiPath = path.join(_workspace.absolute.path,
-            'test_shard', 'iris_tester', 'android', 'libs', abi);
-        if (!fileSystem.directory(irisTesterLibsAbiPath).existsSync()) {
-          fileSystem
-              .directory(irisTesterLibsAbiPath)
-              .createSync(recursive: true);
-        }
+        final libIrisDebuggerSOPath = path.join(unzipFilePath,
+            'ALL_ARCHITECTURE', 'Release', abi, 'libIrisDebugger.so');
+        if (fileSystem.file(libIrisDebuggerSOPath).existsSync()) {
+          final irisTesterLibsAbiPath = path.join(_workspace.absolute.path,
+              'test_shard', 'iris_tester', 'android', 'libs', abi);
+          if (!fileSystem.directory(irisTesterLibsAbiPath).existsSync()) {
+            fileSystem
+                .directory(irisTesterLibsAbiPath)
+                .createSync(recursive: true);
+          }
 
-        fileSystem
-            .file(path.join(unzipFilePath, 'ALL_ARCHITECTURE', 'Release', abi,
-                'libIrisDebugger.so'))
-            .copySync(
-              path.join(
-                irisTesterLibsAbiPath,
-                'libIrisDebugger.so',
-              ),
-            );
+          fileSystem
+              .file(path.join(unzipFilePath, 'ALL_ARCHITECTURE', 'Release', abi,
+                  'libIrisDebugger.so'))
+              .copySync(
+                path.join(
+                  irisTesterLibsAbiPath,
+                  'libIrisDebugger.so',
+                ),
+              );
+        }
       }
     }
   }
@@ -275,18 +279,23 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         iosModulePath
       ]);
 
-      processManager.runSyncWithOutput([
-        'cp',
-        '-RP',
-        path.join(
-          unzipFilePath,
-          'ALL_ARCHITECTURE',
-          'Release',
-          'Release',
-          'IrisDebugger.xcframework',
-        ),
-        path.join(_workspace.absolute.path, 'test_shard', 'iris_tester', 'ios'),
-      ]);
+      final irisDebuggerXCframeworkPath = path.join(
+        unzipFilePath,
+        'ALL_ARCHITECTURE',
+        'Release',
+        'Release',
+        'IrisDebugger.xcframework',
+      );
+
+      if (fileSystem.directory(irisDebuggerXCframeworkPath).existsSync()) {
+        processManager.runSyncWithOutput([
+          'cp',
+          '-RP',
+          irisDebuggerXCframeworkPath,
+          path.join(
+              _workspace.absolute.path, 'test_shard', 'iris_tester', 'ios'),
+        ]);
+      }
     }
 
     fileSystem.file(path.join(iosModulePath, '.plugin_dev')).createSync();
@@ -352,19 +361,24 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         ),
         macosModulePath
       ]);
-      processManager.runSyncWithOutput([
-        'cp',
-        '-RP',
-        path.join(
-          unzipFilePath,
-          'MAC',
-          'Release',
-          'Release',
-          'IrisDebugger.framework',
-        ),
-        path.join(
-            _workspace.absolute.path, 'test_shard', 'iris_tester', 'macos'),
-      ]);
+
+      final irisDebuggerFrameworkPath = path.join(
+        unzipFilePath,
+        'MAC',
+        'Release',
+        'Release',
+        'IrisDebugger.framework',
+      );
+
+      if (fileSystem.directory(irisDebuggerFrameworkPath).existsSync()) {
+        processManager.runSyncWithOutput([
+          'cp',
+          '-RP',
+          irisDebuggerFrameworkPath,
+          path.join(
+              _workspace.absolute.path, 'test_shard', 'iris_tester', 'macos'),
+        ]);
+      }
     }
 
     fileSystem.file(path.join(macosModulePath, '.plugin_dev')).createSync();

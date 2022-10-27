@@ -173,6 +173,7 @@ jobs:
           flutter-version: '3.0.0'
 
       - name: Run build windows
+        shell: bash
         run: |
           IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
           echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
