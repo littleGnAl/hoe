@@ -42,7 +42,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     argParser.addOption('iris-android-cdn-url');
     argParser.addOption('iris-macos-cdn-url');
     argParser.addOption('iris-ios-cdn-url');
-    argParser.addOption('iris-windows-download-url');
+    argParser.addOption('iris-windows-cdn-url');
     argParser.addFlag('process-build');
     argParser.addOption('apple-package-name');
     argParser.addOption('flutter-package-name');
@@ -69,7 +69,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     final String irisMacosCDNUrl = argResults?['iris-macos-cdn-url'] ?? '';
     final String irisIOSCDNUrl = argResults?['iris-ios-cdn-url'] ?? '';
     final String irisWindowsDownloadUrl =
-        argResults?['iris-windows-download-url'] ?? '';
+        argResults?['iris-windows-cdn-url'] ?? '';
     final bool isProcessBuild = argResults?['process-build'] ?? false;
     final String applePackageName = argResults?['apple-package-name'] ?? '';
     final String flutterPackageName = argResults?['flutter-package-name'] ?? '';
