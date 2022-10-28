@@ -422,82 +422,28 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
             'zip_download_path',
           )),
           thirdPartyIrisDir);
+
+      // Release
+
+      final irisDebuggerDllPath = path.join(
+          unzipFilePath, 'x64', 'Release', 'Release', 'IrisDebugger.dll');
+      if (fileSystem.file(irisDebuggerDllPath).existsSync()) {
+        fileSystem.file(irisDebuggerDllPath).copySync(
+              path.join(
+                _workspace.absolute.path,
+                'test_shard',
+                'iris_tester',
+                'windows',
+              ),
+            );
+      }
     }
-
-// iris_windows
-//     final irisWindowsPath = path.join(windowsModulePath, 'iris_windows');
-//     final irisWindowsDir = fileSystem.directory(irisWindowsPath);
-//     final irisWindowsTmpDir =
-//         fileSystem.directory(path.join(irisWindowsPath, 'tmp'));
-//     final irisWindowsIrisSDKDir = fileSystem.directory(
-//         path.join(irisWindowsPath, 'Agora_Native_SDK_for_Windows_IRIS'));
-//     if (irisWindowsDir.existsSync()) {
-//       irisWindowsDir.deleteSync(recursive: true);
-//     }
-
-//     irisWindowsDir.createSync();
-//     irisWindowsIrisSDKDir.createSync();
-//     irisWindowsTmpDir.createSync();
-
-//     final irisWindowsZipFile = fileSystem
-//         .file(path.join(irisWindowsDir.absolute.path, 'iris_windows.zip'));
-//     final fileDownloader = DefaultFileDownloader(_globalConfig);
-//     await fileDownloader.downloadFile(
-//       irisWindowsDownloadUrl,
-//       irisWindowsZipFile.absolute.path,
-//     );
-
-// // Use an InputFileStream to access the zip file without storing it in memory.
-//     final inputStream = InputFileStream(irisWindowsZipFile.absolute.path);
-// // Decode the zip from the InputFileStream. The archive will have the contents of the
-// // zip, without having stored the data in memory.
-//     final archive = ZipDecoder().decodeBuffer(inputStream);
-//     extractArchiveToDisk(archive, irisWindowsTmpDir.absolute.path);
-//     inputStream.close();
-
-//     inputStream.close();
-
-//     // final tmpDir = fileSystem.directory(path.join(irisWindowsPath, 'tmp'));
-//     final extractPath = irisWindowsTmpDir.listSync()[0].path;
-//     _copyDirectory(fileSystem.directory(extractPath), irisWindowsIrisSDKDir);
-
-//     irisWindowsZipFile.deleteSync(recursive: true);
-//     irisWindowsTmpDir.deleteSync(recursive: true);
-
-//     final thirdPartyDir =
-//         fileSystem.directory(path.join(windowsModulePath, 'third_party'));
-//     if (thirdPartyDir.existsSync()) {
-//       thirdPartyDir.deleteSync(recursive: true);
-//     }
-
-//     thirdPartyDir.createSync();
-//     final thirdPartyIrisDir =
-//         fileSystem.directory(path.join(thirdPartyDir.absolute.path, 'iris'));
-//     thirdPartyIrisDir.createSync();
-
-//     _copyDirectory(irisWindowsDir, thirdPartyIrisDir);
-//     irisWindowsDir.deleteSync(recursive: true);
 
     final devFilePath = path.join(windowsModulePath, '.plugin_dev');
     final devFile = fileSystem.file(devFilePath);
     if (!devFile.existsSync()) {
       devFile.createSync();
     }
-
-    // final irisArctifactsPath = path.join(windowsModulePath, 'third_party',
-    //     'iris', 'Agora_Native_SDK_for_Windows_IRIS');
-
-    // final irisArctifactsDir = fileSystem.directory(irisArctifactsPath);
-    // if (irisArctifactsDir.existsSync()) {
-    //   irisArctifactsDir.deleteSync(recursive: true);
-    // }
-
-    // processManager.runSyncWithOutput(
-    //   ['bash', downloadWindowsScriptPath, irisWindowsDownloadUrl],
-    //   runInShell: true,
-    //   includeParentEnvironment: true,
-    //   workingDirectory: _workspace.absolute.path,
-    // );
   }
 
   void _modifyPodSpecFile(String podspecFilePath, bool forDev) {
