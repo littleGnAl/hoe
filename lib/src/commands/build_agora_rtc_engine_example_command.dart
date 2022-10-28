@@ -434,6 +434,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
                 'test_shard',
                 'iris_tester',
                 'windows',
+                'IrisDebugger.dll',
               ),
             );
       }
