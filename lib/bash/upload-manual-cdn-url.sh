@@ -17,4 +17,6 @@ curl -X POST -L $JENKINS_CDN_URL/buildWithParameters \
 
 bash ${MY_PATH}/wait-jenkins-job-end.sh $JENKINS_CDN_URL
 
+bash ${MY_PATH}/notify-wecom.sh ${WECOM_URL} "CDN uploaded: ${JENKINS_CDN_URL}"
+
 
