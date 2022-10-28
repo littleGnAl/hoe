@@ -972,23 +972,23 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
     final zipFileBaseName = Uri.parse(zipFileUrl).pathSegments.last;
 
-    processManager.runSyncWithOutput([
-      'curl',
-      '-u',
-      '${_globalConfig.agoraArtifactoryUser}:${_globalConfig.agoraArtifactoryPwd}',
-      '-o',
-      zipFileBaseName,
-      zipFileUrl,
-    ]);
-
-    _globalConfig.agoraArtifactoryUser;
-    _globalConfig.agoraArtifactoryPwd;
-
-    // final fileDownloader = DefaultFileDownloader(_globalConfig);
-    // await fileDownloader.downloadFile(
+    // processManager.runSyncWithOutput([
+    //   'curl',
+    //   '-u',
+    //   '${_globalConfig.agoraArtifactoryUser}:${_globalConfig.agoraArtifactoryPwd}',
+    //   '-o',
+    //   zipFileBaseName,
     //   zipFileUrl,
-    //   path.join(zipDownloadPath, zipFileBaseName),
-    // );
+    // ]);
+
+    // _globalConfig.agoraArtifactoryUser;
+    // _globalConfig.agoraArtifactoryPwd;
+
+    final fileDownloader = DefaultFileDownloader(_globalConfig);
+    await fileDownloader.downloadFile(
+      zipFileUrl,
+      path.join(zipDownloadPath, zipFileBaseName),
+    );
 
     if (isUnzipSymlinks) {
       _unzipSymlinks(
