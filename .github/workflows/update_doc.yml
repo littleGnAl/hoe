@@ -78,6 +78,8 @@ jobs:
 
       - name: Run build macos
         run: |
+          brew install coreutils
+
           TARGET_REPO=${{ inputs.target_repo }}
           ROOT_PATH=$(pwd)
           EXPORT_FILE_PATH=$(realpath ${TARGET_REPO}/${{ inputs.export-file-path }})
@@ -90,7 +92,7 @@ jobs:
                   --language=${{ inputs.language }} \
                   --template-urls=${{ inputs.template-urls }} \
                   --export-file-path=${EXPORT_FILE_PATH}
-                  
+
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v4
