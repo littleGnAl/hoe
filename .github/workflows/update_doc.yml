@@ -15,6 +15,18 @@ on:
         required: true
         default: 'main'
 
+      pull_request_title:
+        description: The title of the pull request
+        type: string
+        required: true
+        default: '[AUTO] Update doc'
+
+      commit_message:
+        description: The commit message of the pull request
+        type: string
+        required: true
+        default: '[AUTO] Update doc'
+
       config:
         description: The language config
         type: string
@@ -27,8 +39,8 @@ on:
         required: true
         default: 'dart'
 
-      template-url:
-        description: The template url
+      template-urls:
+        description: The template urls
         type: string
         required: true
         default: 'https://github.com/AgoraIO/agora_doc_source/releases/download/main/flutter_ng_json_template_en.json'
@@ -75,7 +87,7 @@ jobs:
           python3 iris_doc.py \
                   --config=${{ inputs.config }} \
                   --language=${{ inputs.language }} \
-                  --template-url=${{ inputs.template-url }} \
+                  --template-urls=${{ inputs.template-urls }} \
                   --export-file-path=${ROOT_PATH}/${{ inputs.target_repo }}/${{ inputs.export-file-path }}
       - name: Create Pull Request
         id: cpr
@@ -83,12 +95,12 @@ jobs:
         with:
           token: ${{ secrets.ACTION_PAT }}
           path: ${{ inputs.target_repo }}
-          commit-message: Update doc
+          commit-message: ${{ inputs.commit_message }}
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: false
           branch: "${{ inputs.target_branch }}-doc"
           base: ${{ inputs.target_branch }}
           delete-branch: true
-          title: 'Update doc'
+          title: ${{ inputs.pull_request_title }}
           draft: false
