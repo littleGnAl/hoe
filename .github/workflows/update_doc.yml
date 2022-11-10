@@ -80,6 +80,7 @@ jobs:
         run: |
           TARGET_REPO=${{ inputs.target_repo }}
           ROOT_PATH=$(pwd)
+          EXPORT_FILE_PATH=$(realpath ${TARGET_REPO}/${{ inputs.export-file-path }})
           cd iris-doc
 
           python3 -m pip install -r requirements.txt
@@ -88,7 +89,8 @@ jobs:
                   --config=${{ inputs.config }} \
                   --language=${{ inputs.language }} \
                   --template-urls=${{ inputs.template-urls }} \
-                  --export-file-path=${ROOT_PATH}/${{ inputs.target_repo }}/${{ inputs.export-file-path }}
+                  --export-file-path=${EXPORT_FILE_PATH}
+                  
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v4
