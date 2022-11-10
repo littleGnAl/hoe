@@ -39,11 +39,16 @@ on:
         required: true
         default: 'dart'
 
-      template-urls:
-        description: The template urls
+      base-template-url:
+        description: The base template url
         type: string
         required: true
         default: 'https://github.com/AgoraIO/agora_doc_source/releases/download/main/flutter_ng_json_template_en.json'
+
+      merge-template-url:
+        description: The template url to merge
+        type: string
+        default: ''
 
       export-file-path:
         description: The export file path
@@ -78,13 +83,13 @@ jobs:
 
       - name: Run build macos
         run: |
-          TEMPLATE_URLS=${{ inputs.template-urls }}
-          TEMPLATE_URL_ARGS=""
+          BASE_TEMPLATE_URL=${{ inputs.base-template-url }}
+          MERGE_TEMPLATE_URL=${{ inputs.merge-template-url }}
+          TEMPLATE_URL_ARGS="--template-url=${BASE_TEMPLATE_URL}"
 
-          IFS=';' read -ra ADDR <<< "${TEMPLATE_URLS}"
-          for i in "${ADDR[@]}"; do
-            TEMPLATE_URL_ARGS="${TEMPLATE_URL_ARGS} --template-url=${i}"
-          done
+          if [ ! -z "${MERGE_TEMPLATE_URL}" ]; then
+            TEMPLATE_URL_ARGS="${TEMPLATE_URL_ARGS} --template-url=${MERGE_TEMPLATE_URL}"
+          fi
 
           TARGET_REPO=${{ inputs.target_repo }}
           ROOT_PATH=$(pwd)
