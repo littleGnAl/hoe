@@ -93,7 +93,7 @@ jobs:
 
           TARGET_REPO=${{ inputs.target_repo }}
           ROOT_PATH=$(pwd)
-          EXPORT_FILE_PATH=${TARGET_REPO}/${{ inputs.export-file-path }}
+          EXPORT_FILE_PATH=${ROOT_PATH}/${TARGET_REPO}/${{ inputs.export-file-path }}
           cd iris-doc
 
           python3 -m pip install -r requirements.txt
