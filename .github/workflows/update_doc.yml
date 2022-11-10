@@ -78,18 +78,24 @@ jobs:
 
       - name: Run build macos
         run: |
-          brew install coreutils
+          TEMPLATE_URLS=${{ inputs.template-urls }}
+          TEMPLATE_URL_ARGS=""
+
+          IFS=';' read -ra ADDR <<< "${TEMPLATE_URLS}"
+          for i in "${ADDR[@]}"; do
+            TEMPLATE_URL_ARGS="${TEMPLATE_URL_ARGS} --template-url=${i}"
+          done
 
           TARGET_REPO=${{ inputs.target_repo }}
           ROOT_PATH=$(pwd)
-          EXPORT_FILE_PATH=$(realpath ${TARGET_REPO}/${{ inputs.export-file-path }})
+          EXPORT_FILE_PATH=${TARGET_REPO}/${{ inputs.export-file-path }}
           cd iris-doc
 
           python3 -m pip install -r requirements.txt
 
           echo ${EXPORT_FILE_PATH}
 
-          python3 iris_doc.py --config=${{ inputs.config }} --language=${{ inputs.language }} --template-urls=${{ inputs.template-urls }} --export-file-path=${EXPORT_FILE_PATH}
+          python3 iris_doc.py --config=${{ inputs.config }} --language=${{ inputs.language }} --export-file-path=${EXPORT_FILE_PATH} ${TEMPLATE_URL_ARGS}
 
       - name: Create Pull Request
         id: cpr
