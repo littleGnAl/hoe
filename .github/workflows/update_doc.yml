@@ -85,7 +85,7 @@ jobs:
       - uses: actions/setup-node@v3
         if: ${{ inputs.language == 'ts' }}
         with:
-          node-version: '14.x'
+          node-version: '16.x'
       - run: npm install -g yarn
         if: ${{ inputs.language == 'ts' }}
 
