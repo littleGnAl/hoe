@@ -82,10 +82,12 @@ jobs:
         with:
           flutter-version: '3.0.0'
           
-      - uses: borales/actions-yarn@v3.0.0
+      - uses: actions/setup-node@v3
         if: ${{ inputs.language == 'ts' }}
         with:
-          cmd: install
+          node-version: '14.x'
+      - run: npm install -g yarn
+        if: ${{ inputs.language == 'ts' }}
 
       - name: Run build macos
         run: |
