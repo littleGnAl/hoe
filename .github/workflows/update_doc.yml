@@ -78,8 +78,14 @@ jobs:
           path: ${{ inputs.target_repo }}
 
       - uses: subosito/flutter-action@v1
+        if: ${{ language == 'dart' }}
         with:
-          flutter-version: '3.0.0'
+          cmd: install
+          
+      - uses: borales/actions-yarn@v3.0.0
+        if: ${{ language == 'ts' }}
+        with:
+          node-version: '14.x'
 
       - name: Run build macos
         run: |
