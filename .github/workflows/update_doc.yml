@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       iris-doc-ref:
-        description: iris_doc repo ref
+        description: iris-doc repo ref
         type: string
         required: true
         default: 'main'
