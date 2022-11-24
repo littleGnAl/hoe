@@ -173,8 +173,11 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         );
       }
     } else if (irisAndroidCDNUrl.isNotEmpty) {
-      final unzipFilePath =
+      final zipDownloadPath =
           await _downloadAndUnzip(irisAndroidCDNUrl, androidModulePath, false);
+
+      final unzipFilePath =
+          _getUnzipDir(irisAndroidCDNUrl, zipDownloadPath, 'DCG', 'Android');
 
       _copyDirectory(
           fileSystem.directory(path.join(unzipFilePath, 'DCG',
@@ -217,6 +220,18 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
               );
         }
       }
+
+      final unzipRtmDirPath =
+          _getUnzipDir(irisAndroidCDNUrl, zipDownloadPath, 'RTM', 'Android');
+      if (fileSystem.directory(unzipRtmDirPath).existsSync()) {
+        for (final abi in abis) {
+          fileSystem
+              .file(path.join(unzipRtmDirPath, 'ALL_ARCHITECTURE', 'Release',
+                  abi, 'libAgoraRtmWrapper.so'))
+              .copySync(path.join(
+                  androidModulePath, 'libs', abi, 'libAgoraRtmWrapper.so'));
+        }
+      }
     }
   }
 
@@ -242,8 +257,11 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     }
 
     if (irisIOSCDNUrl.isNotEmpty) {
-      final unzipFilePath =
+      final zipDownloadPath =
           await _downloadAndUnzip(irisIOSCDNUrl, iosModulePath, true);
+
+      final unzipFilePath =
+          _getUnzipDir(irisIOSCDNUrl, zipDownloadPath, 'DCG', 'iOS');
 
       fileSystem
           .directory(path.join(
@@ -296,6 +314,22 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
               _workspace.absolute.path, 'test_shard', 'iris_tester', 'ios'),
         ]);
       }
+
+      final unzipRtmPath =
+          _getUnzipDir(irisIOSCDNUrl, zipDownloadPath, 'RTM', 'iOS');
+      if (fileSystem.directory(unzipRtmPath).existsSync()) {
+        processManager.runSyncWithOutput([
+          'cp',
+          '-RP',
+          path.join(
+            unzipRtmPath,
+            'ALL_ARCHITECTURE',
+            'Release',
+            'AgoraRtmWrapper.xcframework',
+          ),
+          iosModulePath
+        ]);
+      }
     }
 
     fileSystem.file(path.join(iosModulePath, '.plugin_dev')).createSync();
@@ -336,8 +370,10 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     }
 
     if (irisMacosCDNUrl.isNotEmpty) {
-      final unzipFilePath =
+      final zipDownloadPath =
           await _downloadAndUnzip(irisMacosCDNUrl, macosModulePath, true);
+      final unzipFilePath =
+          _getUnzipDir(irisMacosCDNUrl, zipDownloadPath, 'DCG', 'macOS');
 
       processManager.runSyncWithOutput([
         'cp',
@@ -377,6 +413,22 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           irisDebuggerFrameworkPath,
           path.join(
               _workspace.absolute.path, 'test_shard', 'iris_tester', 'macos'),
+        ]);
+      }
+
+      final unzipRtmPath =
+          _getUnzipDir(irisMacosCDNUrl, zipDownloadPath, 'RTM', 'macOS');
+      if (fileSystem.directory(unzipRtmPath).existsSync()) {
+        processManager.runSyncWithOutput([
+          'cp',
+          '-RP',
+          path.join(
+            unzipFilePath,
+            'MAC',
+            'Release',
+            'AgoraRtmWrapper.framework',
+          ),
+          macosModulePath
         ]);
       }
     }
@@ -964,6 +1016,38 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 //     inputStream.close();
   }
 
+  String _getUnzipDir(
+    String zipFileUrl,
+    String zipDownloadPath,
+    String irisType, // DCG/RTM
+    String platform, // iOS/Android/macOS/Windows
+  ) {
+    final zipDownloadDir = fileSystem.directory(zipDownloadPath);
+    final zipFileBaseName = Uri.parse(zipFileUrl).pathSegments.last;
+
+    final zipDirList = zipDownloadDir.listSync();
+    bool hasWrapDir = false;
+
+    for (final dir in zipDirList) {
+      if (dir.path == zipFileBaseName) {
+        hasWrapDir = true;
+        break;
+      }
+    }
+
+    final version = zipFileBaseName.split(' ')[1];
+
+    if (hasWrapDir) {
+      return path.join(
+        zipDownloadPath,
+        zipFileBaseName,
+        'iris_${version}_${irisType}_$platform',
+      );
+    }
+
+    return path.join(zipDownloadPath, 'iris_${version}_${irisType}_$platform');
+  }
+
   Future<String> _downloadAndUnzip(
       String zipFileUrl, String unzipOutputPath, bool isUnzipSymlinks) async {
     final zipDownloadPath = path.join(unzipOutputPath, 'zip_download_path');
@@ -1012,7 +1096,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
     // fileSystem.directory(zipDownloadPath).deleteSync(recursive: true);
 
-    return unzipFilePath;
+    return zipDownloadPath;
   }
 
   void _runFlutterPackagesGet(String packagePath) {
