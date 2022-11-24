@@ -373,7 +373,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       final zipDownloadPath =
           await _downloadAndUnzip(irisMacosCDNUrl, macosModulePath, true);
       final unzipFilePath =
-          _getUnzipDir(irisMacosCDNUrl, zipDownloadPath, 'DCG', 'macOS');
+          _getUnzipDir(irisMacosCDNUrl, zipDownloadPath, 'DCG', 'MAC');
 
       processManager.runSyncWithOutput([
         'cp',
