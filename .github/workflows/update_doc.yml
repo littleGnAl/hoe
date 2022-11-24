@@ -108,7 +108,8 @@ jobs:
 
           echo ${EXPORT_FILE_PATH}
 
-          python3 iris_doc.py --config=${{ inputs.config }} --language=${{ inputs.language }} --export-file-path=${EXPORT_FILE_PATH} ${TEMPLATE_URL_ARGS}
+          CONFIG=${{ inputs.config }}
+          python3 iris_doc.py --config="$ROOT_PATH/iris-doc/$CONFIG" --language=${{ inputs.language }} --export-file-path=${EXPORT_FILE_PATH} ${TEMPLATE_URL_ARGS}
 
       - name: Create Pull Request
         id: cpr
