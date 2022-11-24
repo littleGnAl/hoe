@@ -1035,7 +1035,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       }
     }
 
-    final version = zipFileBaseName.split(' ')[1];
+    // iris_4.1.0_DCG_Mac_Video_20221122_0724
+    final version = zipFileBaseName.split('_')[1];
 
     if (hasWrapDir) {
       return path.join(
