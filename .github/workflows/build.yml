@@ -125,7 +125,6 @@ jobs:
   build_macos:
     name: Build macos
     runs-on: macos-11
-    timeout-minutes: 60
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
@@ -208,7 +207,6 @@ jobs:
   build_windows:
     name: Build windows
     runs-on: windows-2019
-    timeout-minutes: 60
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
@@ -278,7 +276,6 @@ jobs:
   build_ios:
     name: Build ios
     runs-on: macos-11
-    timeout-minutes: 60
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
