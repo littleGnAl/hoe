@@ -327,7 +327,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
             'Release',
             'AgoraRtmWrapper.xcframework',
           ),
-          iosModulePath
+          path.join(iosModulePath, 'libs')
         ]);
       }
     }
@@ -428,7 +428,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
             'Release',
             'AgoraRtmWrapper.framework',
           ),
-          macosModulePath
+          path.join(macosModulePath, 'libs')
         ]);
       }
     }
