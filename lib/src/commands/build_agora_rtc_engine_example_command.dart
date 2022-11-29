@@ -417,7 +417,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       }
 
       final unzipRtmPath =
-          _getUnzipDir(irisMacosCDNUrl, zipDownloadPath, 'RTM', 'macOS');
+          _getUnzipDir(irisMacosCDNUrl, zipDownloadPath, 'RTM', 'MAC');
       if (fileSystem.directory(unzipRtmPath).existsSync()) {
         processManager.runSyncWithOutput([
           'cp',
