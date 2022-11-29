@@ -1163,6 +1163,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         'MUSIC_CENTER_APPID=${_globalConfig.musicCenterAppid}',
         '--dart-define',
         'RTM_APP_ID=${_globalConfig.testAppId}',
+        '--dart-define',
+        'RTM_TOKEN=${_globalConfig.testAppId}',
         ...extraArgs,
       ],
       runInShell: true,
