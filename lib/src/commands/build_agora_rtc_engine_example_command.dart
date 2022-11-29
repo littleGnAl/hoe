@@ -423,7 +423,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           'cp',
           '-RP',
           path.join(
-            unzipFilePath,
+            unzipRtmPath,
             'MAC',
             'Release',
             'AgoraRtmWrapper.framework',
