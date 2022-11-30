@@ -440,8 +440,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     _createAgoraRtcWrapperPodSpecFile(macosModuleDir);
     _modifyPodSpecFile(podspecFilePath, true);
 
-    _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
-    _runPodInstall(path.join(_workspace.absolute.path, 'example', 'macos'));
+    // _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
+    // _runPodInstall(path.join(_workspace.absolute.path, 'example', 'macos'));
   }
 
   Future<void> _setupWindowsDev(
@@ -584,6 +584,9 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
                 : 'AgoraRtcWrapper.framework');
     agoraRtcWrapperPodspecFile
         .writeAsStringSync(agoraRtcWrapperPodSpecFileContent);
+
+    stdout.writeln('Created AgoraRtcWrapper.podspec:');
+    stdout.writeln(agoraRtcWrapperPodspecFile.readAsStringSync());
   }
 
   void _runPodInstall(String iosProjectPath) {
