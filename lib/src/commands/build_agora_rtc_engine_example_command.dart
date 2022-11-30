@@ -468,7 +468,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       final unzipFilePath = _getUnzipDir(
           irisWindowsDownloadUrl, zipDownloadPath, 'DCG', 'Windows');
 
-      _copyDirectory(fileSystem.directory(unzipFilePath), thirdPartyIrisDir);
+      _copyDirectory(fileSystem.directory(zipDownloadPath), thirdPartyIrisDir);
 
       final irisDebuggerDllPath = path.join(
           unzipFilePath, 'x64', 'Release', 'Release', 'IrisDebugger.dll');
