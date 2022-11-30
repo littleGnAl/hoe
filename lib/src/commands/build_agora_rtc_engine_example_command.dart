@@ -439,9 +439,6 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         path.join(macosModulePath, 'agora_rtc_engine.podspec');
     _createAgoraRtcWrapperPodSpecFile(macosModuleDir);
     _modifyPodSpecFile(podspecFilePath, true);
-
-    // _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
-    // _runPodInstall(path.join(_workspace.absolute.path, 'example', 'macos'));
   }
 
   Future<void> _setupWindowsDev(
