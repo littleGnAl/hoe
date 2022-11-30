@@ -11,12 +11,8 @@ class DefaultFileDownloader {
   final Dio _dio = Dio();
 
   Future<Response> downloadFile(String url, String savePath) async {
-    // final envVarMap = Platform.environment;
     final user = _globalConfig.agoraArtifactoryUser;
-    // stdout.writeln('user: $user');
-
     final pwd = _globalConfig.agoraArtifactoryPwd;
-    // stdout.writeln('pwd: $pwd');
     return _dio.download(url, savePath,
         options: Options(headers: {
           'Authorization': 'Basic ' +
