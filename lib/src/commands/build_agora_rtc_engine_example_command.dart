@@ -595,7 +595,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
   void _runPodInstall(String iosProjectPath) {
     processManager.runSyncWithOutput(
-      ['pod', 'install'],
+      ['pod', 'install', '--repo-update'],
       runInShell: true,
       workingDirectory: iosProjectPath,
     );
