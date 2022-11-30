@@ -465,8 +465,11 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           fileSystem.directory(path.join(thirdPartyDir.absolute.path, 'iris'));
       thirdPartyIrisDir.createSync();
 
-      final unzipFilePath = await _downloadAndUnzip(
+      final zipDownloadPath = await _downloadAndUnzip(
           irisWindowsDownloadUrl, windowsModulePath, false);
+
+      final unzipFilePath = _getUnzipDir(
+          irisWindowsDownloadUrl, zipDownloadPath, 'DCG', 'Windows');
 
       _copyDirectory(fileSystem.directory(unzipFilePath), thirdPartyIrisDir);
 
