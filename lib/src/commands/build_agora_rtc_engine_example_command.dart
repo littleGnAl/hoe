@@ -532,6 +532,9 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     }
 
     podspecFile.writeAsStringSync(newOutput.toString());
+
+    stdout.writeln('Modified $podspecFilePath:');
+    stdout.writeln(podspecFile.readAsStringSync());
   }
 
   void _modifyPodFile(String podFilePath, bool forDev) {
