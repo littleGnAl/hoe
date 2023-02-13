@@ -37,7 +37,7 @@ on:
 jobs:
   build_android:
     name: Build Android
-    runs-on: macos-11
+    runs-on: macos-12
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
@@ -124,7 +124,7 @@ jobs:
 
   build_macos:
     name: Build macos
-    runs-on: macos-11
+    runs-on: macos-12
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
@@ -275,7 +275,7 @@ jobs:
 
   build_ios:
     name: Build ios
-    runs-on: macos-11
+    runs-on: macos-12
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
