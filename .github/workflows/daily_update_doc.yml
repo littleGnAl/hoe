@@ -16,7 +16,7 @@ jobs:
         with:
           script: |
             const date = new Date()
-            var dateString = `${d.getFullYear()}-${d.getMonth()}-${d.getDay()}`
+            var dateString = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`
 
             // Only trigger Agora-Flutter-SDK repo at this time
             const owner = "AgoraIO-Extensions"
