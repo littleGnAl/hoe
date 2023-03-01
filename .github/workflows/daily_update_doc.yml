@@ -3,7 +3,7 @@ name: Daily update doc
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron:  '*/10 * * * *'
+    - cron:  '*/5 * * * *'
 
 jobs:
   update_doc:
@@ -30,16 +30,16 @@ jobs:
               workflow_id: workflow_id,
               ref: main,
               inputs: {
-                iris-doc-ref: 'main',
-                target_repo: 'AgoraIO-Extensions/Agora-Flutter-SDK',
-                target_branch: 'main',
-                pull_request_title: `[doc] daily update ${dateString}`,
-                commit_message: `[doc] daily update ${dateString}`,
-                config: 'fmt_config/fmt_dart.yaml',
-                language: 'dart',
-                base-template-url: 'https://github.com/AgoraIO/agora_doc_source/releases/download/main/flutter_ng_json_template_en.json',
-                merge-template-url: '',
-                export-file-path: 'lib/agora_rtc_engine.dart'
+                'iris-doc-ref': 'main',
+                'target_repo': 'AgoraIO-Extensions/Agora-Flutter-SDK',
+                'target_branch': 'main',
+                'pull_request_title': `[doc] daily update ${dateString}`,
+                'commit_message': `[doc] daily update ${dateString}`,
+                'config': 'fmt_config/fmt_dart.yaml',
+                'language': 'dart',
+                'base-template-url': 'https://github.com/AgoraIO/agora_doc_source/releases/download/main/flutter_ng_json_template_en.json',
+                'merge-template-url': '',
+                'export-file-path': 'lib/agora_rtc_engine.dart'
               },
               headers: {
                 'X-GitHub-Api-Version': '2022-11-28'
