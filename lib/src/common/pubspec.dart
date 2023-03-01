@@ -6,7 +6,7 @@ class Pubspec {
   factory Pubspec.load(String pubspecFileContent) {
     var doc = loadYaml(pubspecFileContent);
 
-    return Pubspec._(doc['hoe'], doc['version']);
+    return Pubspec._(doc['name'], doc['version']);
   }
 
   final String name;
