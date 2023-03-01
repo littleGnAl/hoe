@@ -1,0 +1,49 @@
+name: Daily update doc
+
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '*/10 * * * *'
+
+jobs:
+  update_doc:
+    name: Updating DOC
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Trigger update_doc workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const date = new Date()
+            var dateString = `${d.getFullYear()}-${d.getMonth()}-${d.getDay()}`
+
+            // Only trigger Agora-Flutter-SDK repo at this time
+            const owner = "AgoraIO-Extensions"
+            const repo = "Agora-Flutter-SDK"
+            const workflow_id = "update_doc"
+
+            // see https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
+            github.request(`POST /repos/${owner}/${repo}/actions/workflows/${workflow_id}/dispatches`, {
+              owner: owner,
+              repo: repo,
+              workflow_id: workflow_id,
+              ref: main,
+              inputs: {
+                iris-doc-ref: 'main',
+                target_repo: 'AgoraIO-Extensions/Agora-Flutter-SDK',
+                target_branch: 'main',
+                pull_request_title: `[doc] daily update ${dateString}`,
+                commit_message: `[doc] daily update ${dateString}`,
+                config: 'fmt_config/fmt_dart.yaml',
+                language: 'dart',
+                base-template-url: 'https://github.com/AgoraIO/agora_doc_source/releases/download/main/flutter_ng_json_template_en.json',
+                merge-template-url: '',
+                export-file-path: 'lib/agora_rtc_engine.dart'
+              },
+              headers: {
+                'X-GitHub-Api-Version': '2022-11-28'
+              }
+            })
+
+     
