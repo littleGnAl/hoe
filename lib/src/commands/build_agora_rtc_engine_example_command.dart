@@ -8,6 +8,7 @@ import 'package:hoe/src/base/process_manager_ext.dart';
 import 'package:hoe/src/common/default_file_downloader.dart';
 import 'package:hoe/src/common/global_config.dart';
 import 'package:hoe/src/common/ios_plist_config.dart';
+import 'package:hoe/src/common/pubspec.dart';
 import 'package:path/path.dart' as path;
 import 'package:process/process.dart';
 
@@ -963,11 +964,15 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
   }
 
   String _createOutputZipPath(String flutterPackageName, String platform) {
+    final pubspecFilePath = path.join(_workspace.absolute.path, 'pubspec.yaml');
+    final pubspec =
+        Pubspec.load(fileSystem.file(pubspecFilePath).readAsStringSync());
+
     final today = DateTime.now();
     String dateSlug =
         "${today.year.toString()}${today.month.toString().padLeft(2, '0')}${today.day.toString().padLeft(2, '0')}${today.hour.toString().padLeft(2, '0')}${today.minute.toString().padLeft(2, '0')}${today.second.toString().padLeft(2, '0')}";
     final internalTestingArtifactsWindowsZipBaseName =
-        '${flutterPackageName}_${platform}_$dateSlug.zip';
+        '${flutterPackageName}_${platform}_${pubspec.version}_$dateSlug.zip';
     return internalTestingArtifactsWindowsZipBaseName;
   }
 
