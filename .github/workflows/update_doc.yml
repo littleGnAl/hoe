@@ -130,5 +130,13 @@ jobs:
           branch: "${{ inputs.target_branch }}-doc"
           base: ${{ inputs.target_branch }}
           delete-branch: true
-          title: ${{ inputs.pull_request_title }}
           draft: false
+          title: ${{ inputs.pull_request_title }}
+          body: |
+            ${{ inputs.commit_message }}
+
+            doc source: ${{ inputs.base-template-url }}
+
+            > This pull request is trigger by bot, do not edit it directly
+          labels: |
+            ci:doc
