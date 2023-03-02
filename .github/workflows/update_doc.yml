@@ -121,6 +121,7 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
+          token: ${{ secrets.ACTION_PAT }}
           path: ${{ inputs.target_repo }}
           commit-message: ${{ inputs.commit_message }}
           committer: GitHub <noreply@github.com>
@@ -135,5 +136,7 @@ jobs:
             ${{ inputs.commit_message }}
 
             doc source: ${{ inputs.base-template-url }}
+
+            > This pull request is trigger by bot, do not edit it directly
           labels: |
             ci:doc
