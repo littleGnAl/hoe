@@ -121,7 +121,6 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
-          token: ${{ secrets.ACTION_PAT }}
           path: ${{ inputs.target_repo }}
           commit-message: ${{ inputs.commit_message }}
           committer: GitHub <noreply@github.com>
@@ -130,5 +129,11 @@ jobs:
           branch: "${{ inputs.target_branch }}-doc"
           base: ${{ inputs.target_branch }}
           delete-branch: true
-          title: ${{ inputs.pull_request_title }}
           draft: false
+          title: ${{ inputs.pull_request_title }}
+          body: |
+            ${{ inputs.commit_message }}
+
+            doc source: ${{ inputs.base-template-url }}
+          labels: |
+            ci:doc
