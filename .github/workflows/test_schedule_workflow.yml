@@ -1,0 +1,14 @@
+name: run workflow every 5 minutes
+
+on:
+  schedule:
+    # https://github.blog/changelog/2019-11-01-github-actions-scheduled-jobs-maximum-frequency-is-changing/
+    - cron:  '* * * * *'
+
+jobs:
+  update_doc:
+    name: run workflow every 5 minutes
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - run: echo "run workflow every 5 minutes"
