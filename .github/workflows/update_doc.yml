@@ -21,6 +21,12 @@ on:
         required: true
         default: 'main'
 
+      target_branch_name_surffix:
+        description: The surffix of the branch name, e.g., if doc-update, the branch name become main-doc-update
+        type: string
+        required: true
+        default: 'doc-update'
+
       pull_request_title:
         description: The title of the pull request
         type: string
