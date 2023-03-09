@@ -33,12 +33,6 @@ on:
         required: true
         default: '[AUTO] Update doc'
 
-      commit_message:
-        description: The commit message of the pull request
-        type: string
-        required: true
-        default: '[AUTO] Update doc'
-
       config:
         description: The language config
         type: string
@@ -129,17 +123,17 @@ jobs:
         with:
           token: ${{ secrets.ACTION_PAT }}
           path: ${{ inputs.target_repo }}
-          commit-message: ${{ inputs.commit_message }}
+          commit-message: ${{ inputs.pull_request_title }}
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: false
-          branch: "${{ inputs.target_branch }}-doc"
+          branch: "${{ inputs.target_branch }}-${{ inputs.target_branch_name_surffix }}"
           base: ${{ inputs.target_branch }}
           delete-branch: true
           draft: false
           title: ${{ inputs.pull_request_title }}
           body: |
-            ${{ inputs.commit_message }}
+            ${{ inputs.pull_request_title }}
 
             doc source: ${{ inputs.base-template-url }}
 
