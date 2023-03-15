@@ -282,8 +282,8 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
 
     return _modifiedVersFileContent(
       sourceFileContentLines,
-      () => findIrisAndroidMaven(irisDenpendenciesContent),
       () => findNativeAndroidMaven(nativeSdkDependenciesContent),
+      () => findIrisAndroidMaven(irisDenpendenciesContent),
       r"^[\s]*(implementation|api) 'io.agora.rtc:[a-z-]+:[0-9a-zA-Z\.-]+'",
       (sourceLine) => '$tab${sourceLine.replaceFirst('implementation', 'api')}',
     );
