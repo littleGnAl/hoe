@@ -21,7 +21,7 @@ void main() {
   });
 
   test('findNativeAndroidMaven', () {
-    final nativeSdkVersionContent = '''
+    final nativeSdkDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -35,7 +35,7 @@ pod 'AgoraAudio_Special_iOS', '4.0.1.9'
 pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
 ''';
 
-    final result = command.findNativeAndroidMaven(nativeSdkVersionContent);
+    final result = command.findNativeAndroidMaven(nativeSdkDependenciesContent);
     expect(result.mavenOrCocoaPods[0],
         "implementation 'io.agora.rtc:full-sdk:4.1.0-1'");
     expect(result.mavenOrCocoaPods[1],
@@ -45,7 +45,7 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
   });
 
   test('findNativeIOSPod', () {
-    final nativeSdkVersionContent = '''
+    final nativeSdkDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -60,14 +60,14 @@ pod 'AgoraAudio_Special_iOS', '4.0.1.9'
 pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
 ''';
 
-    final result = command.findNativeIOSPod(nativeSdkVersionContent);
+    final result = command.findNativeIOSPod(nativeSdkDependenciesContent);
     expect(result.mavenOrCocoaPods[0], "pod 'AgoraRtcEngine_iOS', '4.1.0'");
     expect(result.mavenOrCocoaPods[1],
         "pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'");
   });
 
   test('findNativeMacosPod', () {
-    final nativeSdkVersionContent = '''
+    final nativeSdkDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -84,14 +84,14 @@ pod 'AgoraRtcEngine_macOS', '4.1.0'
 pod 'AgoraRtcEngine_Special_macOS', '4.1.1.1'
 ''';
 
-    final result = command.findNativeMacosPod(nativeSdkVersionContent);
+    final result = command.findNativeMacosPod(nativeSdkDependenciesContent);
     expect(result.mavenOrCocoaPods[0], "pod 'AgoraRtcEngine_macOS', '4.1.0'");
     expect(result.mavenOrCocoaPods[1],
         "pod 'AgoraRtcEngine_Special_macOS', '4.1.1.1'");
   });
 
   test('findNativeWindowsCDN', () {
-    final nativeSdkVersionContent = '''
+    final nativeSdkDependenciesContent = '''
 CDN：
 https://download.agora.io/sdk/release/Agora_Native_SDK_for_iOS_rel.v4.0.1.9_62663_VOICE_20230308_1735_257723.zip
 https://download.agora.io/sdk/release/Agora_Native_SDK_for_iOS_rel.v4.0.1.9_62662_FULL_20230308_1737_257722.zip
@@ -107,13 +107,13 @@ pod 'AgoraAudio_Special_iOS', '4.0.1.9'
 pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
 ''';
 
-    final result = command.findNativeWindowsCDN(nativeSdkVersionContent);
+    final result = command.findNativeWindowsCDN(nativeSdkDependenciesContent);
     expect(result.cdn,
         'https://download.agora.io/sdk/release/Agora_Native_SDK_for_Windows_rel.v4.0.1.9_19521_FULL_20230308_1749_257724.zip');
   });
 
   test('findIrisAndroidMaven', () {
-    final irisVersionContent = '''
+    final irisDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -124,7 +124,7 @@ Maven:
 implementation 'io.agora.rtc:iris-rtc:4.1.1.205-build.2'
 ''';
 
-    final result = command.findIrisAndroidMaven(irisVersionContent);
+    final result = command.findIrisAndroidMaven(irisDependenciesContent);
     expect(result.cdn,
         'https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116.zip');
     expect(result.mavenOrCocoaPods[0],
@@ -132,7 +132,7 @@ implementation 'io.agora.rtc:iris-rtc:4.1.1.205-build.2'
   });
 
   test('findIrisIOSPod', () {
-    final irisVersionContent = '''
+    final irisDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -143,7 +143,7 @@ Cocoapods:
 pod 'AgoraIrisRTC_iOS', '4.1.1.205-build.2'
 ''';
 
-    final result = command.findIrisIOSPod(irisVersionContent);
+    final result = command.findIrisIOSPod(irisDependenciesContent);
     expect(result.cdn,
         'https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_iOS_Video_20230312_1116.zip');
     expect(result.mavenOrCocoaPods[0],
@@ -151,7 +151,7 @@ pod 'AgoraIrisRTC_iOS', '4.1.1.205-build.2'
   });
 
   test('findIrisMacosPod', () {
-    final irisVersionContent = '''
+    final irisDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -162,7 +162,7 @@ Cocoapods:
 pod 'AgoraIrisRTC_macOS', '4.1.0-rc.2'
 ''';
 
-    final result = command.findIrisMacosPod(irisVersionContent);
+    final result = command.findIrisMacosPod(irisDependenciesContent);
     expect(result.cdn,
         'https://download.agora.io/sdk/release/iris_4.1.0_DCG_Mac_Video_20230105_0846.zip');
     expect(
@@ -170,7 +170,7 @@ pod 'AgoraIrisRTC_macOS', '4.1.0-rc.2'
   });
 
   test('findIrisWindowsCDN', () {
-    final irisVersionContent = '''
+    final irisDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -179,13 +179,13 @@ CDN:
 https://download.agora.io/sdk/release/iris_4.1.1.205-build.1_DCG_Windows_Video_20230311_0918.zip
 ''';
 
-    final result = command.findIrisWindowsCDN(irisVersionContent);
+    final result = command.findIrisWindowsCDN(irisDependenciesContent);
     expect(result.cdn,
         'https://download.agora.io/sdk/release/iris_4.1.1.205-build.1_DCG_Windows_Video_20230311_0918.zip');
   });
 
   test('modifiedAndroidGradleContent', () {
-    final nativeSdkVersionContent = '''
+    final nativeSdkDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -198,7 +198,7 @@ pod 'AgoraAudio_Special_iOS', '4.0.1.9'
 pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
 ''';
 
-    final irisVersionContent = '''
+    final irisDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -281,13 +281,13 @@ dependencies {
 }
 ''';
 
-    final result = command.modifiedAndroidGradleContent(
-        fileContent.split('\n'), nativeSdkVersionContent, irisVersionContent);
+    final result = command.modifiedAndroidGradleContent(fileContent.split('\n'),
+        nativeSdkDependenciesContent, irisDependenciesContent);
     expect(result, expectedFileContent);
   });
 
   test('modifiedIOSPodspecContent', () {
-    final nativeSdkVersionContent = '''
+    final nativeSdkDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -299,7 +299,7 @@ Cocoapods：
 pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
 ''';
 
-    final irisVersionContent = '''
+    final irisDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -358,13 +358,13 @@ Pod::Spec.new do |s|
 end
 ''';
 
-    final result = command.modifiedIOSPodspecContent(
-        fileContent.split('\n'), nativeSdkVersionContent, irisVersionContent);
+    final result = command.modifiedIOSPodspecContent(fileContent.split('\n'),
+        nativeSdkDependenciesContent, irisDependenciesContent);
     expect(result, expectedFileContent);
   });
 
   test('modifiedMacOSPodspecContent', () {
-    final nativeSdkVersionContent = '''
+    final nativeSdkDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -380,7 +380,7 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
 pod 'AgoraRtcEngine_macOS', '4.1.1'
 ''';
 
-    final irisVersionContent = '''
+    final irisDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -443,13 +443,13 @@ A new flutter plugin project.
 end
 ''';
 
-    final result = command.modifiedMacOSPodspecContent(
-        fileContent.split('\n'), nativeSdkVersionContent, irisVersionContent);
+    final result = command.modifiedMacOSPodspecContent(fileContent.split('\n'),
+        nativeSdkDependenciesContent, irisDependenciesContent);
     expect(result, expectedFileContent);
   });
 
   test('modifiedWindowsCMakeContent', () {
-    final irisVersionContent = '''
+    final irisDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -511,7 +511,7 @@ set(IRIS_DOWNLOAD_PATH "${CMAKE_CURRENT_SOURCE_DIR}/third_party/iris")
 ''';
 
     final result = command.modifiedWindowsCMakeContent(
-        fileContent.split('\n'), irisVersionContent);
+        fileContent.split('\n'), irisDependenciesContent);
     expect(result, expectedFileContent);
   });
 }
