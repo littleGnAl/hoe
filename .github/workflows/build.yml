@@ -44,6 +44,8 @@ jobs:
       AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
       AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
       BITBUCKET_IRIS_GIT_URL: ${{ secrets.BITBUCKET_IRIS_GIT_URL }}
+    outputs:
+      android_artifactory_name: ${{ steps.android-build-step.outputs.output_android_artifactory_name }}
     steps:
       - uses: actions/checkout@v3
 
@@ -77,6 +79,7 @@ jobs:
           flutter-version: '3.0.0'
 
       - name: Run build android
+        id: android-build-step
         run: |
           IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
           echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
@@ -108,6 +111,9 @@ jobs:
             --apple-package-name=io.agora.agoraRtcEngineExample \
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
+
+          OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
+          echo "output_android_artifactory_name=${OUTPUT_ARTIFACT_FILE_NAME}" >> "$GITHUB_OUTPUT"
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
