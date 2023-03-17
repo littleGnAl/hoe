@@ -2,6 +2,52 @@ name: Build flutter project example
 
 on:
   workflow_call:
+    inputs:
+      build_branch:
+        description: flutter project branch
+        type: string
+        required: true
+        default: 'main'
+
+      setup-local-dev:
+        type: boolean
+        description: Is setup local dev
+        default: false
+
+      iris-branch:
+        description: iris branch
+        type: string
+
+      iris-macos-cdn-url:
+        description: iris macos cdn url
+        type: string
+
+      iris-ios-cdn-url:
+        description: iris ios cdn url
+        type: string
+
+      iris-android-cdn-url:
+        description: iris android cdn url
+        type: string
+
+      iris-windows-cdn-url:
+        description: iris windows cdn url
+        type: string
+
+    outputs:
+      android_artifactory_download_url:
+        description: "The android artifactory download url"
+        value: ${{ jobs.build_android.outputs.android_artifactory_download_url }}
+      macos_artifactory_download_url:
+        description: "The macos artifactory download url"
+        value: ${{ jobs.build_macos.outputs.macos_artifactory_download_url }}
+      windows_artifactory_download_url:
+        description: "The windows artifactory download url"
+        value: ${{ jobs.build_windows.outputs.windows_artifactory_download_url }}
+      ios_artifactory_download_url:
+        description: "The android artifactory download url"
+        value: ${{ jobs.build_ios.outputs.ios_artifactory_download_url }}
+
   workflow_dispatch:
     inputs:
       build_branch:
