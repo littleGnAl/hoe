@@ -45,7 +45,7 @@ jobs:
       AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
       BITBUCKET_IRIS_GIT_URL: ${{ secrets.BITBUCKET_IRIS_GIT_URL }}
     outputs:
-      android_artifactory_name: ${{ steps.android-build-step.outputs.output_android_artifactory_name }}
+      android_artifactory_download_url: ${{ steps.android-build-step.outputs.output_android_artifactory_download_url }}
     steps:
       - uses: actions/checkout@v3
 
@@ -112,8 +112,16 @@ jobs:
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
 
+          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          DATE=$(date '+%Y-%m-%d')
+          TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          echo "output_android_artifactory_name=${OUTPUT_ARTIFACT_FILE_NAME}" >> "$GITHUB_OUTPUT"
+          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+          
+          echo "output_android_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
@@ -125,7 +133,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          tag_name: ${{ env.TAG_NAME }}
           files: "output/*.zip"
 
   build_macos:
@@ -138,7 +146,7 @@ jobs:
       AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
       BITBUCKET_IRIS_GIT_URL: ${{ secrets.BITBUCKET_IRIS_GIT_URL }}
     outputs:
-      macos_artifactory_name: ${{ steps.macos-build-step.outputs.output_macos_artifactory_name }}
+      macos_artifactory_download_url: ${{ steps.macos-build-step.outputs.output_macos_artifactory_download_url }}
     steps:
       - uses: actions/checkout@v3
 
@@ -200,8 +208,16 @@ jobs:
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
 
+          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          DATE=$(date '+%Y-%m-%d')
+          TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          echo "output_macos_artifactory_name=${OUTPUT_ARTIFACT_FILE_NAME}" >> "$GITHUB_OUTPUT"
+          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+
+          echo "output_macos_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
@@ -213,7 +229,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          tag_name: ${{ env.TAG_NAME }}
           files: "output/*.zip"
 
   build_windows:
@@ -225,7 +241,7 @@ jobs:
       AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
       AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
     outputs:
-      windows_artifactory_name: ${{ steps.windows-build-step.outputs.output_windows_artifactory_name }}
+      windows_artifactory_download_url: ${{ steps.windows-build-step.outputs.output_windows_artifactory_download_url }}
     steps:
       - uses: actions/checkout@v3
 
@@ -274,8 +290,15 @@ jobs:
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
 
+          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          DATE=$(date '+%Y-%m-%d')
+          TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          echo "output_windows_artifactory_name=${OUTPUT_ARTIFACT_FILE_NAME}" >> "$GITHUB_OUTPUT"
+          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+          echo "output_windows_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
 
       - name: Get current date
         id: date
@@ -288,7 +311,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          tag_name: ${{ env.TAG_NAME }}
           files: "output/*.zip"
 
   build_ios:
@@ -321,7 +344,7 @@ jobs:
       CODE_SIGN_IDENTITY_QA: ${{ secrets.CODE_SIGN_IDENTITY_QA }}
       CODE_SIGN_IDENTITY_TEST: ${{ secrets.CODE_SIGN_IDENTITY_TEST }}
     outputs:
-      ios_artifactory_name: ${{ steps.ios-build-step.outputs.output_ios_artifactory_name }}
+      ios_artifactory_download_url: ${{ steps.ios-build-step.outputs.output_ios_artifactory_download_url }}
     steps:
       - uses: actions/checkout@v3
 
@@ -363,8 +386,16 @@ jobs:
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
 
+          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          DATE=$(date '+%Y-%m-%d')
+          TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          echo "output_ios_artifactory_name=${OUTPUT_ARTIFACT_FILE_NAME}" >> "$GITHUB_OUTPUT"
+          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+
+          echo "output_ios_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
 
       - name: Get current date
         id: date
@@ -377,5 +408,5 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          tag_name: ${{ env.TAG_NAME }}
           files: "output/*.zip"
