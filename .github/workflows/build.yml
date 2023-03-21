@@ -1,6 +1,53 @@
 name: Build flutter project example
 
-on: 
+on:
+  workflow_call:
+    inputs:
+      build_branch:
+        description: flutter project branch
+        type: string
+        required: true
+        default: 'main'
+
+      setup-local-dev:
+        type: boolean
+        description: Is setup local dev
+        default: false
+
+      iris-branch:
+        description: iris branch
+        type: string
+
+      iris-macos-cdn-url:
+        description: iris macos cdn url
+        type: string
+
+      iris-ios-cdn-url:
+        description: iris ios cdn url
+        type: string
+
+      iris-android-cdn-url:
+        description: iris android cdn url
+        type: string
+
+      iris-windows-cdn-url:
+        description: iris windows cdn url
+        type: string
+
+    outputs:
+      android_artifactory_download_url:
+        description: "The android artifactory download url"
+        value: ${{ jobs.build_android.outputs.android_artifactory_download_url }}
+      macos_artifactory_download_url:
+        description: "The macos artifactory download url"
+        value: ${{ jobs.build_macos.outputs.macos_artifactory_download_url }}
+      windows_artifactory_download_url:
+        description: "The windows artifactory download url"
+        value: ${{ jobs.build_windows.outputs.windows_artifactory_download_url }}
+      ios_artifactory_download_url:
+        description: "The android artifactory download url"
+        value: ${{ jobs.build_ios.outputs.ios_artifactory_download_url }}
+
   workflow_dispatch:
     inputs:
       build_branch:
@@ -44,6 +91,8 @@ jobs:
       AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
       AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
       BITBUCKET_IRIS_GIT_URL: ${{ secrets.BITBUCKET_IRIS_GIT_URL }}
+    outputs:
+      android_artifactory_download_url: ${{ steps.android-build-step.outputs.output_android_artifactory_download_url }}
     steps:
       - uses: actions/checkout@v3
 
@@ -77,6 +126,7 @@ jobs:
           flutter-version: '3.0.0'
 
       - name: Run build android
+        id: android-build-step
         run: |
           IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
           echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
@@ -108,6 +158,17 @@ jobs:
             --apple-package-name=io.agora.agoraRtcEngineExample \
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
+
+          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          DATE=$(date '+%Y-%m-%d')
+          TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
+          OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
+          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+          
+          echo "output_android_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
@@ -119,7 +180,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          tag_name: ${{ env.TAG_NAME }}
           files: "output/*.zip"
 
   build_macos:
@@ -131,6 +192,8 @@ jobs:
       AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
       AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
       BITBUCKET_IRIS_GIT_URL: ${{ secrets.BITBUCKET_IRIS_GIT_URL }}
+    outputs:
+      macos_artifactory_download_url: ${{ steps.macos-build-step.outputs.output_macos_artifactory_download_url }}
     steps:
       - uses: actions/checkout@v3
 
@@ -161,6 +224,7 @@ jobs:
           flutter-version: '3.0.0'
 
       - name: Run build macos
+        id: macos-build-step
         run: |
           IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
           echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
@@ -190,6 +254,17 @@ jobs:
             --apple-package-name=io.agora.agoraRtcEngineExample \
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
+
+          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          DATE=$(date '+%Y-%m-%d')
+          TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
+          OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
+          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+
+          echo "output_macos_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
@@ -201,7 +276,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          tag_name: ${{ env.TAG_NAME }}
           files: "output/*.zip"
 
   build_windows:
@@ -212,6 +287,8 @@ jobs:
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
       AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
       AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
+    outputs:
+      windows_artifactory_download_url: ${{ steps.windows-build-step.outputs.output_windows_artifactory_download_url }}
     steps:
       - uses: actions/checkout@v3
 
@@ -231,6 +308,7 @@ jobs:
           cat ${FLUTTER_ROOT}/bin/internal/engine.version
 
       - name: Run build windows
+        id: windows-build-step
         shell: bash
         run: |
           git config --system core.longpaths true
@@ -259,6 +337,16 @@ jobs:
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
 
+          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          DATE=$(date '+%Y-%m-%d')
+          TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
+          OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
+          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+          echo "output_windows_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
+
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
@@ -270,7 +358,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          tag_name: ${{ env.TAG_NAME }}
           files: "output/*.zip"
 
   build_ios:
@@ -302,6 +390,8 @@ jobs:
       CODE_SIGN_IDENTITY_LAB: ${{ secrets.CODE_SIGN_IDENTITY_LAB }}
       CODE_SIGN_IDENTITY_QA: ${{ secrets.CODE_SIGN_IDENTITY_QA }}
       CODE_SIGN_IDENTITY_TEST: ${{ secrets.CODE_SIGN_IDENTITY_TEST }}
+    outputs:
+      ios_artifactory_download_url: ${{ steps.ios-build-step.outputs.output_ios_artifactory_download_url }}
     steps:
       - uses: actions/checkout@v3
 
@@ -317,6 +407,7 @@ jobs:
           flutter-version: '3.0.0'
 
       - name: Run build ios
+        id: ios-build-step
         run: |
           IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
           echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
@@ -341,6 +432,18 @@ jobs:
             --apple-package-name=io.agora.agoraRtcEngineExample \
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
+
+          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          DATE=$(date '+%Y-%m-%d')
+          TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
+          OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
+          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+
+          echo "output_ios_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
+
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d')"
@@ -352,5 +455,5 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          tag_name: ${{ env.TAG_NAME }}
           files: "output/*.zip"
