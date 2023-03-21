@@ -112,7 +112,7 @@ jobs:
           if_key_exists: fail # replace / ignore / fail; optional (defaults to fail)
       - name: Clone iris
         run: |
-          IRIS_BRANCH=${{ github.event.inputs.iris-branch }}
+          IRIS_BRANCH=${{ inputs.iris-branch }}
           if [ ! -z "${IRIS_BRANCH}" ]; then
             git clone ${BITBUCKET_IRIS_GIT_URL} --branch ${IRIS_BRANCH}
           fi
@@ -128,19 +128,19 @@ jobs:
       - name: Run build android
         id: android-build-step
         run: |
-          IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
+          IS_SETUP_LOCAL_DEV=${{ inputs.setup-local-dev }}
           echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
           EXTRA_ARGS=""
           if ${IS_SETUP_LOCAL_DEV} ; then
             EXTRA_ARGS=" --setup-local-dev"
           fi
 
-          IRIS_BRANCH=${{ github.event.inputs.iris-branch }}
+          IRIS_BRANCH=${{ inputs.iris-branch }}
           if [ ! -z "${IRIS_BRANCH}" ]; then
             EXTRA_ARGS="${EXTRA_ARGS} --local-iris-path=iris"
           fi
 
-          IRIS_ANDROID_CDN_URL=${{ github.event.inputs.iris-android-cdn-url }}
+          IRIS_ANDROID_CDN_URL=${{ inputs.iris-android-cdn-url }}
           if [ ! -z "${IRIS_ANDROID_CDN_URL}" ]; then
             EXTRA_ARGS="${EXTRA_ARGS} --iris-android-cdn-url=${IRIS_ANDROID_CDN_URL}"
           fi
@@ -214,7 +214,7 @@ jobs:
 
       - name: Clone iris
         run: |
-          IRIS_BRANCH=${{ github.event.inputs.iris-branch }}
+          IRIS_BRANCH=${{ inputs.iris-branch }}
           if [ ! -z "${IRIS_BRANCH}" ]; then
             git clone ${BITBUCKET_IRIS_GIT_URL} --branch ${IRIS_BRANCH}
           fi
@@ -226,19 +226,19 @@ jobs:
       - name: Run build macos
         id: macos-build-step
         run: |
-          IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
+          IS_SETUP_LOCAL_DEV=${{ inputs.setup-local-dev }}
           echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
           EXTRA_ARGS=""
           if ${IS_SETUP_LOCAL_DEV} ; then
             EXTRA_ARGS=" --setup-local-dev"
           fi
 
-          IRIS_BRANCH=${{ github.event.inputs.iris-branch }}
+          IRIS_BRANCH=${{ inputs.iris-branch }}
           if [ ! -z "${IRIS_BRANCH}" ]; then
             EXTRA_ARGS="${EXTRA_ARGS} --local-iris-path=iris"
           fi
 
-          IRIS_MACOS_CDN_URL=${{ github.event.inputs.iris-macos-cdn-url }}
+          IRIS_MACOS_CDN_URL=${{ inputs.iris-macos-cdn-url }}
           if [ ! -z "${IRIS_MACOS_CDN_URL}" ]; then
             EXTRA_ARGS="${EXTRA_ARGS} --iris-macos-cdn-url=${IRIS_MACOS_CDN_URL}"
           fi
@@ -313,14 +313,14 @@ jobs:
         run: |
           git config --system core.longpaths true
           
-          IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
+          IS_SETUP_LOCAL_DEV=${{ inputs.setup-local-dev }}
           echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
           EXTRA_ARGS=""
           if ${IS_SETUP_LOCAL_DEV} ; then
             EXTRA_ARGS=" --setup-local-dev"
           fi
 
-          IRIS_WINDOWS_CDN_URL=${{ github.event.inputs.iris-windows-cdn-url }}
+          IRIS_WINDOWS_CDN_URL=${{ inputs.iris-windows-cdn-url }}
           if [ ! -z "${IRIS_WINDOWS_CDN_URL}" ]; then
             EXTRA_ARGS="${EXTRA_ARGS} --iris-windows-cdn-url=${IRIS_WINDOWS_CDN_URL}"
           fi
@@ -409,14 +409,14 @@ jobs:
       - name: Run build ios
         id: ios-build-step
         run: |
-          IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
+          IS_SETUP_LOCAL_DEV=${{ inputs.setup-local-dev }}
           echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
           EXTRA_ARGS=""
           if ${IS_SETUP_LOCAL_DEV} ; then
             EXTRA_ARGS=" --setup-local-dev"
           fi
 
-          IRIS_IOS_CDN_URL=${{ github.event.inputs.iris-ios-cdn-url }}
+          IRIS_IOS_CDN_URL=${{ inputs.iris-ios-cdn-url }}
           if [ ! -z "${IRIS_IOS_CDN_URL}" ]; then
             EXTRA_ARGS="${EXTRA_ARGS} --iris-ios-cdn-url=${IRIS_IOS_CDN_URL}"
           fi
