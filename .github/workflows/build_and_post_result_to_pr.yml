@@ -21,7 +21,6 @@ on:
 
 jobs:
   build_examples:
-    id: build-examples-step
     uses: ./.github/workflows/build.yml
     with:
       build_branch: ${{ github.event.inputs.target_branch }}
