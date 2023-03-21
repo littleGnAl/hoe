@@ -1,0 +1,55 @@
+name: Build and post reuslt to the Pull Request
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_repo:
+        description: pull request target repo
+        type: string
+        required: true
+        default: 'AgoraIO-Extensions/Agora-Flutter-SDK'
+
+      target_branch:
+        description: pull request target branch
+        type: string
+        required: true
+
+      pr_number:
+        description: The pull request number
+        type: number
+        required: true
+
+jobs:
+  build_examples:
+    id: build-examples-step
+    uses: ./.github/workflows/build.yml
+    with:
+      build_branch: ${{ github.event.inputs.target_branch }}
+
+  comment_pr:
+    name: Comment PR
+    needs: build_examples
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment the artifactories download url to PR
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.ACTION_PAT }}
+          issue-number: ${{ github.event.inputs.pr_number }}
+          repository: ${{ github.event.inputs.target_repo }}
+          body: |
+            Examples built:
+            - ${{ needs.build_examples.outputs.android_artifactory_download_url }}
+            - ${{ needs.build_examples.outputs.ios_artifactory_download_url }}
+            - ${{ needs.build_examples.outputs.macos_artifactory_download_url }}
+            - ${{ needs.build_examples.outputs.windows_artifactory_download_url }}
+
+            > This comment is commented by bot, do not edit it directly
+
+      - name: Remove label "ci:schedule_build_example"
+        uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          github_token: ${{ secrets.ACTION_PAT }}
+          repo: ${{ github.event.inputs.target_repo }}
+          number: ${{ github.event.inputs.pr_number }}
+          labels: ci:schedule_build_example
