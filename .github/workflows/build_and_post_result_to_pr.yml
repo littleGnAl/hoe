@@ -22,6 +22,7 @@ on:
 jobs:
   build_examples:
     uses: ./.github/workflows/build.yml
+    secrets: inherit
     with:
       build_branch: ${{ github.event.inputs.target_branch }}
 
