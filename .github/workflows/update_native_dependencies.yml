@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       native_sdk_version:
-        description: The content of the iris dependencies
+        description: The native sdk version
         required: true
         type: string
 
@@ -17,7 +17,7 @@ on:
         type: string
 
       base_tag_or_branch:
-        description: The content of the iris dependencies
+        description: The base branch or tag to release
         required: true
         type: string
 
