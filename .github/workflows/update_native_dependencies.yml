@@ -42,7 +42,7 @@ jobs:
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-          BRANCH_NAME=special/${{ github.event.inputs.native_sdk_version }}
+          BRANCH_NAME=special/native-${{ inputs.native_sdk_version }}
           git checkout -b ${BRANCH_NAME}
           git push -u origin ${BRANCH_NAME}
 
