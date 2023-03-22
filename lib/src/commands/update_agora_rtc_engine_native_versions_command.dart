@@ -19,8 +19,8 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     required Logger logger,
   }) : super(fileSystem, processManager, logger) {
     argParser.addOption('project-dir');
-    argParser.addOption('native-sdk-version-content');
-    argParser.addOption('iris-version-content');
+    argParser.addOption('native-sdk-dependencies-content');
+    argParser.addOption('iris-dependencies-content');
   }
 
   late final Directory _workspace;
