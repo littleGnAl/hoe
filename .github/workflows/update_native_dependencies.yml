@@ -85,8 +85,8 @@ jobs:
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: false
-          branch: "littlegnal/special/native-${{ inputs.native_sdk_version }}"
-          base: "special/native-${{ inputs.native_sdk_version }}"
+          branch: littlegnal/special/native-${{ inputs.native_sdk_version }}
+          base: special/native-${{ inputs.native_sdk_version }}
           delete-branch: true
           draft: false
           title: "feat: upgrade native sdk ${{ inputs.native_sdk_version }}"
