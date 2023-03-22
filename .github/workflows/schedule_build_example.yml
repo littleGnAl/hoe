@@ -25,18 +25,13 @@ jobs:
               }
             });
 
-            console.log(response);
-
             if (response.status == 200) {
               const prs = response.data;
-              console.log(prs);
-              for (let pr in prs) {
-                console.log(pr.title);
+              for (let pr of prs) {
                 let prNumber = pr.number;
-                console.log(pr.head);
                 let targetBranch = pr.head.ref;
 
-                for (let label in pr.labels) {
+                for (let label of pr.labels) {
                   if (label.name == "ci:schedule_build_example") {
                     const owner = "littleGnAl"
                     const repo = "hoe"
