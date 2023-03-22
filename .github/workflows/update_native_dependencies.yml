@@ -57,8 +57,8 @@ jobs:
       - name: Update native sdk and iris dependencies
         run: |
           PROJECT_DIR=$(pwd)/for-update-dependencies-branch
-          NATIVE_SDK_DEPENDENCIES_CONTENT=${{ github.event.inputs.native_sdk_dependencies_content }}
-          IRIS_DEPENDENCIES_CONTENT=${{ github.event.inputs.iris_dependencies_content }}
+          NATIVE_SDK_DEPENDENCIES_CONTENT="${{ github.event.inputs.native_sdk_dependencies_content }}"
+          IRIS_DEPENDENCIES_CONTENT="${{ github.event.inputs.iris_dependencies_content }}"
 
           
           dart pub get
