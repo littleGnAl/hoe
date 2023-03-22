@@ -22,13 +22,11 @@ on:
         type: string
 
 jobs:
-  build_android:
-    name: Build Android
-    runs-on: macos-12
+  setup_base_release_branch:
+    name: Set up the base branch for releasing
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Check for release branch
+      - name: Checkout for release branch
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.ACTION_PAT }}
@@ -46,6 +44,17 @@ jobs:
           git checkout -b ${BRANCH_NAME}
           git push -u origin ${BRANCH_NAME}
 
+  udpate_dependencies:
+    name: Update dependencies
+    runs-on: macos-12
+    needs: setup_base_release_branch
+    steps:
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 2.17.1
+
+      - uses: actions/checkout@v3
+
       - name: Check for update dependencies branch
         uses: actions/checkout@v3
         with:
@@ -53,10 +62,6 @@ jobs:
           repository: AgoraIO/Agora-Flutter-SDK
           ref: "special/native-${{ inputs.native_sdk_version }}"
           path: for-update-dependencies-branch
-
-      - uses: dart-lang/setup-dart@v1
-        with:
-          sdk: 2.17.1
 
       - name: Update native sdk and iris dependencies
         run: |
