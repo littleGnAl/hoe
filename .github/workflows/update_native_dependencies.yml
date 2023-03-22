@@ -125,6 +125,7 @@ jobs:
         with:
           github-token: ${{ secrets.ACTION_PAT }}
           script: |
+            const owner = 'AgoraIO-Extensions';
             const branchName = `littlegnal/special/native-${{ inputs.native_sdk_version }}`;
             const baseBranchName = `special/native-${{ inputs.native_sdk_version }}`
             const body = `
@@ -134,7 +135,7 @@ jobs:
             `;
             // https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#create-a-pull-request
             await github.request('POST /repos/{owner}/{repo}/pulls', {
-              owner: 'AgoraIO-Extensions',
+              owner: owner,
               repo: 'Agora-Flutter-SDK',
               title: `feat: upgrade native sdk ${{ inputs.native_sdk_version }}`,
               body: body,
