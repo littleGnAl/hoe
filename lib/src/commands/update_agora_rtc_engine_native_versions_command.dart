@@ -18,6 +18,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     required ProcessManager processManager,
     required Logger logger,
   }) : super(fileSystem, processManager, logger) {
+    argParser.addFlag('project-dir');
     argParser.addOption('native-sdk-version-content');
     argParser.addFlag('iris-version-content');
   }
@@ -32,11 +33,11 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
 
   @override
   Future<void> run() async {
+    final String projectDir = argResults?['project-dir'] ?? '';
     final String nativeSdkDependenciesContent =
         argResults?['native-sdk-dependencies-content'] ?? '';
     final String irisDenpendenciesContent =
         argResults?['iris-dependencies-content'] ?? '';
-    final String projectDir = argResults?['project-dir'] ?? '';
 
     _workspace = fileSystem.directory(projectDir);
     stdout.writeln(_workspace.absolute.path);
