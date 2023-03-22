@@ -12,6 +12,12 @@ class VersionLink {
   final List<String> mavenOrCocoaPods;
 }
 
+extension VersionLinkExt on VersionLink {
+  bool noVersionLink() {
+    return cdn.isEmpty && mavenOrCocoaPods.every((element) => element.isEmpty);
+  }
+}
+
 class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   UpdateAgoraRtcEngineNativeVersionsCommand({
     required FileSystem fileSystem,
@@ -285,7 +291,8 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       sourceFileContentLines,
       () => findNativeAndroidMaven(nativeSdkDependenciesContent),
       () => findIrisAndroidMaven(irisDenpendenciesContent),
-      r"^[\s]*(implementation|api) 'io.agora.rtc:[a-z-]+:[0-9a-zA-Z\.-]+'",
+      r"^[\s]*(implementation|api) 'io.agora.rtc:agora[a-z-]+:[0-9a-zA-Z\.-]+'",
+      r"^[\s]*(implementation|api) 'io.agora.rtc:iris[a-z-]+:[0-9a-zA-Z\.-]+'",
       (sourceLine) => '$tab${sourceLine.replaceFirst('implementation', 'api')}',
     );
   }
@@ -295,12 +302,12 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     String nativeSdkDependenciesContent,
     String irisDenpendenciesContent,
   ) {
-    final regExp = r"^[\s]*s.dependency 'Agora[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'";
     return _modifiedVersFileContent(
       sourceFileContentLines,
       () => findNativeIOSPod(nativeSdkDependenciesContent),
       () => findIrisIOSPod(irisDenpendenciesContent),
-      regExp,
+      r"^[\s]*s.dependency 'AgoraRtc[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
+      r"^[\s]*s.dependency 'AgoraIris[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
       (e) {
         return '  ${e.replaceFirst('pod', 's.dependency')}';
       },
@@ -312,12 +319,12 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     String nativeSdkDependenciesContent,
     String irisDenpendenciesContent,
   ) {
-    final regExp = r"^[\s]*s.dependency 'Agora[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'";
     return _modifiedVersFileContent(
       sourceFileContentLines,
       () => findNativeMacosPod(nativeSdkDependenciesContent),
       () => findIrisMacosPod(irisDenpendenciesContent),
-      regExp,
+      r"^[\s]*s.dependency 'AgoraRtc[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
+      r"^[\s]*s.dependency 'AgoraIris[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
       (e) {
         return '  ${e.replaceFirst('pod', 's.dependency')}';
       },
@@ -349,6 +356,9 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     );
 
     final cdn = findIrisWindowsCDN(irisDenpendenciesContent).cdn;
+    if (cdn.isEmpty) {
+      return sourceFileContentLines.join('\n');
+    }
 
     String downloadNameFromCDN = '';
     if (downloadNameFromCDNRegExp.hasMatch(cdn)) {
@@ -377,33 +387,54 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     List<String> sourceFileContentLines,
     VersionLink Function() findNativeVersionLink,
     VersionLink Function() findIrisVersionLink,
-    String regExp,
+    String nativeSDKRegExp,
+    String irisRegExp,
     String Function(String sourceLine) lineMapped,
   ) {
     List<String> modifiedFileContentLines = [];
 
-    RegExp mavenRegExp = RegExp(
-      regExp,
+    RegExp theNativeSDKRegExp = RegExp(
+      nativeSDKRegExp,
       caseSensitive: true,
       multiLine: true,
     );
 
-    bool isAddedVersions = false;
-    for (final line in sourceFileContentLines) {
-      if (mavenRegExp.hasMatch(line)) {
-        if (!isAddedVersions) {
-          VersionLink irisVersionLink = findIrisVersionLink();
-          VersionLink nativeVersionLink = findNativeVersionLink();
+    RegExp theIrisRegExp = RegExp(
+      nativeSDKRegExp,
+      caseSensitive: true,
+      multiLine: true,
+    );
 
-          final mavenOrCocoaPods = irisVersionLink.mavenOrCocoaPods
+    VersionLink irisVersionLink = findIrisVersionLink();
+    VersionLink nativeVersionLink = findNativeVersionLink();
+
+    bool isAddedNativeSDKVersions = false;
+    bool isAddedIrisVersions = false;
+    for (final line in sourceFileContentLines) {
+      if (theNativeSDKRegExp.hasMatch(line) &&
+          !nativeVersionLink.noVersionLink()) {
+        if (!isAddedNativeSDKVersions) {
+          final mavenOrCocoaPods = nativeVersionLink.mavenOrCocoaPods
               .map((e) => lineMapped(e))
               .toList();
-          mavenOrCocoaPods.addAll(
-              nativeVersionLink.mavenOrCocoaPods.map((e) => lineMapped(e)));
 
           modifiedFileContentLines.addAll(mavenOrCocoaPods);
 
-          isAddedVersions = true;
+          isAddedNativeSDKVersions = true;
+        }
+
+        continue;
+      }
+
+      if (theIrisRegExp.hasMatch(line) && !irisVersionLink.noVersionLink()) {
+        if (!isAddedIrisVersions) {
+          final mavenOrCocoaPods = irisVersionLink.mavenOrCocoaPods
+              .map((e) => lineMapped(e))
+              .toList();
+
+          modifiedFileContentLines.addAll(mavenOrCocoaPods);
+
+          isAddedIrisVersions = true;
         }
 
         continue;
