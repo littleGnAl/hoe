@@ -29,6 +29,7 @@ jobs:
 
             if (response.status == 200) {
               const prs = response.data;
+              console.log(prs);
               for (let pr in prs) {
                 console.log(pr.title);
                 let prNumber = pr.number;
