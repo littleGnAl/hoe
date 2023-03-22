@@ -18,6 +18,23 @@ extension VersionLinkExt on VersionLink {
   }
 }
 
+extension StringRegExpListExt on List<String> {
+  bool hasMatch(String content) {
+    bool isMatch = false;
+    for (final r in this) {
+      RegExp theRegExp = RegExp(
+        r,
+        caseSensitive: true,
+        multiLine: true,
+      );
+
+      isMatch |= theRegExp.hasMatch(content);
+    }
+
+    return isMatch;
+  }
+}
+
 class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   UpdateAgoraRtcEngineNativeVersionsCommand({
     required FileSystem fileSystem,
@@ -89,7 +106,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     List<String> mavens = [];
 
     RegExp mavenFullRegExp = RegExp(
-      r"^implementation 'io.agora.rtc:full-sdk:[0-9a-z\.-]+'",
+      r"implementation[\s]*'io.agora.rtc:full-sdk:[0-9a-z\.-]+'",
       caseSensitive: true,
       multiLine: true,
     );
@@ -99,7 +116,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     }
 
     RegExp mavenSpecialRegExp = RegExp(
-      r"^implementation 'io.agora.rtc:agora-special-full:[0-9a-z\.-]+'",
+      r"implementation[\s]*'io.agora.rtc:agora-special-full:[0-9a-z\.-]+'",
       caseSensitive: true,
       multiLine: true,
     );
@@ -109,7 +126,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     }
 
     RegExp mavenFullScreenSharingRegExp = RegExp(
-      r"^implementation 'io.agora.rtc:full-screen-sharing:[0-9a-z\.-]+'",
+      r"implementation[\s]*'io.agora.rtc:full-screen-sharing:[0-9a-z\.-]+'",
       caseSensitive: true,
       multiLine: true,
     );
@@ -126,7 +143,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     List<String> cocoapods = [];
 
     RegExp cocoapodsFullRegExp = RegExp(
-      r"^pod 'AgoraRtcEngine_iOS', '[0-9a-z.-]+'$",
+      r"pod[\s]*'AgoraRtcEngine_iOS',[\s]*'[0-9a-z.-]+'",
       caseSensitive: true,
       multiLine: true,
     );
@@ -136,7 +153,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     }
 
     RegExp cocoapodsSpecialRegExp = RegExp(
-      r"^pod 'AgoraRtcEngine_Special_iOS', '[0-9a-z.-]+'$",
+      r"pod[\s]*'AgoraRtcEngine_Special_iOS',[\s]*'[0-9a-z.-]+'",
       caseSensitive: true,
       multiLine: true,
     );
@@ -153,7 +170,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     List<String> cocoapods = [];
 
     RegExp cocoapodsFullRegExp = RegExp(
-      r"^pod 'AgoraRtcEngine_macOS', '[0-9a-z.-]+'$",
+      r"pod[\s]*'AgoraRtcEngine_macOS',[\s]*'[0-9a-z.-]+'",
       caseSensitive: true,
       multiLine: true,
     );
@@ -163,7 +180,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     }
 
     RegExp cocoapodsSpecialRegExp = RegExp(
-      r"^pod 'AgoraRtcEngine_Special_macOS', '[0-9a-z.-]+'$",
+      r"pod[\s]*'AgoraRtcEngine_Special_macOS',[\s]*'[0-9a-z.-]+'",
       caseSensitive: true,
       multiLine: true,
     );
@@ -179,7 +196,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   VersionLink findNativeWindowsCDN(String nativeSdkDependenciesContent) {
     String cdn = '';
     RegExp cdnRegExp = RegExp(
-      r'^https:\/\/download.agora.io\/sdk\/release\/Agora_Native_SDK_for_Windows_rel.v[0-9a-z\.-_]+_FULL_[0-9_]+\.zip$',
+      r'https:\/\/download.agora.io\/sdk\/release\/Agora_Native_SDK_for_Windows_rel.v[0-9a-z\.-_]+_FULL_[0-9_]+\.zip',
       caseSensitive: true,
       multiLine: true,
     );
@@ -195,7 +212,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     String maven = '';
 
     RegExp cdnRegExp = RegExp(
-      r'^https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Android_Video_[0-9]+_[0-9]+\.zip$',
+      r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Android_Video_[0-9]+_[0-9]+\.zip',
       caseSensitive: true,
       multiLine: true,
     );
@@ -204,7 +221,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     }
 
     RegExp mavenRegExp = RegExp(
-      r"^implementation 'io.agora.rtc:iris-rtc:[0-9a-z\.-]+'",
+      r"implementation 'io.agora.rtc:iris-rtc:[0-9a-z\.-]+'",
       caseSensitive: true,
       multiLine: true,
     );
@@ -220,7 +237,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     String cocoapods = '';
 
     RegExp cdnRegExp = RegExp(
-      r'^https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_iOS_Video_[0-9]+_[0-9]+\.zip$',
+      r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_iOS_Video_[0-9]+_[0-9]+\.zip',
       caseSensitive: true,
       multiLine: true,
     );
@@ -229,7 +246,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     }
 
     RegExp cocoapodsRegExp = RegExp(
-      r"^pod \'AgoraIrisRTC_iOS\', \'[0-9a-z.-]+\'$",
+      r"pod[\s]*'AgoraIrisRTC_iOS',[\s]*'[0-9a-z.-]+'",
       caseSensitive: true,
       multiLine: true,
     );
@@ -245,7 +262,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     String cocoapods = '';
 
     RegExp cdnRegExp = RegExp(
-      r'^https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Mac_Video_[0-9]+_[0-9]+\.zip$',
+      r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Mac_Video_[0-9]+_[0-9]+\.zip$',
       caseSensitive: true,
       multiLine: true,
     );
@@ -254,7 +271,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     }
 
     RegExp cocoapodsRegExp = RegExp(
-      r"^pod \'AgoraIrisRTC_macOS\', \'[0-9a-z.-]+\'$",
+      r"pod[\s]*'AgoraIrisRTC_macOS',[\s]*'[0-9a-z.-]+'",
       caseSensitive: true,
       multiLine: true,
     );
@@ -269,7 +286,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     String cdn = '';
 
     RegExp cdnRegExp = RegExp(
-      r'^https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Windows_Video_[0-9]+_[0-9]+\.zip$',
+      r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Windows_Video_[0-9]+_[0-9]+\.zip',
       caseSensitive: true,
       multiLine: true,
     );
@@ -291,8 +308,13 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       sourceFileContentLines,
       () => findNativeAndroidMaven(nativeSdkDependenciesContent),
       () => findIrisAndroidMaven(irisDenpendenciesContent),
-      r"^[\s]*(implementation|api) 'io.agora.rtc:agora[a-z-]+:[0-9a-zA-Z\.-]+'",
-      r"^[\s]*(implementation|api) 'io.agora.rtc:iris[a-z-]+:[0-9a-zA-Z\.-]+'",
+      [
+        r"^[\s]*(implementation|api) 'io.agora.rtc:agora[a-z-]+:[0-9a-zA-Z\.-]+'",
+        r"^[\s]*(implementation|api) 'io.agora.rtc:full-[a-z-]+:[0-9a-zA-Z\.-]+'"
+      ],
+      [
+        r"^[\s]*(implementation|api) 'io.agora.rtc:iris[a-z-]+:[0-9a-zA-Z\.-]+'"
+      ],
       (sourceLine) => '$tab${sourceLine.replaceFirst('implementation', 'api')}',
     );
   }
@@ -306,8 +328,8 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       sourceFileContentLines,
       () => findNativeIOSPod(nativeSdkDependenciesContent),
       () => findIrisIOSPod(irisDenpendenciesContent),
-      r"^[\s]*s.dependency 'AgoraRtc[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
-      r"^[\s]*s.dependency 'AgoraIris[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
+      [r"^[\s]*s.dependency 'AgoraRtc[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'"],
+      [r"^[\s]*s.dependency 'AgoraIris[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'"],
       (e) {
         return '  ${e.replaceFirst('pod', 's.dependency')}';
       },
@@ -323,8 +345,8 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       sourceFileContentLines,
       () => findNativeMacosPod(nativeSdkDependenciesContent),
       () => findIrisMacosPod(irisDenpendenciesContent),
-      r"^[\s]*s.dependency 'AgoraRtc[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
-      r"^[\s]*s.dependency 'AgoraIris[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
+      [r"^[\s]*s.dependency 'AgoraRtc[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'"],
+      [r"^[\s]*s.dependency 'AgoraIris[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'"],
       (e) {
         return '  ${e.replaceFirst('pod', 's.dependency')}';
       },
@@ -387,23 +409,11 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     List<String> sourceFileContentLines,
     VersionLink Function() findNativeVersionLink,
     VersionLink Function() findIrisVersionLink,
-    String nativeSDKRegExp,
-    String irisRegExp,
+    List<String> nativeSDKRegExps,
+    List<String> irisRegExps,
     String Function(String sourceLine) lineMapped,
   ) {
     List<String> modifiedFileContentLines = [];
-
-    RegExp theNativeSDKRegExp = RegExp(
-      nativeSDKRegExp,
-      caseSensitive: true,
-      multiLine: true,
-    );
-
-    RegExp theIrisRegExp = RegExp(
-      nativeSDKRegExp,
-      caseSensitive: true,
-      multiLine: true,
-    );
 
     VersionLink irisVersionLink = findIrisVersionLink();
     VersionLink nativeVersionLink = findNativeVersionLink();
@@ -411,7 +421,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     bool isAddedNativeSDKVersions = false;
     bool isAddedIrisVersions = false;
     for (final line in sourceFileContentLines) {
-      if (theNativeSDKRegExp.hasMatch(line) &&
+      if (nativeSDKRegExps.hasMatch(line) &&
           !nativeVersionLink.noVersionLink()) {
         if (!isAddedNativeSDKVersions) {
           final mavenOrCocoaPods = nativeVersionLink.mavenOrCocoaPods
@@ -426,7 +436,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
         continue;
       }
 
-      if (theIrisRegExp.hasMatch(line) && !irisVersionLink.noVersionLink()) {
+      if (irisRegExps.hasMatch(line) && !irisVersionLink.noVersionLink()) {
         if (!isAddedIrisVersions) {
           final mavenOrCocoaPods = irisVersionLink.mavenOrCocoaPods
               .map((e) => lineMapped(e))

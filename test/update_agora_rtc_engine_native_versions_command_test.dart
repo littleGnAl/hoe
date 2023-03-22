@@ -44,6 +44,17 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
         "implementation 'io.agora.rtc:full-screen-sharing:4.0.1.9'");
   });
 
+  test('findNativeAndroidMaven with single line input', () {
+    final nativeSdkDependenciesContent =
+        "implementation 'io.agora.rtc:agora-special-full:4.0.0.132.1'  implementation 'io.agora.rtc:full-screen-sharing:4.0.0.132.1'  pod 'AgoraRtcEngine_Special_iOS', '4.0.0.132.1'";
+
+    final result = command.findNativeAndroidMaven(nativeSdkDependenciesContent);
+    expect(result.mavenOrCocoaPods[0],
+        "implementation 'io.agora.rtc:agora-special-full:4.0.0.132.1'");
+    expect(result.mavenOrCocoaPods[1],
+        "implementation 'io.agora.rtc:full-screen-sharing:4.0.0.132.1'");
+  });
+
   test('findNativeIOSPod', () {
     final nativeSdkDependenciesContent = '''
 Iris:
@@ -64,6 +75,15 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
     expect(result.mavenOrCocoaPods[0], "pod 'AgoraRtcEngine_iOS', '4.1.0'");
     expect(result.mavenOrCocoaPods[1],
         "pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'");
+  });
+
+  test('findNativeIOSPod with single line input', () {
+    final nativeSdkDependenciesContent =
+        "implementation 'io.agora.rtc:agora-special-full:4.0.0.132.1'  implementation 'io.agora.rtc:full-screen-sharing:4.0.0.132.1'  pod 'AgoraRtcEngine_Special_iOS', '4.0.0.132.1'";
+
+    final result = command.findNativeIOSPod(nativeSdkDependenciesContent);
+    expect(result.mavenOrCocoaPods[0],
+        "pod 'AgoraRtcEngine_Special_iOS', '4.0.0.132.1'");
   });
 
   test('findNativeMacosPod', () {
@@ -239,7 +259,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
   } else {
     api 'io.agora.rtc:iris-rtc:4.1.0-rc.2'
-    api 'io.agora.rtc:voice-sdk:4.1.0'
+    api 'io.agora.rtc:full-sdk:4.1.0'
     implementation 'io.agora.rtc:full-screen-sharing:4.1.0-1'
   }
 }
@@ -323,7 +343,7 @@ Pod::Spec.new do |s|
   s.source_files = 'Classes/**/*.{h,mm,m,swift}'
   s.dependency 'Flutter'
   s.dependency 'AgoraIrisRTC_iOS', '4.1.0-rc.2'
-  s.dependency 'AgoraAudio_Special_iOS', '4.1.0.BASIC'
+  s.dependency 'AgoraRtcEngine_Special_iOS', '4.1.0.BASIC'
   # s.dependency 'AgoraRtcWrapper'
   s.platform = :ios, '9.0'
   s.swift_version = '5.0'
@@ -435,8 +455,8 @@ A new flutter plugin project.
   s.source_files = 'Classes/**/*.{h,mm}', 'Classes/File.swift'
   s.dependency 'FlutterMacOS'
   #   s.dependency 'AgoraRtcWrapper'
-  s.dependency 'AgoraIrisRTC_macOS', '4.1.1'
   s.dependency 'AgoraRtcEngine_macOS', '4.1.1'
+  s.dependency 'AgoraIrisRTC_macOS', '4.1.1'
 
   s.platform = :osx, '10.11'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
