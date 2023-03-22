@@ -64,8 +64,8 @@ jobs:
           dart pub get
           dart run bin/hoe.dart update-agora-flutter-native-dependencies \
             --project-dir=${PROJECT_DIR} \
-            --native-sdk-dependencies-content=${NATIVE_SDK_DEPENDENCIES_CONTENT} \
-            --iris-dependencies-content=${IRIS_DEPENDENCIES_CONTENT}
+            --native-sdk-dependencies-content="${NATIVE_SDK_DEPENDENCIES_CONTENT}" \
+            --iris-dependencies-content="${IRIS_DEPENDENCIES_CONTENT}"
 
       - name: Create Pull Request
         id: cpr
