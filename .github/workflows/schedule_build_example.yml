@@ -31,6 +31,7 @@ jobs:
               const prs = response.data;
               for (let pr in prs) {
                 let prNumber = pr.number;
+                console.log(pr.head);
                 let targetBranch = pr.head.ref;
 
                 for (let label in pr.labels) {
