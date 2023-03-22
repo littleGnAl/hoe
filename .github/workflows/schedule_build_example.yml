@@ -14,6 +14,7 @@ jobs:
       - name: Trigger update_doc workflow
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.ACTION_PAT }}
           script: |
             // https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#list-pull-requests
             const response = await github.request('GET /repos/{owner}/{repo}/pulls', {
