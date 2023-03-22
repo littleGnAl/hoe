@@ -29,6 +29,7 @@ jobs:
   comment_pr:
     name: Comment PR
     needs: build_examples
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Comment the artifactories download url to PR
