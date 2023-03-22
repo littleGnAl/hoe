@@ -54,12 +54,15 @@ jobs:
           ref: "special/native-${{ inputs.native_sdk_version }}"
           path: for-update-dependencies-branch
 
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 2.17.1
+
       - name: Update native sdk and iris dependencies
         run: |
           PROJECT_DIR=$(pwd)/for-update-dependencies-branch
           NATIVE_SDK_DEPENDENCIES_CONTENT="${{ github.event.inputs.native_sdk_dependencies_content }}"
           IRIS_DEPENDENCIES_CONTENT="${{ github.event.inputs.iris_dependencies_content }}"
-
           
           dart pub get
           dart run bin/hoe.dart update-agora-flutter-native-dependencies \
