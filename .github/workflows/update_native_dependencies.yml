@@ -63,15 +63,6 @@ jobs:
           ref: "special/native-${{ inputs.native_sdk_version }}"
           path: AgoraIO-Extensions/Agora-Flutter-SDK
 
-      - name: Create and push new release branch
-        run: |
-          cd AgoraIO-Extensions/Agora-Flutter-SDK
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-
-          BRANCH_NAME=littlegnal/special/native-${{ inputs.native_sdk_version }}
-          git checkout -b ${BRANCH_NAME}
-
       - name: Update native sdk and iris dependencies
         run: |
           PROJECT_DIR=$(pwd)/AgoraIO-Extensions/Agora-Flutter-SDK
@@ -83,20 +74,6 @@ jobs:
             --project-dir=${PROJECT_DIR} \
             --native-sdk-dependencies-content="${NATIVE_SDK_DEPENDENCIES_CONTENT}" \
             --iris-dependencies-content="${IRIS_DEPENDENCIES_CONTENT}"
-
-      - name: Create and push new release branch
-        run: |
-          cd AgoraIO-Extensions/Agora-Flutter-SDK
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-
-          BRANCH_NAME="littlegnal/special/native-${{ inputs.native_sdk_version }}"
-          COMMIT_MSG="feat: upgrade native sdk ${{ inputs.native_sdk_version }}"
-          git add .
-          git commit -am "${COMMIT_MSG}"
-          git push -u origin ${BRANCH_NAME}
-
-          
 
       - name: Create Pull Request
         id: cpr
