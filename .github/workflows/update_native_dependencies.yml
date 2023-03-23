@@ -30,13 +30,13 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.ACTION_PAT }}
-          repository: AgoraIO/Agora-Flutter-SDK
+          repository: AgoraIO-Extensions/Agora-Flutter-SDK
           ref: ${{ inputs.base_tag_or_branch }}
-          path: AgoraIO/Agora-Flutter-SDK
+          path: AgoraIO-Extensions/Agora-Flutter-SDK
 
       - name: Create and push new release branch
         run: |
-          cd AgoraIO/Agora-Flutter-SDK
+          cd AgoraIO-Extensions/Agora-Flutter-SDK
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
@@ -59,13 +59,13 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.ACTION_PAT }}
-          repository: AgoraIO/Agora-Flutter-SDK
+          repository: AgoraIO-Extensions/Agora-Flutter-SDK
           ref: "special/native-${{ inputs.native_sdk_version }}"
-          path: AgoraIO/Agora-Flutter-SDK
+          path: AgoraIO-Extensions/Agora-Flutter-SDK
 
       - name: Create and push new release branch
         run: |
-          cd AgoraIO/Agora-Flutter-SDK
+          cd AgoraIO-Extensions/Agora-Flutter-SDK
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
@@ -74,7 +74,7 @@ jobs:
 
       - name: Update native sdk and iris dependencies
         run: |
-          PROJECT_DIR=$(pwd)/AgoraIO/Agora-Flutter-SDK
+          PROJECT_DIR=$(pwd)/AgoraIO-Extensions/Agora-Flutter-SDK
           NATIVE_SDK_DEPENDENCIES_CONTENT="${{ github.event.inputs.native_sdk_dependencies_content }}"
           IRIS_DEPENDENCIES_CONTENT="${{ github.event.inputs.iris_dependencies_content }}"
           
@@ -86,7 +86,7 @@ jobs:
 
       - name: Create and push new release branch
         run: |
-          cd AgoraIO/Agora-Flutter-SDK
+          cd AgoraIO-Extensions/Agora-Flutter-SDK
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
@@ -98,80 +98,24 @@ jobs:
 
           
 
-      # - name: Create Pull Request
-      #   id: cpr
-      #   uses: peter-evans/create-pull-request@v4
-      #   with:
-      #     token: ${{ secrets.ACTION_PAT }}
-      #     path: AgoraIO/Agora-Flutter-SDK
-      #     commit-message: "feat: upgrade native sdk ${{ inputs.native_sdk_version }}"
-      #     committer: GitHub <noreply@github.com>
-      #     author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-      #     signoff: false
-      #     branch: littlegnal/special/native-${{ inputs.native_sdk_version }}
-      #     base: special/native-${{ inputs.native_sdk_version }}
-      #     delete-branch: true
-      #     draft: false
-      #     title: "feat: upgrade native sdk ${{ inputs.native_sdk_version }}"
-      #     body: |
-      #       Update native sdk ${{ inputs.native_sdk_version }} dependencies
-
-      #       > This pull request is trigger by bot, you can checkout this branch and update it.
-      #     labels: |
-      #       version:special
-
       - name: Create Pull Request
-        uses: actions/github-script@v6
+        id: cpr
+        uses: peter-evans/create-pull-request@v4
         with:
-          github-token: ${{ secrets.ACTION_PAT }}
-          script: |
-            const owner = 'AgoraIO-Extensions';
-            const branchName = `littlegnal/special/native-${{ inputs.native_sdk_version }}`;
-            const baseBranchName = `special/native-${{ inputs.native_sdk_version }}`
-            const body = `
+          token: ${{ secrets.ACTION_PAT }}
+          path: AgoraIO-Extensions/Agora-Flutter-SDK
+          commit-message: "feat: upgrade native sdk ${{ inputs.native_sdk_version }}"
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: littlegnal/special/native-${{ inputs.native_sdk_version }}
+          base: special/native-${{ inputs.native_sdk_version }}
+          delete-branch: true
+          draft: false
+          title: "feat: upgrade native sdk ${{ inputs.native_sdk_version }}"
+          body: |
             Update native sdk ${{ inputs.native_sdk_version }} dependencies
 
             > This pull request is trigger by bot, you can checkout this branch and update it.
-            `;
-            // https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#create-a-pull-request
-            await github.request('POST /repos/{owner}/{repo}/pulls', {
-              owner: owner,
-              repo: 'Agora-Flutter-SDK',
-              title: `feat: upgrade native sdk ${{ inputs.native_sdk_version }}`,
-              body: body,
-              head: `${owner}:${branchName}`,
-              base: baseBranchName,
-              headers: {
-                'X-GitHub-Api-Version': '2022-11-28'
-              }
-            });
-
-  # schedule_build_examples:
-  #   name: Schedule build examples
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 60
-  #   steps:
-  #     - name: Schedule build examples
-  #       uses: actions/github-script@v6
-  #       with:
-  #         github-token: ${{ secrets.ACTION_PAT }}
-  #         script: |
-  #           const branchName = `littlegnal/special/native-${{ inputs.native_sdk_version }}`;
-  #           const baseBranchName = `special/native-${{ inputs.native_sdk_version }}`
-  #           const body = `
-  #           Update native sdk ${{ inputs.native_sdk_version }} dependencies
-
-  #           > This pull request is trigger by bot, you can checkout this branch and update it.
-  #           `;
-  #           // https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#create-a-pull-request
-  #           await github.request('POST /repos/{owner}/{repo}/pulls', {
-  #             owner: 'AgoraIO-Extensions',
-  #             repo: 'Agora-Flutter-SDK',
-  #             title: `feat: upgrade native sdk ${{ inputs.native_sdk_version }}`,
-  #             body: body,
-  #             head: `${owner}:${branchName}`,
-  #             base: baseBranchName,
-  #             headers: {
-  #               'X-GitHub-Api-Version': '2022-11-28'
-  #             }
-  #           });
+          labels: |
+            version:special
