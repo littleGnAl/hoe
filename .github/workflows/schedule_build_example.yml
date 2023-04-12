@@ -33,6 +33,17 @@ jobs:
 
                 for (let label of pr.labels) {
                   if (label.name == "ci:schedule_build_example") {
+                    if (pr.labels.includes("ci:building_example")) {
+                      return;
+                    }
+
+                    await github.rest.issues.addLabels({
+                      issue_number: prNumber,
+                      owner: 'AgoraIO-Extensions',
+                      repo: 'Agora-Flutter-SDK',
+                      labels: ['ci:building_example']
+                    })
+
                     const owner = "littleGnAl"
                     const repo = "hoe"
                     const workflow_id = "build_and_post_result_to_pr.yml"
