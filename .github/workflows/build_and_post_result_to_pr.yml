@@ -53,4 +53,6 @@ jobs:
           github_token: ${{ secrets.ACTION_PAT }}
           repo: ${{ github.event.inputs.target_repo }}
           number: ${{ github.event.inputs.pr_number }}
-          labels: ci:schedule_build_example
+          labels: |
+            ci:schedule_build_example
+            ci:building_example
