@@ -406,7 +406,7 @@ Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
 https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116_Dummy text.zip
 CDN:
-https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_iOS_Video_20230312_1116.zip
+https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Mac_Video_20230312_1116.zip
 Cocoapods:
 pod 'AgoraIrisRTC_macOS', '4.1.1'
 ''';
