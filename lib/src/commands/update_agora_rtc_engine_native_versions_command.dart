@@ -120,44 +120,12 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   }
 
   VersionLink findNativeAndroidMaven(String nativeSdkDependenciesContent) {
-    List<String> mavens = [];
-
-    // RegExp mavenFullRegExp = RegExp(
-    //   r"implementation[\s]*'io.agora.rtc:full-sdk:[0-9a-z\.-]+'",
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (mavenFullRegExp.hasMatch(nativeSdkDependenciesContent)) {
-    //   mavens
-    //       .add(mavenFullRegExp.stringMatch(nativeSdkDependenciesContent) ?? '');
-    // }
-
-    // RegExp mavenSpecialRegExp = RegExp(
-    //   r"implementation[\s]*'io.agora.rtc:agora-special-full:[0-9a-z\.-]+'",
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (mavenSpecialRegExp.hasMatch(nativeSdkDependenciesContent)) {
-    //   mavens.add(
-    //       mavenSpecialRegExp.stringMatch(nativeSdkDependenciesContent) ?? '');
-    // }
-
-    // RegExp mavenFullScreenSharingRegExp = RegExp(
-    //   r"implementation[\s]*'io.agora.rtc:full-screen-sharing:[0-9a-z\.-]+'",
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (mavenFullScreenSharingRegExp.hasMatch(nativeSdkDependenciesContent)) {
-    //   mavens.add(mavenFullScreenSharingRegExp
-    //           .stringMatch(nativeSdkDependenciesContent) ??
-    //       '');
-    // }
-
-    mavens = _findByRegExp(
+    List<String> mavens = _findByRegExp(
       [
-        r"implementation[\s]*'io.agora.rtc:full-sdk:[0-9a-z\.-]+'",
-        r"implementation[\s]*'io.agora.rtc:agora-special-full:[0-9a-z\.-]+'",
-        r"implementation[\s]*'io.agora.rtc:full-screen-sharing:[0-9a-z\.-]+'",
+        r"implementation[\s]*'io.agora.rtc:full-sdk:[0-9a-zA-Z\.-]+'",
+        r"implementation[\s]*'io.agora.rtc:agora-special-full:[0-9a-zA-Z\.-]+'",
+        r"implementation[\s]*'io.agora.rtc:full-screen-sharing:[0-9a-zA-Z\.-]+'",
+        r"implementation[\s]*'io.agora.rtc:agora-special-voice:[0-9a-zA-Z\.-]+'"
       ],
       nativeSdkDependenciesContent,
     );
@@ -166,33 +134,11 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   }
 
   VersionLink findNativeIOSPod(String nativeSdkDependenciesContent) {
-    List<String> cocoapods = [];
-
-    // RegExp cocoapodsFullRegExp = RegExp(
-    //   r"pod[\s]*'AgoraRtcEngine_iOS',[\s]*'[0-9a-z.-]+'",
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (cocoapodsFullRegExp.hasMatch(nativeSdkDependenciesContent)) {
-    //   cocoapods.add(
-    //       cocoapodsFullRegExp.stringMatch(nativeSdkDependenciesContent) ?? '');
-    // }
-
-    // RegExp cocoapodsSpecialRegExp = RegExp(
-    //   r"pod[\s]*'AgoraRtcEngine_Special_iOS',[\s]*'[0-9a-z.-]+'",
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (cocoapodsSpecialRegExp.hasMatch(nativeSdkDependenciesContent)) {
-    //   cocoapods.add(
-    //       cocoapodsSpecialRegExp.stringMatch(nativeSdkDependenciesContent) ??
-    //           '');
-    // }
-
-    cocoapods = _findByRegExp(
+    List<String> cocoapods = _findByRegExp(
       [
         r"pod[\s]*'AgoraRtcEngine_iOS',[\s]*'[0-9a-z.-]+'",
         r"pod[\s]*'AgoraRtcEngine_Special_iOS',[\s]*'[0-9a-z.-]+'",
+        r"pod[\s]*'AgoraAudio_Special_iOS',[\s]*'[0-9a-zA-Z.-]+'",
       ],
       nativeSdkDependenciesContent,
     );
@@ -201,30 +147,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   }
 
   VersionLink findNativeMacosPod(String nativeSdkDependenciesContent) {
-    List<String> cocoapods = [];
-
-    // RegExp cocoapodsFullRegExp = RegExp(
-    //   r"pod[\s]*'AgoraRtcEngine_macOS',[\s]*'[0-9a-z.-]+'",
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (cocoapodsFullRegExp.hasMatch(nativeSdkDependenciesContent)) {
-    //   cocoapods.add(
-    //       cocoapodsFullRegExp.stringMatch(nativeSdkDependenciesContent) ?? '');
-    // }
-
-    // RegExp cocoapodsSpecialRegExp = RegExp(
-    //   r"pod[\s]*'AgoraRtcEngine_Special_macOS',[\s]*'[0-9a-z.-]+'",
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (cocoapodsSpecialRegExp.hasMatch(nativeSdkDependenciesContent)) {
-    //   cocoapods.add(
-    //       cocoapodsSpecialRegExp.stringMatch(nativeSdkDependenciesContent) ??
-    //           '');
-    // }
-
-    cocoapods = _findByRegExp(
+    List<String> cocoapods = _findByRegExp(
       [
         r"pod[\s]*'AgoraRtcEngine_macOS',[\s]*'[0-9a-z.-]+'",
         r"pod[\s]*'AgoraRtcEngine_Special_macOS',[\s]*'[0-9a-z.-]+'",
@@ -236,16 +159,6 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   }
 
   VersionLink findNativeWindowsCDN(String nativeSdkDependenciesContent) {
-    String cdn = '';
-    // RegExp cdnRegExp = RegExp(
-    //   r'https:\/\/download.agora.io\/sdk\/release\/Agora_Native_SDK_for_Windows_rel.v[0-9a-z\.-_]+_FULL_[0-9_]+\.zip',
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (cdnRegExp.hasMatch(nativeSdkDependenciesContent)) {
-    //   cdn = cdnRegExp.stringMatch(nativeSdkDependenciesContent) ?? '';
-    // }
-
     final cdns = _findByRegExp(
       [
         r'https:\/\/download.agora.io\/sdk\/release\/Agora_Native_SDK_for_Windows_rel.v[0-9a-z\.-_]+_FULL_[0-9_]+\.zip',
@@ -257,27 +170,6 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   }
 
   VersionLink findIrisAndroidMaven(String irisDenpendenciesContent) {
-    String cdn = '';
-    String maven = '';
-
-    // RegExp cdnRegExp = RegExp(
-    //   r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Android_Video_[0-9]+_[0-9]+\.zip',
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (cdnRegExp.hasMatch(irisDenpendenciesContent)) {
-    //   cdn = cdnRegExp.stringMatch(irisDenpendenciesContent) ?? '';
-    // }
-
-    // RegExp mavenRegExp = RegExp(
-    //   r"implementation 'io.agora.rtc:iris-rtc:[0-9a-z\.-]+'",
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (mavenRegExp.hasMatch(irisDenpendenciesContent)) {
-    //   maven = mavenRegExp.stringMatch(irisDenpendenciesContent) ?? '';
-    // }
-
     final cdns = _findByRegExp(
       [
         r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Android_Video_[0-9]+_[0-9]+\.zip',
@@ -296,27 +188,6 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   }
 
   VersionLink findIrisIOSPod(String irisDenpendenciesContent) {
-    // String cdn = '';
-    // String cocoapods = '';
-
-    // // RegExp cdnRegExp = RegExp(
-    // //   r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_iOS_Video_[0-9]+_[0-9]+\.zip',
-    // //   caseSensitive: true,
-    // //   multiLine: true,
-    // // );
-    // // if (cdnRegExp.hasMatch(irisDenpendenciesContent)) {
-    // //   cdn = cdnRegExp.stringMatch(irisDenpendenciesContent) ?? '';
-    // // }
-
-    // RegExp cocoapodsRegExp = RegExp(
-    //   r"pod[\s]*'AgoraIrisRTC_iOS',[\s]*'[0-9a-z.-]+'",
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (cocoapodsRegExp.hasMatch(irisDenpendenciesContent)) {
-    //   cocoapods = cocoapodsRegExp.stringMatch(irisDenpendenciesContent) ?? '';
-    // }
-
     final cdns = _findByRegExp(
       [
         r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_iOS_Video_[0-9]+_[0-9]+\.zip',
@@ -335,27 +206,6 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   }
 
   VersionLink findIrisMacosPod(String irisDenpendenciesContent) {
-    String cdn = '';
-    // String cocoapods = '';
-
-    // RegExp cdnRegExp = RegExp(
-    //   r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Mac_Video_[0-9]+_[0-9]+\.zip$',
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (cdnRegExp.hasMatch(irisDenpendenciesContent)) {
-    //   cdn = cdnRegExp.stringMatch(irisDenpendenciesContent) ?? '';
-    // }
-
-    // RegExp cocoapodsRegExp = RegExp(
-    //   r"pod[\s]*'AgoraIrisRTC_macOS',[\s]*'[0-9a-z.-]+'",
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (cocoapodsRegExp.hasMatch(irisDenpendenciesContent)) {
-    //   cocoapods = cocoapodsRegExp.stringMatch(irisDenpendenciesContent) ?? '';
-    // }
-
     final cdns = _findByRegExp(
       [
         r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Mac_Video_[0-9]+_[0-9]+\.zip',
@@ -374,17 +224,6 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   }
 
   VersionLink findIrisWindowsCDN(String irisDenpendenciesContent) {
-    String cdn = '';
-
-    // RegExp cdnRegExp = RegExp(
-    //   r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Windows_Video_[0-9]+_[0-9]+\.zip',
-    //   caseSensitive: true,
-    //   multiLine: true,
-    // );
-    // if (cdnRegExp.hasMatch(irisDenpendenciesContent)) {
-    //   cdn = cdnRegExp.stringMatch(irisDenpendenciesContent) ?? '';
-    // }
-
     final cdns = _findByRegExp(
       [
         r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Windows_Video_[0-9]+_[0-9]+\.zip',
@@ -408,7 +247,8 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       () => findIrisAndroidMaven(irisDenpendenciesContent),
       [
         r"^[\s]*(implementation|api) 'io.agora.rtc:agora[a-z-]+:[0-9a-zA-Z\.-]+'",
-        r"^[\s]*(implementation|api) 'io.agora.rtc:full-[a-z-]+:[0-9a-zA-Z\.-]+'"
+        r"^[\s]*(implementation|api) 'io.agora.rtc:full-[a-z-]+:[0-9a-zA-Z\.-]+'",
+        r"^[\s]*(implementation|api) 'io.agora.rtc:voice-[a-z-]+:[0-9a-zA-Z\.-]+'",
       ],
       [
         r"^[\s]*(implementation|api) 'io.agora.rtc:iris[a-z-]+:[0-9a-zA-Z\.-]+'"
