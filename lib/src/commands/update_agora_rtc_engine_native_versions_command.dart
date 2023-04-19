@@ -73,6 +73,8 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
         _workspace.absolute.path, 'macos', 'agora_rtc_engine.podspec');
     final windowsCMakeFilePath =
         path.join(_workspace.absolute.path, 'windows', 'CMakeLists.txt');
+    final artifactsVersionFilePath =
+        path.join(_workspace.absolute.path, 'scripts', 'artifacts_version.sh');
 
     final androidGradleFile = fileSystem.file(androidGradleFilePath);
     androidGradleFile.writeAsStringSync(modifiedAndroidGradleContent(
@@ -98,6 +100,12 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     final windowsCMakeFile = fileSystem.file(windowsCMakeFilePath);
     windowsCMakeFile.writeAsStringSync(modifiedWindowsCMakeContent(
       windowsCMakeFile.readAsLinesSync(),
+      irisDenpendenciesContent,
+    ));
+
+    final artifactsVersionFile = fileSystem.file(artifactsVersionFilePath);
+    artifactsVersionFile.writeAsStringSync(modifiedArtifactsVersionContent(
+      windowsCMakeFile.readAsStringSync(),
       irisDenpendenciesContent,
     ));
   }
@@ -341,6 +349,40 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     }
 
     return modifiedFileContentLines.join('\n');
+  }
+
+  String modifiedArtifactsVersionContent(
+    String sourceFileContent,
+    String irisDenpendenciesContent,
+  ) {
+    final androidCDN = findIrisAndroidMaven(irisDenpendenciesContent).cdn;
+    final iosCDN = findIrisIOSPod(irisDenpendenciesContent).cdn;
+    final macOSCDN = findIrisMacosPod(irisDenpendenciesContent).cdn;
+    final windowsCDN = findIrisWindowsCDN(irisDenpendenciesContent).cdn;
+
+    String modifiedContent = sourceFileContent;
+    modifiedContent = modifiedContent.replaceFirst(
+      RegExp(r'export IRIS_CDN_URL_ANDROID=\"(.*)\"',
+          multiLine: true, caseSensitive: true),
+      'export IRIS_CDN_URL_ANDROID="$androidCDN"',
+    );
+    modifiedContent = modifiedContent.replaceFirst(
+      RegExp(r'export IRIS_CDN_URL_IOS=\"(.*)\"',
+          multiLine: true, caseSensitive: true),
+      'export IRIS_CDN_URL_IOS="$iosCDN"',
+    );
+    modifiedContent = modifiedContent.replaceFirst(
+      RegExp(r'export IRIS_CDN_URL_MACOS=\"(.*)\"',
+          multiLine: true, caseSensitive: true),
+      'export IRIS_CDN_URL_MACOS="$macOSCDN"',
+    );
+    modifiedContent = modifiedContent.replaceFirst(
+      RegExp(r'export IRIS_CDN_URL_WINDOWS=\"(.*)\"',
+          multiLine: true, caseSensitive: true),
+      'export IRIS_CDN_URL_WINDOWS="$windowsCDN"',
+    );
+
+    return modifiedContent;
   }
 
   String _modifiedVersFileContent(
