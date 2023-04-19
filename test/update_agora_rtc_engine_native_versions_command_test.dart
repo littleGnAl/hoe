@@ -542,4 +542,40 @@ set(IRIS_DOWNLOAD_PATH "${CMAKE_CURRENT_SOURCE_DIR}/third_party/iris")
         fileContent.split('\n'), irisDependenciesContent);
     expect(result, expectedFileContent);
   });
+
+  test('modifiedArtifactsVersionContent', () {
+    final irisDependenciesContent = '''
+Iris:
+Dummy text Dummy text Dummy text Dummy text Dummy text
+Dummy text Dummy text Dummy text Dummy text Dummy text
+https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116_Dummy text.zip
+CDN:
+https://download.agora.io/sdk/release/iris_4.2.0-dev.6_DCG_Android_Video_20230412_0722.zip
+https://download.agora.io/sdk/release/iris_4.2.0-dev.6_DCG_iOS_Video_20230412_0722.zip
+https://download.agora.io/sdk/release/iris_4.2.0-dev.6_DCG_Mac_Video_20230412_0722.zip
+https://download.agora.io/sdk/release/iris_4.2.0-dev.6_DCG_Windows_Video_20230412_0722.zip
+''';
+
+    final fileContent = r'''
+set -e
+
+export IRIS_CDN_URL_ANDROID="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_Android_Video_20230412_0722.zip"
+export IRIS_CDN_URL_IOS="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_iOS_Video_20230412_0722.zip"
+export IRIS_CDN_URL_MACOS="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_Mac_Video_20230412_0722.zip"
+export IRIS_CDN_URL_WINDOWS="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_Windows_Video_20230412_0722.zip"
+''';
+
+    final expectedFileContent = r'''
+set -e
+
+export IRIS_CDN_URL_ANDROID="https://download.agora.io/sdk/release/iris_4.2.0-dev.6_DCG_Android_Video_20230412_0722.zip"
+export IRIS_CDN_URL_IOS="https://download.agora.io/sdk/release/iris_4.2.0-dev.6_DCG_iOS_Video_20230412_0722.zip"
+export IRIS_CDN_URL_MACOS="https://download.agora.io/sdk/release/iris_4.2.0-dev.6_DCG_Mac_Video_20230412_0722.zip"
+export IRIS_CDN_URL_WINDOWS="https://download.agora.io/sdk/release/iris_4.2.0-dev.6_DCG_Windows_Video_20230412_0722.zip"
+''';
+
+    final result = command.modifiedArtifactsVersionContent(
+        fileContent, irisDependenciesContent);
+    expect(result, expectedFileContent);
+  });
 }
