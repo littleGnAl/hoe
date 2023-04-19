@@ -42,6 +42,8 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
         "implementation 'io.agora.rtc:agora-special-full:4.0.1.9'");
     expect(result.mavenOrCocoaPods[2],
         "implementation 'io.agora.rtc:full-screen-sharing:4.0.1.9'");
+    expect(result.mavenOrCocoaPods[3],
+        "implementation 'io.agora.rtc:agora-special-voice:4.0.1.9'");
   });
 
   test('findNativeAndroidMaven with single line input', () {
@@ -75,6 +77,8 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
     expect(result.mavenOrCocoaPods[0], "pod 'AgoraRtcEngine_iOS', '4.1.0'");
     expect(result.mavenOrCocoaPods[1],
         "pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'");
+    expect(
+        result.mavenOrCocoaPods[2], "pod 'AgoraAudio_Special_iOS', '4.0.1.9'");
   });
 
   test('findNativeIOSPod with single line input', () {
@@ -260,6 +264,7 @@ dependencies {
   } else {
     api 'io.agora.rtc:iris-rtc:4.1.0-rc.2'
     api 'io.agora.rtc:full-sdk:4.1.0'
+    api 'io.agora.rtc:voice-sdk:4.1.0'
     implementation 'io.agora.rtc:full-screen-sharing:4.1.0-1'
   }
 }
@@ -297,6 +302,7 @@ dependencies {
     api 'io.agora.rtc:iris-rtc:4.1.1.205-build.2'
     api 'io.agora.rtc:full-sdk:4.1.0-1'
     api 'io.agora.rtc:full-screen-sharing:4.0.1.9'
+    api 'io.agora.rtc:agora-special-voice:4.0.1.9'
   }
 }
 ''';
@@ -317,6 +323,7 @@ implementation 'io.agora.rtc:agora-special-voice:4.0.1.9'
 implementation 'io.agora.rtc:full-screen-sharing:4.0.1.9'
 Cocoapods：
 pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
+pod 'AgoraAudio_Special_iOS', '4.1.1.3.BASIC'
 ''';
 
     final irisDependenciesContent = '''
@@ -368,6 +375,7 @@ Pod::Spec.new do |s|
   s.dependency 'Flutter'
   s.dependency 'AgoraIrisRTC_iOS', '4.1.1.205-build.2'
   s.dependency 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
+  s.dependency 'AgoraAudio_Special_iOS', '4.1.1.3.BASIC'
   # s.dependency 'AgoraRtcWrapper'
   s.platform = :ios, '9.0'
   s.swift_version = '5.0'
@@ -406,7 +414,7 @@ Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
 https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116_Dummy text.zip
 CDN:
-https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_iOS_Video_20230312_1116.zip
+https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Mac_Video_20230312_1116.zip
 Cocoapods:
 pod 'AgoraIrisRTC_macOS', '4.1.1'
 ''';
