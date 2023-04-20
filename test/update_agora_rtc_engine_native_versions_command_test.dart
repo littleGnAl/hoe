@@ -136,6 +136,22 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
         'https://download.agora.io/sdk/release/Agora_Native_SDK_for_Windows_rel.v4.0.1.9_19521_FULL_20230308_1749_257724.zip');
   });
 
+  test('findNativeWindowsCDN without cdn info', () {
+    final nativeSdkDependenciesContent = '''
+CDN：
+Maven：
+implementation 'io.agora.rtc:agora-special-voice:4.0.1.9'
+implementation 'io.agora.rtc:agora-special-full:4.0.1.9'
+implementation 'io.agora.rtc:full-screen-sharing:4.0.1.9'
+Cocoapods：
+pod 'AgoraAudio_Special_iOS', '4.0.1.9'
+pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
+''';
+
+    final result = command.findNativeWindowsCDN(nativeSdkDependenciesContent);
+    expect(result.cdn, '');
+  });
+
   test('findIrisAndroidMaven', () {
     final irisDependenciesContent = '''
 Iris:
@@ -153,6 +169,14 @@ implementation 'io.agora.rtc:iris-rtc:4.1.1.205-build.2'
         'https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116.zip');
     expect(result.mavenOrCocoaPods[0],
         'implementation \'io.agora.rtc:iris-rtc:4.1.1.205-build.2\'');
+  });
+
+  test('findIrisAndroidMaven with empty content', () {
+    final irisDependenciesContent = '';
+
+    final result = command.findIrisMacosPod(irisDependenciesContent);
+    expect(result.cdn, '');
+    expect(result.mavenOrCocoaPods.length, 0);
   });
 
   test('findIrisIOSPod', () {
@@ -174,6 +198,14 @@ pod 'AgoraIrisRTC_iOS', '4.1.1.205-build.2'
         'pod \'AgoraIrisRTC_iOS\', \'4.1.1.205-build.2\'');
   });
 
+  test('findIrisIOSPod with empty content', () {
+    final irisDependenciesContent = '';
+
+    final result = command.findIrisMacosPod(irisDependenciesContent);
+    expect(result.cdn, '');
+    expect(result.mavenOrCocoaPods.length, 0);
+  });
+
   test('findIrisMacosPod', () {
     final irisDependenciesContent = '''
 Iris:
@@ -193,6 +225,14 @@ pod 'AgoraIrisRTC_macOS', '4.1.0-rc.2'
         result.mavenOrCocoaPods[0], "pod 'AgoraIrisRTC_macOS', '4.1.0-rc.2'");
   });
 
+  test('findIrisMacosPod with empty content', () {
+    final irisDependenciesContent = '';
+
+    final result = command.findIrisMacosPod(irisDependenciesContent);
+    expect(result.cdn, '');
+    expect(result.mavenOrCocoaPods.length, 0);
+  });
+
   test('findIrisWindowsCDN', () {
     final irisDependenciesContent = '''
 Iris:
@@ -206,6 +246,14 @@ https://download.agora.io/sdk/release/iris_4.1.1.205-build.1_DCG_Windows_Video_2
     final result = command.findIrisWindowsCDN(irisDependenciesContent);
     expect(result.cdn,
         'https://download.agora.io/sdk/release/iris_4.1.1.205-build.1_DCG_Windows_Video_20230311_0918.zip');
+  });
+
+  test('findIrisWindowsCDN with empty content', () {
+    final irisDependenciesContent = '';
+
+    final result = command.findIrisMacosPod(irisDependenciesContent);
+    expect(result.cdn, '');
+    expect(result.mavenOrCocoaPods.length, 0);
   });
 
   test('modifiedAndroidGradleContent', () {
