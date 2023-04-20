@@ -43,7 +43,6 @@ jobs:
                 }
 
                 if (isBuildingExample) {
-                  console.log(`Found label: ${label.name}`);
                   console.log(`Skip schedule due to the build is processing...`);
                   return;
                 }
