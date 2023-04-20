@@ -82,6 +82,8 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     final artifactsVersionFilePath =
         path.join(_workspace.absolute.path, 'scripts', 'artifacts_version.sh');
     final pubspecFilePath = path.join(_workspace.absolute.path, 'pubspec.yaml');
+    final exampleIOSPodfileFilePath =
+        path.join(_workspace.absolute.path, 'example', 'ios', 'Podfile');
 
     final androidGradleFile = fileSystem.file(androidGradleFilePath);
     androidGradleFile.writeAsStringSync(modifiedAndroidGradleContent(
@@ -121,10 +123,20 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       pubspecFile.readAsStringSync(),
       pubspecVersion,
     ));
+
+    final exampleIOSPodfileFile = fileSystem.file(exampleIOSPodfileFilePath);
+    exampleIOSPodfileFile.writeAsStringSync(modifiedExampleIOSPodfileContent(
+      exampleIOSPodfileFile.readAsStringSync(),
+      nativeSdkDependenciesContent,
+    ));
   }
 
   List<String> _findByRegExp(List<String> regExps, String input) {
     List<String> outputs = [];
+
+    if (input.isEmpty) {
+      return outputs;
+    }
 
     for (final reg in regExps) {
       RegExp regExp = RegExp(
@@ -298,6 +310,31 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     );
   }
 
+  String modifiedExampleIOSPodfileContent(
+    String sourceFileContent,
+    String nativeSdkDependenciesContent,
+  ) {
+    final iosCocoaPods =
+        findNativeIOSPod(nativeSdkDependenciesContent).mavenOrCocoaPods;
+    String modifiedContent = sourceFileContent;
+
+    final nativeSdkPattern = [
+      r"[^\S\r\n]*pod\s'AgoraRtc[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
+      r"[^\S\r\n]*pod\s'AgoraAudio[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
+    ];
+
+    if (iosCocoaPods.isNotEmpty) {
+      for (final p in nativeSdkPattern) {
+        modifiedContent = modifiedContent.replaceFirst(
+          RegExp(p, multiLine: true, caseSensitive: true),
+          '    ${iosCocoaPods[0]}',
+        );
+      }
+    }
+
+    return modifiedContent;
+  }
+
   String modifiedMacOSPodspecContent(
     List<String> sourceFileContentLines,
     String nativeSdkDependenciesContent,
@@ -467,6 +504,10 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     String sourceFileContent,
     String version,
   ) {
+    if (version.isEmpty) {
+      return version;
+    }
+
     String modifiedContent = sourceFileContent;
     modifiedContent = modifiedContent.replaceFirst(
       RegExp(r'version\:\s[a-zA-Z0-9\.-]+',

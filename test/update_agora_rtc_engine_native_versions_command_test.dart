@@ -860,4 +860,183 @@ environment:
     final result = command.modifiedPubspecContent(fileContent, '6.1.1-build.1');
     expect(result, expectedFileContent);
   });
+
+  test('modifiedExampleIOSPodfileContent', () {
+    final nativeSdkDependenciesContent = '''
+Iris:
+Dummy text Dummy text Dummy text Dummy text Dummy text
+Dummy text Dummy text Dummy text Dummy text Dummy text
+Maven：
+implementation 'io.agora.rtc:full-sdk:4.1.0-1'
+implementation 'io.agora.rtc:agora-special-voice:4.0.1.9'
+implementation 'io.agora.rtc:full-screen-sharing:4.0.1.9'
+Cocoapods：
+pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
+''';
+
+    final fileContent = '''
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+  
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+#  pod 'iris_event_handler', :path => File.join('.symlinks', 'plugins', 'iris_event', 'ios')
+
+  if plugin_dev != nil
+    pod 'AgoraRtcWrapper', :path => File.join('.symlinks', 'plugins', 'agora_rtc_engine', 'ios')
+    # pod 'iris_event_handler', :path => File.join('.symlinks', 'plugins', 'iris_event', 'ios')
+  end
+end
+
+target 'ScreenSharing' do
+  use_frameworks!
+  use_modular_headers!
+  
+  if plugin_dev != nil
+    pod 'AgoraRtcWrapper', :path => File.join('.symlinks', 'plugins', 'agora_rtc_engine', 'ios')
+  else
+    pod 'AgoraAudio_Special_iOS', '4.1.0.BASIC'
+  end
+end
+''';
+
+    final expectedFileContent = '''
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+  
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+#  pod 'iris_event_handler', :path => File.join('.symlinks', 'plugins', 'iris_event', 'ios')
+
+  if plugin_dev != nil
+    pod 'AgoraRtcWrapper', :path => File.join('.symlinks', 'plugins', 'agora_rtc_engine', 'ios')
+    # pod 'iris_event_handler', :path => File.join('.symlinks', 'plugins', 'iris_event', 'ios')
+  end
+end
+
+target 'ScreenSharing' do
+  use_frameworks!
+  use_modular_headers!
+  
+  if plugin_dev != nil
+    pod 'AgoraRtcWrapper', :path => File.join('.symlinks', 'plugins', 'agora_rtc_engine', 'ios')
+  else
+    pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
+  end
+end
+''';
+
+    final result = command.modifiedExampleIOSPodfileContent(
+        fileContent, nativeSdkDependenciesContent);
+    expect(result, expectedFileContent);
+  });
+
+  test('modifiedExampleIOSPodfileContent with audio only', () {
+    final nativeSdkDependenciesContent = '''
+Iris:
+Dummy text Dummy text Dummy text Dummy text Dummy text
+Dummy text Dummy text Dummy text Dummy text Dummy text
+Maven：
+implementation 'io.agora.rtc:full-sdk:4.1.0-1'
+implementation 'io.agora.rtc:agora-special-voice:4.0.1.9'
+implementation 'io.agora.rtc:full-screen-sharing:4.0.1.9'
+Cocoapods：
+pod 'AgoraAudio_Special_iOS', '4.1.1.3.BASIC'
+''';
+
+    final fileContent = '''
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+  
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+#  pod 'iris_event_handler', :path => File.join('.symlinks', 'plugins', 'iris_event', 'ios')
+
+  if plugin_dev != nil
+    pod 'AgoraRtcWrapper', :path => File.join('.symlinks', 'plugins', 'agora_rtc_engine', 'ios')
+    # pod 'iris_event_handler', :path => File.join('.symlinks', 'plugins', 'iris_event', 'ios')
+  end
+end
+
+target 'ScreenSharing' do
+  use_frameworks!
+  use_modular_headers!
+  
+  if plugin_dev != nil
+    pod 'AgoraRtcWrapper', :path => File.join('.symlinks', 'plugins', 'agora_rtc_engine', 'ios')
+  else
+    pod 'AgoraAudio_Special_iOS', '4.1.0.BASIC'
+  end
+end
+''';
+
+    final expectedFileContent = '''
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+  
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+#  pod 'iris_event_handler', :path => File.join('.symlinks', 'plugins', 'iris_event', 'ios')
+
+  if plugin_dev != nil
+    pod 'AgoraRtcWrapper', :path => File.join('.symlinks', 'plugins', 'agora_rtc_engine', 'ios')
+    # pod 'iris_event_handler', :path => File.join('.symlinks', 'plugins', 'iris_event', 'ios')
+  end
+end
+
+target 'ScreenSharing' do
+  use_frameworks!
+  use_modular_headers!
+  
+  if plugin_dev != nil
+    pod 'AgoraRtcWrapper', :path => File.join('.symlinks', 'plugins', 'agora_rtc_engine', 'ios')
+  else
+    pod 'AgoraAudio_Special_iOS', '4.1.1.3.BASIC'
+  end
+end
+''';
+
+    final result = command.modifiedExampleIOSPodfileContent(
+        fileContent, nativeSdkDependenciesContent);
+    expect(result, expectedFileContent);
+  });
+
+  test('modifiedExampleIOSPodfileContent with empty content', () {
+    final nativeSdkDependenciesContent = '';
+
+    final fileContent = '''
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+  
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+#  pod 'iris_event_handler', :path => File.join('.symlinks', 'plugins', 'iris_event', 'ios')
+
+  if plugin_dev != nil
+    pod 'AgoraRtcWrapper', :path => File.join('.symlinks', 'plugins', 'agora_rtc_engine', 'ios')
+    # pod 'iris_event_handler', :path => File.join('.symlinks', 'plugins', 'iris_event', 'ios')
+  end
+end
+
+target 'ScreenSharing' do
+  use_frameworks!
+  use_modular_headers!
+  
+  if plugin_dev != nil
+    pod 'AgoraRtcWrapper', :path => File.join('.symlinks', 'plugins', 'agora_rtc_engine', 'ios')
+  else
+    pod 'AgoraAudio_Special_iOS', '4.1.0.BASIC'
+  end
+end
+''';
+
+    final result = command.modifiedExampleIOSPodfileContent(
+        fileContent, nativeSdkDependenciesContent);
+    expect(result, fileContent);
+  });
 }
