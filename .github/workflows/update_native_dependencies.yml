@@ -71,12 +71,14 @@ jobs:
       - name: Update native sdk and iris dependencies
         run: |
           PROJECT_DIR=$(pwd)/AgoraIO-Extensions/Agora-Flutter-SDK
+          PUBSPEC_VERSION="${{ github.event.inputs.pubspec_version }}"
           NATIVE_SDK_DEPENDENCIES_CONTENT="${{ github.event.inputs.native_sdk_dependencies_content }}"
           IRIS_DEPENDENCIES_CONTENT="${{ github.event.inputs.iris_dependencies_content }}"
           
           dart pub get
           dart run bin/hoe.dart update-agora-flutter-native-dependencies \
             --project-dir=${PROJECT_DIR} \
+            --pubspec-version=${PUBSPEC_VERSION} \
             --native-sdk-dependencies-content="${NATIVE_SDK_DEPENDENCIES_CONTENT}" \
             --iris-dependencies-content="${IRIS_DEPENDENCIES_CONTENT}"
 

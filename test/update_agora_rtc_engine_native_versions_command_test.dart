@@ -360,6 +360,53 @@ dependencies {
     expect(result, expectedFileContent);
   });
 
+  test('modifiedAndroidGradleContent with empty content', () {
+    final nativeSdkDependenciesContent = '';
+
+    final irisDependenciesContent = '';
+
+    final fileContent = '''
+group 'io.agora.agora_rtc_ng'
+version '1.0-SNAPSHOT'
+
+android {
+    compileSdkVersion safeExtGet('compileSdkVersion', 31)
+
+    defaultConfig {
+        minSdkVersion safeExtGet('minSdkVersion', 16)
+
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        if (isDev(project)) {
+           main.jniLibs.srcDirs += 'libs'
+        }
+    }
+}
+
+dependencies {
+  if (isDev(project)) {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+  } else {
+    api 'io.agora.rtc:iris-rtc:4.1.0-rc.2'
+    api 'io.agora.rtc:full-sdk:4.1.0'
+    api 'io.agora.rtc:voice-sdk:4.1.0'
+    implementation 'io.agora.rtc:full-screen-sharing:4.1.0-1'
+  }
+}
+''';
+
+    final result = command.modifiedAndroidGradleContent(fileContent.split('\n'),
+        nativeSdkDependenciesContent, irisDependenciesContent);
+    expect(result, fileContent);
+  });
+
   test('modifiedIOSPodspecContent', () {
     final nativeSdkDependenciesContent = '''
 Iris:
@@ -399,6 +446,7 @@ Pod::Spec.new do |s|
   s.dependency 'Flutter'
   s.dependency 'AgoraIrisRTC_iOS', '4.1.0-rc.2'
   s.dependency 'AgoraRtcEngine_Special_iOS', '4.1.0.BASIC'
+  s.dependency 'AgoraAudio_Special_iOS', '4.1.0.BASIC'
   # s.dependency 'AgoraRtcWrapper'
   s.platform = :ios, '9.0'
   s.swift_version = '5.0'
@@ -437,6 +485,41 @@ end
     final result = command.modifiedIOSPodspecContent(fileContent.split('\n'),
         nativeSdkDependenciesContent, irisDependenciesContent);
     expect(result, expectedFileContent);
+  });
+
+  test('modifiedIOSPodspecContent with empty content', () {
+    final nativeSdkDependenciesContent = '';
+
+    final irisDependenciesContent = '';
+
+    final fileContent = '''
+Pod::Spec.new do |s|
+  s.name             = project.name
+  s.version          = project.version
+  s.summary          = 'A new flutter plugin project.'
+  s.description      = project.description
+  s.homepage         = 'https://github.com/AgoraIO/Flutter-SDK'
+  s.license          = { :file => '../LICENSE' }
+  s.author           = { 'Agora' => 'developer@agora.io' }
+  s.source           = { :path => '.' }
+  s.source_files = 'Classes/**/*.{h,mm,m,swift}'
+  s.dependency 'Flutter'
+  s.dependency 'AgoraIrisRTC_iOS', '4.1.0-rc.2'
+  s.dependency 'AgoraRtcEngine_Special_iOS', '4.1.0.BASIC'
+  s.dependency 'AgoraAudio_Special_iOS', '4.1.0.BASIC'
+  # s.dependency 'AgoraRtcWrapper'
+  s.platform = :ios, '9.0'
+  s.swift_version = '5.0'
+  s.libraries = 'stdc++'
+
+  # Flutter.framework does not contain a i386 slice.
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
+end
+''';
+
+    final result = command.modifiedIOSPodspecContent(fileContent.split('\n'),
+        nativeSdkDependenciesContent, irisDependenciesContent);
+    expect(result, fileContent);
   });
 
   test('modifiedMacOSPodspecContent', () {
@@ -524,6 +607,42 @@ end
     expect(result, expectedFileContent);
   });
 
+  test('modifiedMacOSPodspecContent with empty content', () {
+    final nativeSdkDependenciesContent = '';
+
+    final irisDependenciesContent = '';
+
+    final fileContent = '''
+# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
+# Run `pod lib lint agora_rtc_ng.podspec` to validate before publishing.
+#
+Pod::Spec.new do |s|
+  s.name             = 'agora_rtc_engine'
+  s.version          = '0.0.1'
+  s.summary          = 'A new flutter plugin project.'
+  s.description      = <<-DESC
+A new flutter plugin project.
+                       DESC
+  s.homepage         = 'http://example.com'
+  s.license          = { :file => '../LICENSE' }
+  s.author           = { 'Your Company' => 'email@example.com' }
+  s.source           = { :path => '.' }
+  s.source_files = 'Classes/**/*.{h,mm}', 'Classes/File.swift'
+  s.dependency 'FlutterMacOS'
+  #   s.dependency 'AgoraRtcWrapper'
+  s.dependency 'AgoraRtcEngine_macOS', '4.1.0'
+  s.dependency 'AgoraIrisRTC_macOS', '4.1.0-rc.2'
+
+  s.platform = :osx, '10.11'
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
+end
+''';
+
+    final result = command.modifiedMacOSPodspecContent(fileContent.split('\n'),
+        nativeSdkDependenciesContent, irisDependenciesContent);
+    expect(result, fileContent);
+  });
+
   test('modifiedWindowsCMakeContent', () {
     final irisDependenciesContent = '''
 Iris:
@@ -591,6 +710,40 @@ set(IRIS_DOWNLOAD_PATH "${CMAKE_CURRENT_SOURCE_DIR}/third_party/iris")
     expect(result, expectedFileContent);
   });
 
+  test('modifiedWindowsCMakeContent with empty content', () {
+    final irisDependenciesContent = '';
+
+    final fileContent = r'''
+# The Flutter tooling requires that developers have a version of Visual Studio
+# installed that includes CMake 3.14 or later. You should not increase this
+# version, as doing so will cause the plugin to fail to compile for some
+# customers of the plugin.
+cmake_minimum_required(VERSION 3.14)
+
+# Project-level configuration.
+set(PROJECT_NAME "agora_rtc_engine")
+project(${PROJECT_NAME} LANGUAGES CXX)
+
+# This value is used when generating builds using this plugin, so it must
+# not be changed
+set(PLUGIN_NAME "agora_rtc_engine_plugin")
+
+set(IRIS_SDK_DOWNLOAD_URL "https://download.agora.io/sdk/release/iris_4.1.0_DCG_Windows_Video_20221220_0216.zip")
+set(IRIS_SDK_DOWNLOAD_NAME "iris_4.1.0_DCG_Windows")
+set(RTC_SDK_DOWNLOAD_NAME "Agora_Native_SDK_for_Windows_FULL")
+set(IRIS_SDK_VERSION "v3_6_2_fix.1")
+
+# Add this project's cmake/ directory to the module path.
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+set(IRIS_DOWNLOAD_PATH "${CMAKE_CURRENT_SOURCE_DIR}/third_party/iris")
+''';
+
+    final result = command.modifiedWindowsCMakeContent(
+        fileContent.split('\n'), irisDependenciesContent);
+    expect(result, fileContent);
+  });
+
   test('modifiedArtifactsVersionContent', () {
     final irisDependenciesContent = '''
 Iris:
@@ -620,6 +773,56 @@ export IRIS_CDN_URL_ANDROID="https://download.agora.io/sdk/release/iris_4.2.0-de
 export IRIS_CDN_URL_IOS="https://download.agora.io/sdk/release/iris_4.2.0-dev.6_DCG_iOS_Video_20230412_0722.zip"
 export IRIS_CDN_URL_MACOS="https://download.agora.io/sdk/release/iris_4.2.0-dev.6_DCG_Mac_Video_20230412_0722.zip"
 export IRIS_CDN_URL_WINDOWS="https://download.agora.io/sdk/release/iris_4.2.0-dev.6_DCG_Windows_Video_20230412_0722.zip"
+''';
+
+    final result = command.modifiedArtifactsVersionContent(
+        fileContent, irisDependenciesContent);
+    expect(result, expectedFileContent);
+  });
+
+  test('modifiedArtifactsVersionContent with empty content', () {
+    final irisDependenciesContent = '';
+
+    final fileContent = r'''
+set -e
+
+export IRIS_CDN_URL_ANDROID="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_Android_Video_20230412_0722.zip"
+export IRIS_CDN_URL_IOS="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_iOS_Video_20230412_0722.zip"
+export IRIS_CDN_URL_MACOS="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_Mac_Video_20230412_0722.zip"
+export IRIS_CDN_URL_WINDOWS="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_Windows_Video_20230412_0722.zip"
+''';
+
+    final result = command.modifiedArtifactsVersionContent(
+        fileContent, irisDependenciesContent);
+    expect(result, fileContent);
+  });
+
+  test('modifiedArtifactsVersionContent with android cdn url only', () {
+    final irisDependenciesContent = '''
+Iris:
+Dummy text Dummy text Dummy text Dummy text Dummy text
+Dummy text Dummy text Dummy text Dummy text Dummy text
+https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116_Dummy text.zip
+CDN:
+https://download.agora.io/sdk/release/iris_4.2.0-dev.6_DCG_Android_Video_20230412_0722.zip
+''';
+
+    final fileContent = r'''
+set -e
+
+export IRIS_CDN_URL_ANDROID="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_Android_Video_20230412_0722.zip"
+export IRIS_CDN_URL_IOS="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_iOS_Video_20230412_0722.zip"
+export IRIS_CDN_URL_MACOS="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_Mac_Video_20230412_0722.zip"
+export IRIS_CDN_URL_WINDOWS="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_Windows_Video_20230412_0722.zip"
+''';
+
+    final expectedFileContent = '''
+set -e
+
+export IRIS_CDN_URL_ANDROID="https://download.agora.io/sdk/release/iris_4.2.0-dev.6_DCG_Android_Video_20230412_0722.zip"
+export IRIS_CDN_URL_IOS="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_iOS_Video_20230412_0722.zip"
+export IRIS_CDN_URL_MACOS="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_Mac_Video_20230412_0722.zip"
+export IRIS_CDN_URL_WINDOWS="https://download.agora.io/sdk/release/iris_4.0.0-dev.6_DCG_Windows_Video_20230412_0722.zip"
 ''';
 
     final result = command.modifiedArtifactsVersionContent(
