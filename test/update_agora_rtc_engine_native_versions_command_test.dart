@@ -155,6 +155,14 @@ implementation 'io.agora.rtc:iris-rtc:4.1.1.205-build.2'
         'implementation \'io.agora.rtc:iris-rtc:4.1.1.205-build.2\'');
   });
 
+  test('findIrisAndroidMaven with empty content', () {
+    final irisDependenciesContent = '';
+
+    final result = command.findIrisMacosPod(irisDependenciesContent);
+    expect(result.cdn, '');
+    expect(result.mavenOrCocoaPods.length, 0);
+  });
+
   test('findIrisIOSPod', () {
     final irisDependenciesContent = '''
 Iris:
@@ -172,6 +180,14 @@ pod 'AgoraIrisRTC_iOS', '4.1.1.205-build.2'
         'https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_iOS_Video_20230312_1116.zip');
     expect(result.mavenOrCocoaPods[0],
         'pod \'AgoraIrisRTC_iOS\', \'4.1.1.205-build.2\'');
+  });
+
+  test('findIrisIOSPod with empty content', () {
+    final irisDependenciesContent = '';
+
+    final result = command.findIrisMacosPod(irisDependenciesContent);
+    expect(result.cdn, '');
+    expect(result.mavenOrCocoaPods.length, 0);
   });
 
   test('findIrisMacosPod', () {
@@ -193,6 +209,14 @@ pod 'AgoraIrisRTC_macOS', '4.1.0-rc.2'
         result.mavenOrCocoaPods[0], "pod 'AgoraIrisRTC_macOS', '4.1.0-rc.2'");
   });
 
+  test('findIrisMacosPod with empty content', () {
+    final irisDependenciesContent = '';
+
+    final result = command.findIrisMacosPod(irisDependenciesContent);
+    expect(result.cdn, '');
+    expect(result.mavenOrCocoaPods.length, 0);
+  });
+
   test('findIrisWindowsCDN', () {
     final irisDependenciesContent = '''
 Iris:
@@ -206,6 +230,14 @@ https://download.agora.io/sdk/release/iris_4.1.1.205-build.1_DCG_Windows_Video_2
     final result = command.findIrisWindowsCDN(irisDependenciesContent);
     expect(result.cdn,
         'https://download.agora.io/sdk/release/iris_4.1.1.205-build.1_DCG_Windows_Video_20230311_0918.zip');
+  });
+
+  test('findIrisWindowsCDN with empty content', () {
+    final irisDependenciesContent = '';
+
+    final result = command.findIrisMacosPod(irisDependenciesContent);
+    expect(result.cdn, '');
+    expect(result.mavenOrCocoaPods.length, 0);
   });
 
   test('modifiedAndroidGradleContent', () {

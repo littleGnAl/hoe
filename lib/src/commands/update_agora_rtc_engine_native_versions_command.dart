@@ -33,6 +33,10 @@ extension StringRegExpListExt on List<String> {
 
     return isMatch;
   }
+
+  String firstOrEmpty() {
+    return isNotEmpty ? first : '';
+  }
 }
 
 class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
@@ -174,7 +178,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       nativeSdkDependenciesContent,
     );
 
-    return VersionLink(cdns[0], []);
+    return VersionLink(cdns.firstOrEmpty(), []);
   }
 
   VersionLink findIrisAndroidMaven(String irisDenpendenciesContent) {
@@ -192,7 +196,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       irisDenpendenciesContent,
     );
 
-    return VersionLink(cdns[0], mavens);
+    return VersionLink(cdns.firstOrEmpty(), mavens);
   }
 
   VersionLink findIrisIOSPod(String irisDenpendenciesContent) {
@@ -210,7 +214,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       irisDenpendenciesContent,
     );
 
-    return VersionLink(cdns[0], cocoapods);
+    return VersionLink(cdns.firstOrEmpty(), cocoapods);
   }
 
   VersionLink findIrisMacosPod(String irisDenpendenciesContent) {
@@ -228,7 +232,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       irisDenpendenciesContent,
     );
 
-    return VersionLink(cdns[0], cocoapods);
+    return VersionLink(cdns.firstOrEmpty(), cocoapods);
   }
 
   VersionLink findIrisWindowsCDN(String irisDenpendenciesContent) {
@@ -239,7 +243,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       irisDenpendenciesContent,
     );
 
-    return VersionLink(cdns[0], []);
+    return VersionLink(cdns.firstOrEmpty(), []);
   }
 
   String modifiedAndroidGradleContent(
