@@ -626,4 +626,35 @@ export IRIS_CDN_URL_WINDOWS="https://download.agora.io/sdk/release/iris_4.2.0-de
         fileContent, irisDependenciesContent);
     expect(result, expectedFileContent);
   });
+
+  test('modifiedPubspecContent', () {
+    final fileContent = r'''
+name: agora_rtc_engine
+description: >-
+  Flutter plugin of Agora RTC SDK, allow you to simply integrate Agora Video
+  Calling or Live Video Streaming to your app with just a few lines of code.
+version: 6.1.0
+homepage: https://www.agora.io
+repository: https://github.com/AgoraIO-Extensions/Agora-Flutter-SDK/tree/main
+environment:
+  sdk: '>=2.14.0 <3.0.0'
+  flutter: '>=2.5.0'
+''';
+
+    final expectedFileContent = r'''
+name: agora_rtc_engine
+description: >-
+  Flutter plugin of Agora RTC SDK, allow you to simply integrate Agora Video
+  Calling or Live Video Streaming to your app with just a few lines of code.
+version: 6.1.1-build.1
+homepage: https://www.agora.io
+repository: https://github.com/AgoraIO-Extensions/Agora-Flutter-SDK/tree/main
+environment:
+  sdk: '>=2.14.0 <3.0.0'
+  flutter: '>=2.5.0'
+''';
+
+    final result = command.modifiedPubspecContent(fileContent, '6.1.1-build.1');
+    expect(result, expectedFileContent);
+  });
 }
