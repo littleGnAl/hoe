@@ -8,6 +8,11 @@ on:
         required: true
         type: string
 
+      pubspec_version:
+        description: The pubspec version
+        required: true
+        type: string
+
       native_sdk_dependencies_content:
         description: The content of the native sdk dependencies
         type: string

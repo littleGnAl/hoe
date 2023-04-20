@@ -46,6 +46,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     required Logger logger,
   }) : super(fileSystem, processManager, logger) {
     argParser.addOption('project-dir');
+    argParser.addOption('pubspec-version');
     argParser.addOption('native-sdk-dependencies-content');
     argParser.addOption('iris-dependencies-content');
   }
@@ -61,6 +62,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   @override
   Future<void> run() async {
     final String projectDir = argResults?['project-dir'] ?? '';
+    final String pubspecVersion = argResults?['pubspec-version'] ?? '';
     final String nativeSdkDependenciesContent =
         argResults?['native-sdk-dependencies-content'] ?? '';
     final String irisDenpendenciesContent =
@@ -79,6 +81,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
         path.join(_workspace.absolute.path, 'windows', 'CMakeLists.txt');
     final artifactsVersionFilePath =
         path.join(_workspace.absolute.path, 'scripts', 'artifacts_version.sh');
+    final pubspecFilePath = path.join(_workspace.absolute.path, 'pubspec.yaml');
 
     final androidGradleFile = fileSystem.file(androidGradleFilePath);
     androidGradleFile.writeAsStringSync(modifiedAndroidGradleContent(
@@ -111,6 +114,12 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     artifactsVersionFile.writeAsStringSync(modifiedArtifactsVersionContent(
       windowsCMakeFile.readAsStringSync(),
       irisDenpendenciesContent,
+    ));
+
+    final pubspecFile = fileSystem.file(pubspecFilePath);
+    pubspecFile.writeAsStringSync(modifiedPubspecContent(
+      pubspecFile.readAsStringSync(),
+      pubspecVersion,
     ));
   }
 
@@ -438,5 +447,19 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     }
 
     return modifiedFileContentLines.join('\n');
+  }
+
+  String modifiedPubspecContent(
+    String sourceFileContent,
+    String version,
+  ) {
+    String modifiedContent = sourceFileContent;
+    modifiedContent = modifiedContent.replaceFirst(
+      RegExp(r'version\:\s[a-zA-Z0-9\.-]+',
+          multiLine: true, caseSensitive: true),
+      'version: $version',
+    );
+
+    return modifiedContent;
   }
 }
