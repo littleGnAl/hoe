@@ -112,7 +112,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
 
     final artifactsVersionFile = fileSystem.file(artifactsVersionFilePath);
     artifactsVersionFile.writeAsStringSync(modifiedArtifactsVersionContent(
-      windowsCMakeFile.readAsStringSync(),
+      artifactsVersionFile.readAsStringSync(),
       irisDenpendenciesContent,
     ));
 
@@ -287,7 +287,10 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       sourceFileContentLines,
       () => findNativeIOSPod(nativeSdkDependenciesContent),
       () => findIrisIOSPod(irisDenpendenciesContent),
-      [r"^[\s]*s.dependency 'AgoraRtc[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'"],
+      [
+        r"^[\s]*s.dependency 'AgoraRtc[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
+        r"^[\s]*s.dependency 'AgoraAudio[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
+      ],
       [r"^[\s]*s.dependency 'AgoraIris[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'"],
       (e) {
         return '  ${e.replaceFirst('pod', 's.dependency')}';
@@ -374,26 +377,37 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     final windowsCDN = findIrisWindowsCDN(irisDenpendenciesContent).cdn;
 
     String modifiedContent = sourceFileContent;
-    modifiedContent = modifiedContent.replaceFirst(
-      RegExp(r'export IRIS_CDN_URL_ANDROID=\"(.*)\"',
-          multiLine: true, caseSensitive: true),
-      'export IRIS_CDN_URL_ANDROID="$androidCDN"',
-    );
-    modifiedContent = modifiedContent.replaceFirst(
-      RegExp(r'export IRIS_CDN_URL_IOS=\"(.*)\"',
-          multiLine: true, caseSensitive: true),
-      'export IRIS_CDN_URL_IOS="$iosCDN"',
-    );
-    modifiedContent = modifiedContent.replaceFirst(
-      RegExp(r'export IRIS_CDN_URL_MACOS=\"(.*)\"',
-          multiLine: true, caseSensitive: true),
-      'export IRIS_CDN_URL_MACOS="$macOSCDN"',
-    );
-    modifiedContent = modifiedContent.replaceFirst(
-      RegExp(r'export IRIS_CDN_URL_WINDOWS=\"(.*)\"',
-          multiLine: true, caseSensitive: true),
-      'export IRIS_CDN_URL_WINDOWS="$windowsCDN"',
-    );
+    if (androidCDN.isNotEmpty) {
+      modifiedContent = modifiedContent.replaceFirst(
+        RegExp(r'export IRIS_CDN_URL_ANDROID=\"(.*)\"',
+            multiLine: true, caseSensitive: true),
+        'export IRIS_CDN_URL_ANDROID="$androidCDN"',
+      );
+    }
+
+    if (iosCDN.isNotEmpty) {
+      modifiedContent = modifiedContent.replaceFirst(
+        RegExp(r'export IRIS_CDN_URL_IOS=\"(.*)\"',
+            multiLine: true, caseSensitive: true),
+        'export IRIS_CDN_URL_IOS="$iosCDN"',
+      );
+    }
+
+    if (macOSCDN.isNotEmpty) {
+      modifiedContent = modifiedContent.replaceFirst(
+        RegExp(r'export IRIS_CDN_URL_MACOS=\"(.*)\"',
+            multiLine: true, caseSensitive: true),
+        'export IRIS_CDN_URL_MACOS="$macOSCDN"',
+      );
+    }
+
+    if (windowsCDN.isNotEmpty) {
+      modifiedContent = modifiedContent.replaceFirst(
+        RegExp(r'export IRIS_CDN_URL_WINDOWS=\"(.*)\"',
+            multiLine: true, caseSensitive: true),
+        'export IRIS_CDN_URL_WINDOWS="$windowsCDN"',
+      );
+    }
 
     return modifiedContent;
   }
