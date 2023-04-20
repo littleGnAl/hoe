@@ -136,6 +136,22 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
         'https://download.agora.io/sdk/release/Agora_Native_SDK_for_Windows_rel.v4.0.1.9_19521_FULL_20230308_1749_257724.zip');
   });
 
+  test('findNativeWindowsCDN without cdn info', () {
+    final nativeSdkDependenciesContent = '''
+CDN：
+Maven：
+implementation 'io.agora.rtc:agora-special-voice:4.0.1.9'
+implementation 'io.agora.rtc:agora-special-full:4.0.1.9'
+implementation 'io.agora.rtc:full-screen-sharing:4.0.1.9'
+Cocoapods：
+pod 'AgoraAudio_Special_iOS', '4.0.1.9'
+pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
+''';
+
+    final result = command.findNativeWindowsCDN(nativeSdkDependenciesContent);
+    expect(result.cdn, '');
+  });
+
   test('findIrisAndroidMaven', () {
     final irisDependenciesContent = '''
 Iris:
