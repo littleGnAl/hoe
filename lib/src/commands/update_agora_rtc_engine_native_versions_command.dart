@@ -113,10 +113,12 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     ));
 
     final artifactsVersionFile = fileSystem.file(artifactsVersionFilePath);
-    artifactsVersionFile.writeAsStringSync(modifiedArtifactsVersionContent(
-      artifactsVersionFile.readAsStringSync(),
-      irisDenpendenciesContent,
-    ));
+    if (artifactsVersionFile.existsSync()) {
+      artifactsVersionFile.writeAsStringSync(modifiedArtifactsVersionContent(
+        artifactsVersionFile.readAsStringSync(),
+        irisDenpendenciesContent,
+      ));
+    }
 
     final pubspecFile = fileSystem.file(pubspecFilePath);
     pubspecFile.writeAsStringSync(modifiedPubspecContent(
