@@ -1,4 +1,4 @@
-name: Update native sdk and iris dependencies
+name: Update native sdk and iris dependencies for special version
 
 on: 
   workflow_dispatch:
