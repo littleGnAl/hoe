@@ -935,11 +935,19 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       if (pluginReleaseDir.existsSync()) {
         for (final pluginArtifactEntity in pluginReleaseDir.listSync()) {
           if (pluginArtifactEntity.absolute.path.endsWith('.pdb')) {
+            if (fileSystem
+                .file(path.join(archiveDirPath, pluginArtifactEntity.basename))
+                .existsSync()) {
+              break;
+            }
+
             stdout.writeln(
                 'Copy ${pluginArtifactEntity.basename} to $archiveDirPath');
             fileSystem
                 .file(pluginArtifactEntity.absolute.path)
                 .copySync(archiveDirPath);
+
+            break;
           }
         }
       }
