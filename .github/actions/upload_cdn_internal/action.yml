@@ -16,17 +16,17 @@ inputs:
     default: 'demo-test'
     type: string
 
-jobs:
-  upload_cdn_internal:
-    using: "composite"
-    steps:
-      - name: Upload github release to CDN
-        run: |
-            UPLOAD_CDN_INTERNAL_JENKINS_HOOK=${{ inputs.upload_cdn_internal_jenkins_hook }}
-            UPLOAD_URL=${{ inputs.url }}
-            RELEASE_TYPE=${{ inputs.release_type }}
-            
-            curl -X POST ${UPLOAD_CDN_INTERNAL_JENKINS_HOOK} \
-                -H "Content-Type: application/json" \
-                -H "Accept: application/json" \
-                -d "{ \"release\": { \"assets\": [ { \"browser_download_url\": \"${UPLOAD_URL}\", \"release_type\": \"${RELEASE_TYPE}\" } ] }}"
+runs:
+  using: "composite"
+  steps:
+    - name: Upload github release to CDN
+      run: |
+        UPLOAD_CDN_INTERNAL_JENKINS_HOOK=${{ inputs.upload_cdn_internal_jenkins_hook }}
+        UPLOAD_URL=${{ inputs.url }}
+        RELEASE_TYPE=${{ inputs.release_type }}
+        
+        curl -X POST ${UPLOAD_CDN_INTERNAL_JENKINS_HOOK} \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            -d "{ \"release\": { \"assets\": [ { \"browser_download_url\": \"${UPLOAD_URL}\", \"release_type\": \"${RELEASE_TYPE}\" } ] }}"
+      shell: bash

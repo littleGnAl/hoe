@@ -165,8 +165,12 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
-          DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+          
+          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
+
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
           
           echo "output_android_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
       - name: Get current date
@@ -182,6 +186,15 @@ jobs:
         with:
           tag_name: ${{ env.TAG_NAME }}
           files: "output/*.zip"
+
+      - name: Upload to CDN
+        env:
+          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+        uses: ./.github/actions/upload_cdn_internal
+        with:
+          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
+          release_type: "demo-test"
 
   build_macos:
     name: Build macos
@@ -261,8 +274,12 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
-          DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+          
+          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
+
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
 
           echo "output_macos_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
       - name: Get current date
@@ -278,6 +295,15 @@ jobs:
         with:
           tag_name: ${{ env.TAG_NAME }}
           files: "output/*.zip"
+
+      - name: Upload to CDN
+        env:
+          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+        uses: ./.github/actions/upload_cdn_internal
+        with:
+          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
+          release_type: "demo-test"
 
   build_windows:
     name: Build windows
@@ -343,8 +369,13 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
-          DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+          
+          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
+
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
+
           echo "output_windows_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
 
       - name: Get current date
@@ -360,6 +391,15 @@ jobs:
         with:
           tag_name: ${{ env.TAG_NAME }}
           files: "output/*.zip"
+
+      - name: Upload to CDN
+        env:
+          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+        uses: ./.github/actions/upload_cdn_internal
+        with:
+          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
+          release_type: "demo-test"
 
   build_ios:
     name: Build ios
@@ -439,8 +479,12 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
-          DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+          
+          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
+
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
 
           echo "output_ios_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
 
@@ -457,3 +501,12 @@ jobs:
         with:
           tag_name: ${{ env.TAG_NAME }}
           files: "output/*.zip"
+
+      - name: Upload to CDN
+        env:
+          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+        uses: ./.github/actions/upload_cdn_internal
+        with:
+          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
+          release_type: "demo-test"
