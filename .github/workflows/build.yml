@@ -165,8 +165,11 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          DOWNLOAD_PREFIX=https://download.agora.io/demo/test
+          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
           DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+
+          GITHUB_RELEASE_DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
+          echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
           
           echo "output_android_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
       - name: Get current date
@@ -189,7 +192,7 @@ jobs:
         uses: ./.github/actions/upload_cdn_internal
         with:
           upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-          url: ${{ steps.android-build-step.outputs.output_android_artifactory_download_url }}
+          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
           release_type: "demo-test"
 
   build_macos:
@@ -270,8 +273,11 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          DOWNLOAD_PREFIX=https://download.agora.io/demo/test
+          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
           DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+
+          GITHUB_RELEASE_DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
+          echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
 
           echo "output_macos_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
       - name: Get current date
@@ -294,7 +300,7 @@ jobs:
         uses: ./.github/actions/upload_cdn_internal
         with:
           upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-          url: ${{ steps.macos-build-step.outputs.output_macos_artifactory_download_url }}
+          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
           release_type: "demo-test"
 
   build_windows:
@@ -361,8 +367,12 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          DOWNLOAD_PREFIX=https://download.agora.io/demo/test
+          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
           DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+
+          GITHUB_RELEASE_DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
+          echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
+
           echo "output_windows_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
 
       - name: Get current date
@@ -385,7 +395,7 @@ jobs:
         uses: ./.github/actions/upload_cdn_internal
         with:
           upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-          url: ${{ steps.windows-build-step.outputs.output_windows_artifactory_download_url }}
+          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
           release_type: "demo-test"
 
   build_ios:
@@ -466,8 +476,11 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          DOWNLOAD_PREFIX=https://download.agora.io/demo/test
+          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
           DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
+
+          GITHUB_RELEASE_DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
+          echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
 
           echo "output_ios_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
 
@@ -491,5 +504,5 @@ jobs:
         uses: ./.github/actions/upload_cdn_internal
         with:
           upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-          url: ${{ steps.ios-build-step.outputs.output_ios_artifactory_download_url }}
+          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
           release_type: "demo-test"
