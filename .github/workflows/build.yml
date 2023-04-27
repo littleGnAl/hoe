@@ -186,7 +186,7 @@ jobs:
       - name: Upload to CDN
         env:
           UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-        uses: ./.github/actions/doc/upload_cdn_internal
+        uses: ./.github/actions/upload_cdn_internal
         with:
           upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
           url: ${{ steps.android-build-step.outputs.output_android_artifactory_download_url }}
@@ -291,7 +291,7 @@ jobs:
       - name: Upload to CDN
         env:
           UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-        uses: ./.github/actions/doc/upload_cdn_internal
+        uses: ./.github/actions/upload_cdn_internal
         with:
           upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
           url: ${{ steps.macos-build-step.outputs.output_macos_artifactory_download_url }}
@@ -382,7 +382,7 @@ jobs:
       - name: Upload to CDN
         env:
           UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-        uses: ./.github/actions/doc/upload_cdn_internal
+        uses: ./.github/actions/upload_cdn_internal
         with:
           upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
           url: ${{ steps.windows-build-step.outputs.output_windows_artifactory_download_url }}
@@ -488,7 +488,7 @@ jobs:
       - name: Upload to CDN
         env:
           UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-        uses: ./.github/actions/doc/upload_cdn_internal
+        uses: ./.github/actions/upload_cdn_internal
         with:
           upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
           url: ${{ steps.ios-build-step.outputs.output_ios_artifactory_download_url }}
