@@ -1,0 +1,32 @@
+name: Upload github release artifacts to CDN internal
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      url:
+        description: The github release artifact url
+        type: string
+        required: true
+
+      release_type:
+        description: The release type of CDN
+        default: 'demo-test'
+        type: string
+
+jobs:
+  upload_cdn_internal:
+    name: Upload github release artifacts to CDN internal
+    runs-on: ubuntu-latest
+    env:
+      UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+    steps:
+      - name: Upload github release to CDN
+        run: |
+            UPLOAD_URL=${{ inputs.url }}
+            RELEASE_TYPE=${{ inputs.release_type }}
+            
+            curl -X POST ${UPLOAD_CDN_INTERNAL_JENKINS_HOOK} \
+                -H "Content-Type: application/json" \
+                -H "Accept: application/json" \
+                -d "{ \"release\": { \"assets\": [ { \"browser_download_url\": \"${UPLOAD_URL}\", \"release_type\": \"${RELEASE_TYPE}\" } ] }}"
