@@ -165,7 +165,7 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          DOWNLOAD_PREFIX=https://download.agora.io/demo/test
           DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
           
           echo "output_android_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
@@ -270,7 +270,7 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          DOWNLOAD_PREFIX=https://download.agora.io/demo/test
           DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
 
           echo "output_macos_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
@@ -361,7 +361,7 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          DOWNLOAD_PREFIX=https://download.agora.io/demo/test
           DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
           echo "output_windows_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
 
@@ -466,7 +466,7 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          DOWNLOAD_PREFIX=https://download.agora.io/demo/test
           DOWNLOAD_URL=${DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}
 
           echo "output_ios_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"

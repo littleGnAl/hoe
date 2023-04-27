@@ -17,7 +17,7 @@ inputs:
     type: string
 
 jobs:
-  upload_cdn_internal:
+  runs:
     using: "composite"
     steps:
       - name: Upload github release to CDN
