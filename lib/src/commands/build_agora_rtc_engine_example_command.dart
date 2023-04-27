@@ -927,6 +927,32 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
             'build', 'windows', 'runner', 'Release')),
         fileSystem.directory(archiveDirPath));
 
+    final pluginsDir = fileSystem.directory(path.join(
+        _workspace.absolute.path, 'example', 'build', 'windows', 'plugins'));
+    for (final pluginEntity in pluginsDir.listSync()) {
+      final pluginReleaseDir = fileSystem
+          .directory(path.join(pluginEntity.absolute.path, 'Release'));
+      if (pluginReleaseDir.existsSync()) {
+        for (final pluginArtifactEntity in pluginReleaseDir.listSync()) {
+          if (pluginArtifactEntity.absolute.path.endsWith('.pdb')) {
+            final dstFilePath =
+                path.join(archiveDirPath, pluginArtifactEntity.basename);
+            if (fileSystem.file(dstFilePath).existsSync()) {
+              break;
+            }
+
+            stdout.writeln(
+                'Copy ${pluginArtifactEntity.basename} to $dstFilePath');
+            fileSystem
+                .file(pluginArtifactEntity.absolute.path)
+                .copySync(dstFilePath);
+
+            break;
+          }
+        }
+      }
+    }
+
     final artifactsOutputDir = fileSystem.directory(artifactsOutputDirPath);
     if (!artifactsOutputDir.existsSync()) {
       artifactsOutputDir.createSync(recursive: true);
