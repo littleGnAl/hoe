@@ -120,17 +120,21 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       ));
     }
 
-    final pubspecFile = fileSystem.file(pubspecFilePath);
-    pubspecFile.writeAsStringSync(modifiedPubspecContent(
-      pubspecFile.readAsStringSync(),
-      pubspecVersion,
-    ));
+    if (pubspecVersion.isNotEmpty) {
+      final pubspecFile = fileSystem.file(pubspecFilePath);
+      pubspecFile.writeAsStringSync(modifiedPubspecContent(
+        pubspecFile.readAsStringSync(),
+        pubspecVersion,
+      ));
+    }
 
-    final exampleIOSPodfileFile = fileSystem.file(exampleIOSPodfileFilePath);
-    exampleIOSPodfileFile.writeAsStringSync(modifiedExampleIOSPodfileContent(
-      exampleIOSPodfileFile.readAsStringSync(),
-      nativeSdkDependenciesContent,
-    ));
+    if (nativeSdkDependenciesContent.isNotEmpty) {
+      final exampleIOSPodfileFile = fileSystem.file(exampleIOSPodfileFilePath);
+      exampleIOSPodfileFile.writeAsStringSync(modifiedExampleIOSPodfileContent(
+        exampleIOSPodfileFile.readAsStringSync(),
+        nativeSdkDependenciesContent,
+      ));
+    }
   }
 
   List<String> _findByRegExp(List<String> regExps, String input) {
