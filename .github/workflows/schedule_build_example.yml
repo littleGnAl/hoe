@@ -39,6 +39,8 @@ jobs:
               let prNumber = pr.number;
               let targetBranch = pr.head.ref;
 
+              console.log(`pr.labels: ${pr.labels}`);
+
               let isScheduleBuildExample = false;
               let isBuildingExample = false;
               for (let label of pr.labels) {
