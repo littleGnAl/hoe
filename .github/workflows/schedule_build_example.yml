@@ -32,6 +32,8 @@ jobs:
               return;
             }
 
+            console.log(`response.data: ${response.data}`);
+
             const prs = response.data;
             for (let pr of prs) {
               let prNumber = pr.number;
