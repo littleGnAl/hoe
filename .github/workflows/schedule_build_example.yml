@@ -55,11 +55,11 @@ jobs:
 
               if (isBuildingExample) {
                 console.log(`Skip schedule due to the build is processing...`);
-                return;
+                continue;
               }
 
               if (!isScheduleBuildExample) {
-                return;
+                continue;
               }
 
               await github.rest.issues.addLabels({
