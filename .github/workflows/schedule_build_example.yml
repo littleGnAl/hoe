@@ -44,7 +44,7 @@ jobs:
               let isScheduleBuildExample = false;
               let isBuildingExample = false;
               for (let label of pr.labels) {
-                console.log(`label: ${label}`);
+                console.log(`label.name: ${label.name}`);
                 if (label.name == "ci:schedule_build_example") {
                   isScheduleBuildExample = true;
                 }
