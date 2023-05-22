@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       base_branch:
-        description: The content of the iris dependencies
+        description: The base branch to update
         type: string
         required: true
         default: 'main'
@@ -16,6 +16,11 @@ on:
       iris_dependencies_content:
         description: The content of the iris dependencies
         type: string
+
+      is_skip_ci:
+        type: boolean
+        description: Is skip ci
+        default: false
 
 jobs:
   udpate_dependencies:
@@ -81,5 +86,4 @@ jobs:
             ```
 
             > This pull request is trigger by bot, DO NOT MODIFY BY HAND.
-          labels: |
-            version:special
+          labels: ${{ (github.event.inputs.is_skip_ci && 'version:special,ci:skip') || 'version:special' }}
