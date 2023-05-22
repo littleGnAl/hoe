@@ -20,8 +20,9 @@ void main() {
     );
   });
 
-  test('findNativeAndroidMaven', () {
-    final nativeSdkDependenciesContent = '''
+  group('findNativeAndroidMaven', () {
+    test('findNativeAndroidMaven', () {
+      final nativeSdkDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -35,30 +36,46 @@ pod 'AgoraAudio_Special_iOS', '4.0.1.9'
 pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
 ''';
 
-    final result = command.findNativeAndroidMaven(nativeSdkDependenciesContent);
-    expect(result.mavenOrCocoaPods[0],
-        "implementation 'io.agora.rtc:full-sdk:4.1.0-1'");
-    expect(result.mavenOrCocoaPods[1],
-        "implementation 'io.agora.rtc:agora-special-full:4.0.1.9'");
-    expect(result.mavenOrCocoaPods[2],
-        "implementation 'io.agora.rtc:full-screen-sharing:4.0.1.9'");
-    expect(result.mavenOrCocoaPods[3],
-        "implementation 'io.agora.rtc:agora-special-voice:4.0.1.9'");
+      final result =
+          command.findNativeAndroidMaven(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0],
+          "implementation 'io.agora.rtc:full-sdk:4.1.0-1'");
+      expect(result.mavenOrCocoaPods[1],
+          "implementation 'io.agora.rtc:agora-special-full:4.0.1.9'");
+      expect(result.mavenOrCocoaPods[2],
+          "implementation 'io.agora.rtc:full-screen-sharing:4.0.1.9'");
+      expect(result.mavenOrCocoaPods[3],
+          "implementation 'io.agora.rtc:agora-special-voice:4.0.1.9'");
+    });
+
+    test('findNativeAndroidMaven with single line input', () {
+      final nativeSdkDependenciesContent =
+          "implementation 'io.agora.rtc:agora-special-full:4.0.0.132.1'  implementation 'io.agora.rtc:full-screen-sharing:4.0.0.132.1'  pod 'AgoraRtcEngine_Special_iOS', '4.0.0.132.1'";
+
+      final result =
+          command.findNativeAndroidMaven(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0],
+          "implementation 'io.agora.rtc:agora-special-full:4.0.0.132.1'");
+      expect(result.mavenOrCocoaPods[1],
+          "implementation 'io.agora.rtc:full-screen-sharing:4.0.0.132.1'");
+    });
+
+    test('findNativeAndroidMaven with single line input with *preview', () {
+      final nativeSdkDependenciesContent =
+          "implementation 'io.agora.rtc:agora-full-preview:4.2.0-dev.16'  implementation 'io.agora.rtc:full-screen-sharing-special:4.2.0-dev.16'  pod 'AgoraRtcEngine_Special_iOS', '4.0.0.132.1'";
+
+      final result =
+          command.findNativeAndroidMaven(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0],
+          "implementation 'io.agora.rtc:agora-full-preview:4.2.0-dev.16'");
+      expect(result.mavenOrCocoaPods[1],
+          "implementation 'io.agora.rtc:full-screen-sharing-special:4.2.0-dev.16'");
+    });
   });
 
-  test('findNativeAndroidMaven with single line input', () {
-    final nativeSdkDependenciesContent =
-        "implementation 'io.agora.rtc:agora-special-full:4.0.0.132.1'  implementation 'io.agora.rtc:full-screen-sharing:4.0.0.132.1'  pod 'AgoraRtcEngine_Special_iOS', '4.0.0.132.1'";
-
-    final result = command.findNativeAndroidMaven(nativeSdkDependenciesContent);
-    expect(result.mavenOrCocoaPods[0],
-        "implementation 'io.agora.rtc:agora-special-full:4.0.0.132.1'");
-    expect(result.mavenOrCocoaPods[1],
-        "implementation 'io.agora.rtc:full-screen-sharing:4.0.0.132.1'");
-  });
-
-  test('findNativeIOSPod', () {
-    final nativeSdkDependenciesContent = '''
+  group('findNativeIOSPod', () {
+    test('findNativeIOSPod', () {
+      final nativeSdkDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -73,25 +90,36 @@ pod 'AgoraAudio_Special_iOS', '4.0.1.9'
 pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
 ''';
 
-    final result = command.findNativeIOSPod(nativeSdkDependenciesContent);
-    expect(result.mavenOrCocoaPods[0], "pod 'AgoraRtcEngine_iOS', '4.1.0'");
-    expect(result.mavenOrCocoaPods[1],
-        "pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'");
-    expect(
-        result.mavenOrCocoaPods[2], "pod 'AgoraAudio_Special_iOS', '4.0.1.9'");
+      final result = command.findNativeIOSPod(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0], "pod 'AgoraRtcEngine_iOS', '4.1.0'");
+      expect(result.mavenOrCocoaPods[1],
+          "pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'");
+      expect(result.mavenOrCocoaPods[2],
+          "pod 'AgoraAudio_Special_iOS', '4.0.1.9'");
+    });
+
+    test('findNativeIOSPod with single line input', () {
+      final nativeSdkDependenciesContent =
+          "implementation 'io.agora.rtc:agora-special-full:4.0.0.132.1'  implementation 'io.agora.rtc:full-screen-sharing:4.0.0.132.1'  pod 'AgoraRtcEngine_Special_iOS', '4.0.0.132.1'";
+
+      final result = command.findNativeIOSPod(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0],
+          "pod 'AgoraRtcEngine_Special_iOS', '4.0.0.132.1'");
+    });
+
+    test('findNativeIOSPod with single line input with *preview', () {
+      final nativeSdkDependenciesContent =
+          "implementation 'io.agora.rtc:agora-special-full:4.0.0.132.1'  implementation 'io.agora.rtc:full-screen-sharing:4.0.0.132.1'  pod 'AgoraRtcEngine_iOS_Preview', '4.2.0-dev.16'";
+
+      final result = command.findNativeIOSPod(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0],
+          "pod 'AgoraRtcEngine_iOS_Preview', '4.2.0-dev.16'");
+    });
   });
 
-  test('findNativeIOSPod with single line input', () {
-    final nativeSdkDependenciesContent =
-        "implementation 'io.agora.rtc:agora-special-full:4.0.0.132.1'  implementation 'io.agora.rtc:full-screen-sharing:4.0.0.132.1'  pod 'AgoraRtcEngine_Special_iOS', '4.0.0.132.1'";
-
-    final result = command.findNativeIOSPod(nativeSdkDependenciesContent);
-    expect(result.mavenOrCocoaPods[0],
-        "pod 'AgoraRtcEngine_Special_iOS', '4.0.0.132.1'");
-  });
-
-  test('findNativeMacosPod', () {
-    final nativeSdkDependenciesContent = '''
+  group('findNativeMacosPod', () {
+    test('findNativeMacosPod', () {
+      final nativeSdkDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -108,10 +136,20 @@ pod 'AgoraRtcEngine_macOS', '4.1.0'
 pod 'AgoraRtcEngine_Special_macOS', '4.1.1.1'
 ''';
 
-    final result = command.findNativeMacosPod(nativeSdkDependenciesContent);
-    expect(result.mavenOrCocoaPods[0], "pod 'AgoraRtcEngine_macOS', '4.1.0'");
-    expect(result.mavenOrCocoaPods[1],
-        "pod 'AgoraRtcEngine_Special_macOS', '4.1.1.1'");
+      final result = command.findNativeMacosPod(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0], "pod 'AgoraRtcEngine_macOS', '4.1.0'");
+      expect(result.mavenOrCocoaPods[1],
+          "pod 'AgoraRtcEngine_Special_macOS', '4.1.1.1'");
+    });
+
+    test('findNativeMacosPod with single line input with *preview', () {
+      final nativeSdkDependenciesContent =
+          "implementation 'io.agora.rtc:agora-special-full:4.0.0.132.1'  implementation 'io.agora.rtc:full-screen-sharing:4.0.0.132.1'  pod 'AgoraRtcEngine_macOS_Preview', '4.2.0-dev.16'";
+
+      final result = command.findNativeMacosPod(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0],
+          "pod 'AgoraRtcEngine_macOS_Preview', '4.2.0-dev.16'");
+    });
   });
 
   test('findNativeWindowsCDN', () {

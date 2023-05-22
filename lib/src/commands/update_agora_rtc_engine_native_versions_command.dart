@@ -163,7 +163,9 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       [
         r"implementation[\s]*'io.agora.rtc:full-sdk:[0-9a-zA-Z\.-]+'",
         r"implementation[\s]*'io.agora.rtc:agora-special-full:[0-9a-zA-Z\.-]+'",
+        r"implementation[\s]*'io.agora.rtc:agora-full-preview:[0-9a-zA-Z\.-]+'",
         r"implementation[\s]*'io.agora.rtc:full-screen-sharing:[0-9a-zA-Z\.-]+'",
+        r"implementation[\s]*'io.agora.rtc:full-screen-sharing-special:[0-9a-zA-Z\.-]+'",
         r"implementation[\s]*'io.agora.rtc:agora-special-voice:[0-9a-zA-Z\.-]+'"
       ],
       nativeSdkDependenciesContent,
@@ -176,8 +178,9 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     List<String> cocoapods = _findByRegExp(
       [
         r"pod[\s]*'AgoraRtcEngine_iOS',[\s]*'[0-9a-z.-]+'",
+        r"pod[\s]*'AgoraRtcEngine_iOS_Preview',[\s]*'[0-9a-zA-Z.-]+'",
         r"pod[\s]*'AgoraRtcEngine_Special_iOS',[\s]*'[0-9a-z.-]+'",
-        r"pod[\s]*'AgoraAudio_Special_iOS',[\s]*'[0-9a-zA-Z.-]+'",
+        r"pod[\s]*'AgoraAudio_Special_iOS',[\s]*'[0-9a-zA-Z.-]+'"
       ],
       nativeSdkDependenciesContent,
     );
@@ -189,7 +192,8 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     List<String> cocoapods = _findByRegExp(
       [
         r"pod[\s]*'AgoraRtcEngine_macOS',[\s]*'[0-9a-z.-]+'",
-        r"pod[\s]*'AgoraRtcEngine_Special_macOS',[\s]*'[0-9a-z.-]+'",
+        r"pod[\s]*'AgoraRtcEngine_macOS_Preview',[\s]*'[0-9a-z.-]+'",
+        r"pod[\s]*'AgoraRtcEngine_Special_macOS',[\s]*'[0-9a-z.-]+'"
       ],
       nativeSdkDependenciesContent,
     );
