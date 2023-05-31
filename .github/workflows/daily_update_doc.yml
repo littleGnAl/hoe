@@ -35,7 +35,7 @@ jobs:
                 'pull_request_title': `[doc] daily update ${dateString}`,
                 'config': 'fmt_config/fmt_dart.yaml',
                 'language': 'dart',
-                'base-template-url': 'https://github.com/AgoraIO/agora_doc_source/releases/download/main/flutter_ng_json_template_en.json',
+                'base-template-url': 'https://github.com/AgoraIO/agora_doc_source/releases/download/master-build/flutter_ng_json_template_en.json',
                 'merge-template-url': '',
                 'export-file-path': 'lib/agora_rtc_engine.dart'
               },
