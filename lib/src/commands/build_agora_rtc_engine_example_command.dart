@@ -12,25 +12,6 @@ import 'package:hoe/src/common/pubspec.dart';
 import 'package:path/path.dart' as path;
 import 'package:process/process.dart';
 
-const String _agoraRtcWrapperPodSpecFileTemplate = '''
-#
-# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint agora_rtc_engine.podspec` to validate before publishing.
-#
-
-Pod::Spec.new do |s|
-  s.name             = 'AgoraRtcWrapper'
-  s.version          = '3.6.2'
-  s.summary          = 'A new flutter plugin project.'
-  s.description      = 'project.description'
-  s.homepage         = 'https://github.com/AgoraIO/Flutter-SDK'
-  s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Agora' => 'developer@agora.io' }
-  s.source           = { :path => '.' }
-  s.vendored_frameworks = '{{AGORA_RTC_WRAPPER}}', {{AGORA_RTC_ENGINE_LIBS}}
-end
-''';
-
 class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
   BuildAgoraRtcEngineExampleCommand({
     required FileSystem fileSystem,
@@ -295,7 +276,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           'Release',
           'AgoraRtcWrapper.xcframework',
         ),
-        iosModulePath
+        path.join(iosModulePath, 'libs')
       ]);
 
       final irisDebuggerXCframeworkPath = path.join(
@@ -334,11 +315,6 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     }
 
     fileSystem.file(path.join(iosModulePath, '.plugin_dev')).createSync();
-
-    final podspecFilePath =
-        path.join(iosModulePath, '$flutterPackageName.podspec');
-    _createAgoraRtcWrapperPodSpecFile(iosModuleDir, isXCFramework: true);
-    _modifyPodSpecFile(podspecFilePath, true);
 
     _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
     _runPodInstall(path.join(_workspace.absolute.path, 'example', 'ios'));
@@ -396,7 +372,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           'Release',
           'AgoraRtcWrapper.framework',
         ),
-        macosModulePath
+        path.join(macosModulePath, 'libs')
       ]);
 
       final irisDebuggerFrameworkPath = path.join(
@@ -435,11 +411,6 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     }
 
     fileSystem.file(path.join(macosModulePath, '.plugin_dev')).createSync();
-
-    final podspecFilePath =
-        path.join(macosModulePath, 'agora_rtc_engine.podspec');
-    _createAgoraRtcWrapperPodSpecFile(macosModuleDir);
-    _modifyPodSpecFile(podspecFilePath, true);
 
     _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
     _runPodInstall(path.join(_workspace.absolute.path, 'example', 'macos'));
@@ -498,97 +469,6 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     if (!devFile.existsSync()) {
       devFile.createSync();
     }
-  }
-
-  void _modifyPodSpecFile(String podspecFilePath, bool forDev) {
-    final podspecFile = fileSystem.file(podspecFilePath);
-    final lines = podspecFile.readAsLinesSync();
-    final newOutput = StringBuffer();
-    bool meetAgoraDependency = false;
-    for (final line in lines) {
-      final trimLine = line.trim();
-
-      if (forDev) {
-        if (trimLine.startsWith('s.dependency \'Agora')) {
-          if (!meetAgoraDependency) {
-            newOutput.writeln('  s.dependency \'AgoraRtcWrapper\'');
-          }
-
-          meetAgoraDependency = true;
-          newOutput.writeln('  # $line');
-
-          continue;
-        }
-      } else {
-        if (trimLine.startsWith('# s.dependency \'AgoraIrisRTC')) {
-          newOutput.writeln(line.replaceAll('# ', ''));
-          continue;
-        }
-        if (trimLine.startsWith('s.dependency \'AgoraRtcWrapper\'')) {
-          continue;
-        }
-      }
-
-      newOutput.writeln(line);
-    }
-
-    podspecFile.writeAsStringSync(newOutput.toString());
-  }
-
-  void _modifyPodFile(String podFilePath, bool forDev) {
-    const agoraRtcWrapperPodLine = 'pod \'AgoraRtcWrapper\', :path => ';
-    final podFile = fileSystem.file(podFilePath);
-    final lines = podFile.readAsLinesSync();
-    final newOutput = StringBuffer();
-    for (final line in lines) {
-      final trimLine = line.trim();
-
-      if (forDev) {
-        if (trimLine.startsWith('# $agoraRtcWrapperPodLine')) {
-          newOutput.writeln(line.replaceAll('# ', ''));
-          continue;
-        }
-      } else {
-        if (trimLine.startsWith(agoraRtcWrapperPodLine)) {
-          newOutput.writeln('# $agoraRtcWrapperPodLine');
-          continue;
-        }
-      }
-
-      newOutput.writeln(line);
-    }
-
-    podFile.writeAsStringSync(newOutput.toString());
-  }
-
-  void _createAgoraRtcWrapperPodSpecFile(Directory iosModuleDir,
-      {bool isXCFramework = false}) {
-    final agoraRtcWrapperPodspecFilePath =
-        path.join(iosModuleDir.absolute.path, 'AgoraRtcWrapper.podspec');
-    final agoraRtcWrapperPodspecFile =
-        fileSystem.file(agoraRtcWrapperPodspecFilePath);
-    if (!agoraRtcWrapperPodspecFile.existsSync()) {
-      agoraRtcWrapperPodspecFile.createSync(recursive: true);
-    }
-    final agoraRtcLibsPath = path.join(iosModuleDir.absolute.path, 'libs');
-    final agoraRtcLibsDir = fileSystem.directory(agoraRtcLibsPath);
-    final agoraRtcLibList = [];
-    agoraRtcLibsDir.listSync().forEach((element) {
-      agoraRtcLibList.add('\'libs/${element.basename}\'');
-    });
-
-    final agoraRtcEngineVendoredFrameworks = agoraRtcLibList.join(', ');
-    String agoraRtcWrapperPodSpecFileContent =
-        _agoraRtcWrapperPodSpecFileTemplate.replaceAll(
-            '{{AGORA_RTC_ENGINE_LIBS}}', agoraRtcEngineVendoredFrameworks);
-    agoraRtcWrapperPodSpecFileContent =
-        agoraRtcWrapperPodSpecFileContent.replaceAll(
-            '{{AGORA_RTC_WRAPPER}}',
-            isXCFramework
-                ? 'AgoraRtcWrapper.xcframework'
-                : 'AgoraRtcWrapper.framework');
-    agoraRtcWrapperPodspecFile
-        .writeAsStringSync(agoraRtcWrapperPodSpecFileContent);
   }
 
   void _runPodInstall(String iosProjectPath) {
