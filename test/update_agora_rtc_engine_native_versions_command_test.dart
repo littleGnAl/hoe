@@ -57,7 +57,7 @@ pod 'AgoraAudio_iOS', '4.2.2'
       final result =
           command.findNativeAndroidMaven(nativeSdkDependenciesContent);
       expect(result.mavenOrCocoaPods[0],
-          "implementation 'io.agora.rtc:voice-sdk:4.2.2");
+          "implementation 'io.agora.rtc:voice-sdk:4.2.2'");
     });
 
     test('findNativeAndroidMaven with single line input', () {
