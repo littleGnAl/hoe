@@ -48,6 +48,18 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
           "implementation 'io.agora.rtc:agora-special-voice:4.0.1.9'");
     });
 
+    test('findNativeAndroidMaven with audio only', () {
+      final nativeSdkDependenciesContent = '''
+implementation 'io.agora.rtc:voice-sdk:4.2.2'
+pod 'AgoraAudio_iOS', '4.2.2'
+''';
+
+      final result =
+          command.findNativeAndroidMaven(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0],
+          "implementation 'io.agora.rtc:voice-sdk:4.2.2'");
+    });
+
     test('findNativeAndroidMaven with single line input', () {
       final nativeSdkDependenciesContent =
           "implementation 'io.agora.rtc:agora-special-full:4.0.0.132.1'  implementation 'io.agora.rtc:full-screen-sharing:4.0.0.132.1'  pod 'AgoraRtcEngine_Special_iOS', '4.0.0.132.1'";
@@ -96,6 +108,16 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
           "pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'");
       expect(result.mavenOrCocoaPods[2],
           "pod 'AgoraAudio_Special_iOS', '4.0.1.9'");
+    });
+
+    test('findNativeIOSPod with audio only', () {
+      final nativeSdkDependenciesContent = '''
+implementation 'io.agora.rtc:voice-sdk:4.2.2'
+pod 'AgoraAudio_iOS', '4.2.2'
+''';
+
+      final result = command.findNativeIOSPod(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0], "pod 'AgoraAudio_iOS', '4.2.2'");
     });
 
     test('findNativeIOSPod with single line input', () {
