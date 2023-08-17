@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cli_util/cli_logging.dart';
 import 'package:file/file.dart';
 import 'package:hoe/src/base/base_command.dart';
+import 'package:hoe/src/base/process_manager_ext.dart';
 import 'package:path/path.dart' as path;
 import 'package:process/process.dart';
 
@@ -135,6 +136,8 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
         nativeSdkDependenciesContent,
       ));
     }
+
+
   }
 
   List<String> _findByRegExp(List<String> regExps, String input) {
@@ -528,5 +531,44 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     );
 
     return modifiedContent;
+  }
+
+    // flutter packages get
+    // pod install --repo-update
+    // /Users/fenglang/codes/aw/Agora-Flutter-SDK/example/ios/Pods
+    // AgoraRtcEngine_Special_iOS
+    // s.weak_frameworks = 'AgoraAiEchoCancellationExtension', 'AgoraAiNoiseSuppressionExtension', 'AgoraAudioBeautyExtension', 'AgoraClearVisionExtension', 'AgoraContentInspectExtension', 'AgoraDrmLoaderExtension', 'AgoraFaceDetectionExtension', 'AgoraReplayKitExtension', 'AgoraSpatialAudioExtension', 'AgoraVideoQualityAnalyzerExtension', 'AgoraVideoSegmentationExtension'
+  void _updateIOSPodspecWeakFrameworks(FileSystem fileSystem,
+      ProcessManager processManager, String iosPodspecPath) {
+    final iosPodspecFile = fileSystem.file(iosPodspecPath);
+    final exampleDirPath = path.join(_workspace.absolute.path, 'example');
+    final exampleIOSDirPath = path.join(_workspace.absolute.path, 'example', 'ios');
+    final exampleIOSPodsDirPath = path.join(_workspace.absolute.path, 'example', 'ios', 'Pods');
+    final exampleIOSPodsDir = fileSystem.directory(exampleIOSPodsDirPath);
+    processManager.runSyncWithOutput(
+      [
+        'flutter',
+        'packages',
+        'get',
+      ],
+      runInShell: true,
+      workingDirectory: exampleDirPath,
+    );
+
+    processManager.runSyncWithOutput(
+      [
+        'pod',
+        'install',
+        '--repo-update',
+      ],
+      runInShell: true,
+      workingDirectory: exampleIOSDirPath,
+    );
+
+    final pods = exampleIOSPodsDir.listSync();
+    String agoraRtcEnginePodsDirPath = '';
+    for (final pod in pods) {
+      
+    }
   }
 }
