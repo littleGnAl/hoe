@@ -180,7 +180,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       [
         r"pod[\s]*'AgoraRtcEngine_iOS',[\s]*'[0-9a-z.-]+'",
         r"pod[\s]*'AgoraRtcEngine_iOS_Preview',[\s]*'[0-9a-zA-Z.-]+'",
-        r"pod[\s]*'AgoraRtcEngine_Special_iOS',[\s]*'[0-9a-z.-]+'",
+        r"pod[\s]*'AgoraRtcEngine_Special_iOS',[\s]*'[0-9a-zA-Z.-]+'",
         r"pod[\s]*'AgoraAudio_Special_iOS',[\s]*'[0-9a-zA-Z.-]+'",
         r"pod[\s]*'AgoraAudio_iOS',[\s]*'[0-9a-zA-Z.-]+'",
       ],
