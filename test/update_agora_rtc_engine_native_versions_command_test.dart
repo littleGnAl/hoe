@@ -1246,6 +1246,29 @@ const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.j
 const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.2-dev.2.js';
 ''');
 
+      final exampleIndexPath = path.join(
+          fileSystem.currentDirectory.absolute.path, 'example/web/index.html');
+      final exampleIndexFile = fileSystem.file(exampleIndexPath);
+      exampleIndexFile.createSync(recursive: true);
+      exampleIndexFile.writeAsStringSync(r'''
+<!DOCTYPE html>
+<html>
+<body>
+  <!-- This script installs service_worker.js to provide PWA functionality to
+       application. For more information, see:
+       https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script>
+    var serviceWorkerVersion = null;
+    } else {
+      // Service workers not supported. Just drop the <script> tag.
+      loadMainDartJs();
+    }
+  </script>
+  <script src="https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js"></script>
+</body>
+</html>
+''');
+
       final nativeDenpendenciesContent = '''
 CDN:
 https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js
@@ -1264,6 +1287,26 @@ const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.
 ''';
 
       expect(f.readAsStringSync(), expectedContent);
+
+      final expectedExampleIndexContent = r'''
+<!DOCTYPE html>
+<html>
+<body>
+  <!-- This script installs service_worker.js to provide PWA functionality to
+       application. For more information, see:
+       https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script>
+    var serviceWorkerVersion = null;
+    } else {
+      // Service workers not supported. Just drop the <script> tag.
+      loadMainDartJs();
+    }
+  </script>
+  <script src="https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js"></script>
+</body>
+</html>
+''';
+      expect(exampleIndexFile.readAsStringSync(), expectedExampleIndexContent);
     });
   });
 }
