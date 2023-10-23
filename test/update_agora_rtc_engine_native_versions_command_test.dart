@@ -1,14 +1,18 @@
 import 'package:cli_util/cli_logging.dart';
+import 'package:file/file.dart';
 import 'package:file/memory.dart';
 import 'package:hoe/src/commands/update_agora_rtc_engine_native_versions_command.dart';
 import 'package:process/process.dart';
 import 'package:test/test.dart';
+import 'package:path/path.dart' as path;
 
 void main() {
   late UpdateAgoraRtcEngineNativeVersionsCommand command;
 
+  late FileSystem fileSystem;
+
   setUp(() {
-    final fileSystem = MemoryFileSystem.test();
+    fileSystem = MemoryFileSystem.test();
     final processManager = const LocalProcessManager();
 
     final logger = Logger.standard();
@@ -46,6 +50,30 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
           "implementation 'io.agora.rtc:full-screen-sharing:4.0.1.9'");
       expect(result.mavenOrCocoaPods[3],
           "implementation 'io.agora.rtc:agora-special-voice:4.0.1.9'");
+    });
+
+    test('findNativeAndroidMaven with audio only', () {
+      final nativeSdkDependenciesContent = '''
+implementation 'io.agora.rtc:voice-sdk:4.2.2'
+pod 'AgoraAudio_iOS', '4.2.2'
+''';
+
+      final result =
+          command.findNativeAndroidMaven(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0],
+          "implementation 'io.agora.rtc:voice-sdk:4.2.2'");
+    });
+
+    test('findNativeAndroidMaven with mini video', () {
+      final nativeSdkDependenciesContent = '''
+implementation 'io.agora.rtc:agora-special-full:4.1.1.13.MINI.VIDEO'
+pod 'AgoraRtcEngine_Special_iOS', '4.1.1.13.MINI.VIDEO'
+''';
+
+      final result =
+          command.findNativeAndroidMaven(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0],
+          "implementation 'io.agora.rtc:agora-special-full:4.1.1.13.MINI.VIDEO'");
     });
 
     test('findNativeAndroidMaven with single line input', () {
@@ -96,6 +124,27 @@ pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
           "pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'");
       expect(result.mavenOrCocoaPods[2],
           "pod 'AgoraAudio_Special_iOS', '4.0.1.9'");
+    });
+
+    test('findNativeIOSPod with audio only', () {
+      final nativeSdkDependenciesContent = '''
+implementation 'io.agora.rtc:voice-sdk:4.2.2'
+pod 'AgoraAudio_iOS', '4.2.2'
+''';
+
+      final result = command.findNativeIOSPod(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0], "pod 'AgoraAudio_iOS', '4.2.2'");
+    });
+
+    test('findNativeIOSPod with mini video', () {
+      final nativeSdkDependenciesContent = '''
+implementation 'io.agora.rtc:agora-special-full:4.1.1.13.MINI.VIDEO'
+pod 'AgoraRtcEngine_Special_iOS', '4.1.1.13.MINI.VIDEO'
+''';
+
+      final result = command.findNativeIOSPod(nativeSdkDependenciesContent);
+      expect(result.mavenOrCocoaPods[0],
+          "pod 'AgoraRtcEngine_Special_iOS', '4.1.1.13.MINI.VIDEO'");
     });
 
     test('findNativeIOSPod with single line input', () {
@@ -1076,5 +1125,188 @@ end
     final result = command.modifiedExampleIOSPodfileContent(
         fileContent, nativeSdkDependenciesContent);
     expect(result, fileContent);
+  });
+
+  group('modifyIrisWebVersion', () {
+    test('can modify iris-web cdn', () {
+      final p = path.join(fileSystem.currentDirectory.absolute.path,
+          'scripts/iris_web_version.js');
+      final f = fileSystem.file(p);
+      f.createSync(recursive: true);
+      f.writeAsStringSync(r'''
+// Share the iris web url to all the tests
+
+// This url should be same as the url inside the `example/web/index.html`
+const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js';
+const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.2-dev.2.js';
+''');
+
+      final exampleIndexPath = path.join(
+          fileSystem.currentDirectory.absolute.path, 'example/web/index.html');
+      final exampleIndexFile = fileSystem.file(exampleIndexPath);
+      exampleIndexFile.createSync(recursive: true);
+      exampleIndexFile.writeAsStringSync(r'''
+<!DOCTYPE html>
+<html>
+<body>
+  <!-- This script installs service_worker.js to provide PWA functionality to
+       application. For more information, see:
+       https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script>
+    var serviceWorkerVersion = null;
+    } else {
+      // Service workers not supported. Just drop the <script> tag.
+      loadMainDartJs();
+    }
+  </script>
+  <script src="https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js"></script>
+</body>
+</html>
+''');
+
+      final nativeDenpendenciesContent = '''
+CDN:
+https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js
+''';
+      command.modifyIrisWebVersion(fileSystem.currentDirectory.absolute.path,
+          nativeDenpendenciesContent);
+
+      final expectedContent = r'''
+// Share the iris web url to all the tests
+
+// This url should be same as the url inside the `example/web/index.html`
+const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js';
+const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.2-dev.2.js';
+''';
+
+      expect(f.readAsStringSync(), expectedContent);
+
+      final expectedExampleIndexContent = r'''
+<!DOCTYPE html>
+<html>
+<body>
+  <!-- This script installs service_worker.js to provide PWA functionality to
+       application. For more information, see:
+       https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script>
+    var serviceWorkerVersion = null;
+    } else {
+      // Service workers not supported. Just drop the <script> tag.
+      loadMainDartJs();
+    }
+  </script>
+  <script src="https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js"></script>
+</body>
+</html>
+''';
+      expect(exampleIndexFile.readAsStringSync(), expectedExampleIndexContent);
+    });
+
+    test('can modify iris-web-fake cdn', () {
+      final p = path.join(fileSystem.currentDirectory.absolute.path,
+          'scripts/iris_web_version.js');
+      final f = fileSystem.file(p);
+      f.createSync(recursive: true);
+      f.writeAsStringSync(r'''
+// Share the iris web url to all the tests
+
+// This url should be same as the url inside the `example/web/index.html`
+const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js';
+const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.2-dev.2.js';
+''');
+
+      final nativeDenpendenciesContent = '''
+CDN:
+https://download.agora.io/staging/iris-web-rtc-fake_0.1.3-dev.2.js
+''';
+      command.modifyIrisWebVersion(fileSystem.currentDirectory.absolute.path,
+          nativeDenpendenciesContent);
+
+      final expectedContent = r'''
+// Share the iris web url to all the tests
+
+// This url should be same as the url inside the `example/web/index.html`
+const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js';
+const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.3-dev.2.js';
+''';
+
+      expect(f.readAsStringSync(), expectedContent);
+    });
+
+    test('can modify iris-web/iris-web-fake cdns', () {
+      final p = path.join(fileSystem.currentDirectory.absolute.path,
+          'scripts/iris_web_version.js');
+      final f = fileSystem.file(p);
+      f.createSync(recursive: true);
+      f.writeAsStringSync(r'''
+// Share the iris web url to all the tests
+
+// This url should be same as the url inside the `example/web/index.html`
+const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js';
+const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.2-dev.2.js';
+''');
+
+      final exampleIndexPath = path.join(
+          fileSystem.currentDirectory.absolute.path, 'example/web/index.html');
+      final exampleIndexFile = fileSystem.file(exampleIndexPath);
+      exampleIndexFile.createSync(recursive: true);
+      exampleIndexFile.writeAsStringSync(r'''
+<!DOCTYPE html>
+<html>
+<body>
+  <!-- This script installs service_worker.js to provide PWA functionality to
+       application. For more information, see:
+       https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script>
+    var serviceWorkerVersion = null;
+    } else {
+      // Service workers not supported. Just drop the <script> tag.
+      loadMainDartJs();
+    }
+  </script>
+  <script src="https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js"></script>
+</body>
+</html>
+''');
+
+      final nativeDenpendenciesContent = '''
+CDN:
+https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js
+CDN:
+https://download.agora.io/staging/iris-web-rtc-fake_0.1.3-dev.2.js
+''';
+      command.modifyIrisWebVersion(fileSystem.currentDirectory.absolute.path,
+          nativeDenpendenciesContent);
+
+      final expectedContent = r'''
+// Share the iris web url to all the tests
+
+// This url should be same as the url inside the `example/web/index.html`
+const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js';
+const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.3-dev.2.js';
+''';
+
+      expect(f.readAsStringSync(), expectedContent);
+
+      final expectedExampleIndexContent = r'''
+<!DOCTYPE html>
+<html>
+<body>
+  <!-- This script installs service_worker.js to provide PWA functionality to
+       application. For more information, see:
+       https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script>
+    var serviceWorkerVersion = null;
+    } else {
+      // Service workers not supported. Just drop the <script> tag.
+      loadMainDartJs();
+    }
+  </script>
+  <script src="https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js"></script>
+</body>
+</html>
+''';
+      expect(exampleIndexFile.readAsStringSync(), expectedExampleIndexContent);
+    });
   });
 }
