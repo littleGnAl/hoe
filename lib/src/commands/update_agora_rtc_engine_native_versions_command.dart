@@ -135,6 +135,8 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
         nativeSdkDependenciesContent,
       ));
     }
+
+    modifyIrisWebVersion(_workspace.absolute.path, irisDenpendenciesContent);
   }
 
   List<String> _findByRegExp(List<String> regExps, String input) {
@@ -277,6 +279,18 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     );
 
     return VersionLink(cdns.firstOrEmpty(), []);
+  }
+
+  VersionLink findIrisWebCDN(
+    String irisDenpendenciesContent,
+    String urlRegExp,
+  ) {
+    final cdn = _findByRegExp(
+      [urlRegExp],
+      irisDenpendenciesContent,
+    );
+
+    return VersionLink(cdn.firstOrEmpty(), []);
   }
 
   String modifiedAndroidGradleContent(
@@ -528,5 +542,90 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     );
 
     return modifiedContent;
+  }
+
+  void modifyIrisWebVersion(
+    String workspacePath,
+    String nativeDenpendenciesContent,
+  ) {
+    if (nativeDenpendenciesContent.isEmpty) {
+      logger.stdout('`nativeDenpendenciesContent` is empty, skip...');
+      return;
+    }
+
+    // scripts/iris_web_version.js
+    final irisWebVersionFilePath =
+        path.join(workspacePath, 'scripts', 'iris_web_version.js');
+
+    final irisWebVersionFile = fileSystem.file(irisWebVersionFilePath);
+    if (!irisWebVersionFile.existsSync()) {
+      logger.stdout('$irisWebVersionFilePath not found, skip...');
+      return;
+    }
+
+    // r'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc-[0-9a-z\.-]+\.js',
+    final irisWebCdn = findIrisWebCDN(
+      nativeDenpendenciesContent,
+      r'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc_[0-9a-z\.-]+\.js',
+    ).cdn;
+    if (irisWebCdn.isEmpty) {
+      logger.stdout(
+          'Can not find the iris-web cdn in\n$nativeDenpendenciesContent,skip...');
+      return;
+    }
+
+    String irisWebVersionFileContent = irisWebVersionFile.readAsStringSync();
+
+    // const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js';
+    RegExp irisWebUrlRegExp = RegExp(
+      r"const irisWebUrl = \'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc_[0-9a-z\.-]+\.js\';",
+      caseSensitive: true,
+      multiLine: true,
+    );
+    irisWebVersionFileContent = irisWebVersionFileContent.replaceFirstMapped(
+        irisWebUrlRegExp, (match) => 'const irisWebUrl = \'$irisWebCdn\';');
+    irisWebVersionFile.writeAsStringSync(irisWebVersionFileContent);
+
+    // example/web/index.html
+    final exampleWebIndexFilePath =
+        path.join(workspacePath, 'example', 'web', 'index.html');
+
+    final exampleWebIndexFile = fileSystem.file(exampleWebIndexFilePath);
+    if (!exampleWebIndexFile.existsSync()) {
+      logger.stdout('$exampleWebIndexFilePath not found, skip...');
+      return;
+    }
+
+    String exampleWebIndexFileContent = exampleWebIndexFile.readAsStringSync();
+
+    irisWebUrlRegExp = RegExp(
+      r'<script src="https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc_[0-9a-z\.-]+\.js"></script>',
+      caseSensitive: true,
+      multiLine: true,
+    );
+    exampleWebIndexFileContent = exampleWebIndexFileContent.replaceFirstMapped(
+        irisWebUrlRegExp, (match) => '<script src="$irisWebCdn"></script>');
+    exampleWebIndexFile.writeAsStringSync(exampleWebIndexFileContent);
+
+    // r'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc-fake_[0-9a-z\.-]+\.js',
+    final irisWebFakeCdn = findIrisWebCDN(
+      nativeDenpendenciesContent,
+      r'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc-fake_[0-9a-z\.-]+\.js',
+    ).cdn;
+    if (irisWebFakeCdn.isEmpty) {
+      logger.stdout(
+          'Can not find the iris-web-fake cdn in\n$nativeDenpendenciesContent\nskip...');
+      return;
+    }
+
+    RegExp irisWebFakeUrlRegExp = RegExp(
+      r"const irisWebFakeUrl = \'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc-fake_[0-9a-z\.-]+\.js\';",
+      caseSensitive: true,
+      multiLine: true,
+    );
+    irisWebVersionFileContent = irisWebVersionFileContent.replaceFirstMapped(
+        irisWebFakeUrlRegExp,
+        (match) => 'const irisWebFakeUrl = \'$irisWebFakeCdn\';');
+    irisWebVersionFile.writeAsStringSync(irisWebVersionFileContent);
   }
 }
