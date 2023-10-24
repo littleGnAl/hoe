@@ -116,6 +116,12 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           }
           break;
 
+        case 'web':
+          if (isProcessBuild) {
+            await _processBuildWeb(flutterPackageName, artifactsOutputDir);
+          }
+          break;
+
         default:
           throw Exception('Unsupported platform: $platform');
       }
@@ -1220,5 +1226,35 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       keychainOutputPath,
       keychainPwd,
     ]);
+  }
+
+  Future<void> _processBuildWeb(
+    String flutterPackageName,
+    String artifactsOutputDirPath,
+  ) async {
+    _runFlutterClean(path.join(_workspace.absolute.path, 'example'));
+    _runFlutterPackagesGet(path.join(_workspace.absolute.path, 'example'));
+
+    final archiveDirPath =
+        _createArchiveOutputDir(_workspace.absolute.path, 'web');
+
+    _flutterBuild(path.join(_workspace.absolute.path, 'example'), 'web');
+
+    _copyDirectory(
+        fileSystem.directory(
+            path.join(_workspace.absolute.path, 'example', 'build', 'web')),
+        fileSystem.directory(archiveDirPath));
+
+    final artifactsOutputDir = fileSystem.directory(artifactsOutputDirPath);
+    if (!artifactsOutputDir.existsSync()) {
+      artifactsOutputDir.createSync(recursive: true);
+    }
+
+    final outputZipPath = path.join(artifactsOutputDirPath,
+        _createOutputZipPath(flutterPackageName, 'web'));
+
+    await _zipDirs([archiveDirPath], outputZipPath);
+
+    stdout.writeln('Created $outputZipPath');
   }
 }
