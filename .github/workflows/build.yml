@@ -514,6 +514,9 @@ jobs:
   build_web:
     name: Build Web
     runs-on: ubuntu-latest
+    env:
+      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
     outputs:
       web_artifactory_download_url: ${{ steps.web-build-step.outputs.output_web_artifactory_download_url }}
     steps:
