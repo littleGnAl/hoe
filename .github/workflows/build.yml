@@ -515,8 +515,8 @@ jobs:
     name: Build Web
     runs-on: ubuntu-latest
     env:
-      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
-      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
+      TEST_APP_ID: "" # Do not pass TEST_APP_ID on web
+      MUSIC_CENTER_APPID: "" # Do not pass MUSIC_CENTER_APPID on web
     outputs:
       web_artifactory_download_url: ${{ steps.web-build-step.outputs.output_web_artifactory_download_url }}
     steps:
