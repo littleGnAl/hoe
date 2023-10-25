@@ -1137,8 +1137,8 @@ end
 // Share the iris web url to all the tests
 
 // This url should be same as the url inside the `example/web/index.html`
-const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js';
-const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.2-dev.2.js';
+const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.1.js';
+const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_n423_w4182_0.2.0-build.1.js';
 ''');
 
       final exampleIndexPath = path.join(
@@ -1159,14 +1159,14 @@ const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.
       loadMainDartJs();
     }
   </script>
-  <script src="https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js"></script>
+  <script src="https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.1.js"></script>
 </body>
 </html>
 ''');
 
       final nativeDenpendenciesContent = '''
 CDN:
-https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js
+https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.2.js
 ''';
       command.modifyIrisWebVersion(fileSystem.currentDirectory.absolute.path,
           nativeDenpendenciesContent);
@@ -1175,8 +1175,8 @@ https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js
 // Share the iris web url to all the tests
 
 // This url should be same as the url inside the `example/web/index.html`
-const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js';
-const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.2-dev.2.js';
+const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.2.js';
+const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_n423_w4182_0.2.0-build.1.js';
 ''';
 
       expect(f.readAsStringSync(), expectedContent);
@@ -1195,7 +1195,7 @@ const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.
       loadMainDartJs();
     }
   </script>
-  <script src="https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js"></script>
+  <script src="https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.2.js"></script>
 </body>
 </html>
 ''';
@@ -1211,13 +1211,13 @@ const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.
 // Share the iris web url to all the tests
 
 // This url should be same as the url inside the `example/web/index.html`
-const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js';
-const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.2-dev.2.js';
+const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.1.js';
+const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_n423_w4182_0.2.0-build.1.js';
 ''');
 
       final nativeDenpendenciesContent = '''
 CDN:
-https://download.agora.io/staging/iris-web-rtc-fake_0.1.3-dev.2.js
+https://download.agora.io/staging/iris-web-rtc-fake_n423_w4182_0.2.0-build.2.js
 ''';
       command.modifyIrisWebVersion(fileSystem.currentDirectory.absolute.path,
           nativeDenpendenciesContent);
@@ -1226,8 +1226,8 @@ https://download.agora.io/staging/iris-web-rtc-fake_0.1.3-dev.2.js
 // Share the iris web url to all the tests
 
 // This url should be same as the url inside the `example/web/index.html`
-const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js';
-const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.3-dev.2.js';
+const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.1.js';
+const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_n423_w4182_0.2.0-build.2.js';
 ''';
 
       expect(f.readAsStringSync(), expectedContent);
@@ -1242,8 +1242,8 @@ const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.
 // Share the iris web url to all the tests
 
 // This url should be same as the url inside the `example/web/index.html`
-const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js';
-const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.2-dev.2.js';
+const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.1.js';
+const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_n423_w4182_0.2.0-build.1.js';
 ''');
 
       final exampleIndexPath = path.join(
@@ -1264,16 +1264,16 @@ const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.
       loadMainDartJs();
     }
   </script>
-  <script src="https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js"></script>
+  <script src="https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.1.js"></script>
 </body>
 </html>
 ''');
 
       final nativeDenpendenciesContent = '''
 CDN:
-https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js
+https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.2.js
 CDN:
-https://download.agora.io/staging/iris-web-rtc-fake_0.1.3-dev.2.js
+https://download.agora.io/staging/iris-web-rtc-fake_n423_w4182_0.2.0-build.2.js
 ''';
       command.modifyIrisWebVersion(fileSystem.currentDirectory.absolute.path,
           nativeDenpendenciesContent);
@@ -1282,8 +1282,8 @@ https://download.agora.io/staging/iris-web-rtc-fake_0.1.3-dev.2.js
 // Share the iris web url to all the tests
 
 // This url should be same as the url inside the `example/web/index.html`
-const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js';
-const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.3-dev.2.js';
+const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.2.js';
+const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_n423_w4182_0.2.0-build.2.js';
 ''';
 
       expect(f.readAsStringSync(), expectedContent);
@@ -1302,7 +1302,7 @@ const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.
       loadMainDartJs();
     }
   </script>
-  <script src="https://download.agora.io/staging/iris-web-rtc_0.1.3-dev.2.js"></script>
+  <script src="https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.2.js"></script>
 </body>
 </html>
 ''';
