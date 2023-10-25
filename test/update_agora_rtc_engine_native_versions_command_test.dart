@@ -1176,7 +1176,7 @@ https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.2.js
 
 // This url should be same as the url inside the `example/web/index.html`
 const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.2.js';
-const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_0.1.2-dev.2.js';
+const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_n423_w4182_0.2.0-build.1.js';
 ''';
 
       expect(f.readAsStringSync(), expectedContent);
