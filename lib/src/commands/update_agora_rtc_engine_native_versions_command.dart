@@ -568,7 +568,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     // r'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc-[0-9a-z\.-]+\.js',
     final irisWebCdn = findIrisWebCDN(
       nativeDenpendenciesContent,
-      r'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc_[0-9a-z\.-]+\.js',
+      r'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc_[0-9a-z]+_[0-9a-z]+_[0-9a-z\.-]+\.js',
     ).cdn;
     if (irisWebCdn.isEmpty) {
       logger.stdout(
@@ -576,7 +576,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     } else {
       // const irisWebUrl = 'https://download.agora.io/staging/iris-web-rtc_0.1.2-dev.2.js';
       RegExp irisWebUrlRegExp = RegExp(
-        r"const irisWebUrl = \'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc_[0-9a-z\.-]+\.js\';",
+        r"const irisWebUrl = \'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc_[0-9a-z]+_[0-9a-z]+_[0-9a-z\.-]+\.js\';",
         caseSensitive: true,
         multiLine: true,
       );
@@ -594,7 +594,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
             exampleWebIndexFile.readAsStringSync();
 
         final irisWebUrlRegExp = RegExp(
-          r'<script src="https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc_[0-9a-z\.-]+\.js"></script>',
+          r'<script src="https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc_[0-9a-z]+_[0-9a-z]+_[0-9a-z\.-]+\.js"></script>',
           caseSensitive: true,
           multiLine: true,
         );
@@ -610,14 +610,14 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     // r'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc-fake_[0-9a-z\.-]+\.js',
     final irisWebFakeCdn = findIrisWebCDN(
       nativeDenpendenciesContent,
-      r'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc-fake_[0-9a-z\.-]+\.js',
+      r'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc-fake_[0-9a-z]+_[0-9a-z]+_[0-9a-z\.-]+\.js',
     ).cdn;
     if (irisWebFakeCdn.isEmpty) {
       logger.stdout(
           'Can not find the iris-web-fake cdn in\n$nativeDenpendenciesContent\nskip...');
     } else {
       RegExp irisWebFakeUrlRegExp = RegExp(
-        r"const irisWebFakeUrl = \'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc-fake_[0-9a-z\.-]+\.js\';",
+        r"const irisWebFakeUrl = \'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc-fake_[0-9a-z]+_[0-9a-z]+_[0-9a-z\.-]+\.js\';",
         caseSensitive: true,
         multiLine: true,
       );
