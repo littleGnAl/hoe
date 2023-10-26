@@ -44,6 +44,7 @@ jobs:
             - ${{ needs.build_examples.outputs.ios_artifactory_download_url }}
             - ${{ needs.build_examples.outputs.macos_artifactory_download_url }}
             - ${{ needs.build_examples.outputs.windows_artifactory_download_url }}
+            - ${{ needs.build_examples.outputs.web_artifactory_download_url }}
 
             > This comment is commented by bot, do not edit it directly
 

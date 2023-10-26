@@ -45,8 +45,11 @@ on:
         description: "The windows artifactory download url"
         value: ${{ jobs.build_windows.outputs.windows_artifactory_download_url }}
       ios_artifactory_download_url:
-        description: "The android artifactory download url"
+        description: "The ios artifactory download url"
         value: ${{ jobs.build_ios.outputs.ios_artifactory_download_url }}
+      web_artifactory_download_url:
+        description: "The web artifactory download url"
+        value: ${{ jobs.build_web.outputs.web_artifactory_download_url }}
 
   workflow_dispatch:
     inputs:
