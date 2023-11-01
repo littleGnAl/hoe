@@ -161,8 +161,14 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         );
       }
     } else if (irisAndroidCDNUrl.isNotEmpty) {
-      final zipDownloadPath =
-          await _downloadAndUnzip(irisAndroidCDNUrl, androidModulePath, false);
+      final zipDownloadPath = await downloadAndUnzip(
+        processManager,
+        fileSystem,
+        _globalConfig,
+        irisAndroidCDNUrl,
+        androidModulePath,
+        isUnzipSymlinks: false,
+      );
 
       final unzipFilePath =
           _getUnzipDir(irisAndroidCDNUrl, zipDownloadPath, 'DCG', 'Android');
@@ -245,8 +251,14 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     }
 
     if (irisIOSCDNUrl.isNotEmpty) {
-      final zipDownloadPath =
-          await _downloadAndUnzip(irisIOSCDNUrl, iosModulePath, true);
+      final zipDownloadPath = await downloadAndUnzip(
+        processManager,
+        fileSystem,
+        _globalConfig,
+        irisIOSCDNUrl,
+        iosModulePath,
+        isUnzipSymlinks: true,
+      );
 
       final unzipFilePath =
           _getUnzipDir(irisIOSCDNUrl, zipDownloadPath, 'DCG', 'iOS');
@@ -353,8 +365,14 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     }
 
     if (irisMacosCDNUrl.isNotEmpty) {
-      final zipDownloadPath =
-          await _downloadAndUnzip(irisMacosCDNUrl, macosModulePath, true);
+      final zipDownloadPath = await downloadAndUnzip(
+        processManager,
+        fileSystem,
+        _globalConfig,
+        irisMacosCDNUrl,
+        macosModulePath,
+        isUnzipSymlinks: true,
+      );
       final unzipFilePath =
           _getUnzipDir(irisMacosCDNUrl, zipDownloadPath, 'DCG', 'MAC');
 
@@ -443,8 +461,14 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           fileSystem.directory(path.join(thirdPartyDir.absolute.path, 'iris'));
       thirdPartyIrisDir.createSync();
 
-      final unzipFilePath = await _downloadAndUnzip(
-          irisWindowsDownloadUrl, windowsModulePath, false);
+      final unzipFilePath = await downloadAndUnzip(
+        processManager,
+        fileSystem,
+        _globalConfig,
+        irisWindowsDownloadUrl,
+        windowsModulePath,
+        isUnzipSymlinks: false,
+      );
 
       _copyDirectory(
           fileSystem.directory(path.join(
@@ -904,34 +928,34 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     // return outputZipPath;
   }
 
-  Future<void> _unzip(String zipFilePath, String outputPath) async {
-    // Use an InputFileStream to access the zip file without storing it in memory.
-    final inputStream = InputFileStream(zipFilePath);
-// Decode the zip from the InputFileStream. The archive will have the contents of the
-// zip, without having stored the data in memory.
-    final archive = ZipDecoder().decodeBuffer(inputStream);
-    extractArchiveToDisk(archive, outputPath);
-    inputStream.close();
-  }
-
-  void _unzipSymlinks(String zipFilePath, String outputPath) {
-    // unzip iris_artifact/iris_artifact.zip -d iris_artifact
-    processManager.runSyncWithOutput([
-      'ditto',
-      '-x',
-      '-k',
-      zipFilePath,
-      outputPath,
-    ]);
-
-    // Use an InputFileStream to access the zip file without storing it in memory.
+//   Future<void> _unzip(String zipFilePath, String outputPath) async {
+//     // Use an InputFileStream to access the zip file without storing it in memory.
 //     final inputStream = InputFileStream(zipFilePath);
 // // Decode the zip from the InputFileStream. The archive will have the contents of the
 // // zip, without having stored the data in memory.
 //     final archive = ZipDecoder().decodeBuffer(inputStream);
 //     extractArchiveToDisk(archive, outputPath);
 //     inputStream.close();
-  }
+//   }
+
+//   void _unzipSymlinks(String zipFilePath, String outputPath) {
+//     // unzip iris_artifact/iris_artifact.zip -d iris_artifact
+//     processManager.runSyncWithOutput([
+//       'ditto',
+//       '-x',
+//       '-k',
+//       zipFilePath,
+//       outputPath,
+//     ]);
+
+//     // Use an InputFileStream to access the zip file without storing it in memory.
+// //     final inputStream = InputFileStream(zipFilePath);
+// // // Decode the zip from the InputFileStream. The archive will have the contents of the
+// // // zip, without having stored the data in memory.
+// //     final archive = ZipDecoder().decodeBuffer(inputStream);
+// //     extractArchiveToDisk(archive, outputPath);
+// //     inputStream.close();
+//   }
 
   String _getUnzipDir(
     String zipFileUrl,
@@ -966,56 +990,56 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     return path.join(zipDownloadPath, 'iris_${version}_${irisType}_$platform');
   }
 
-  Future<String> _downloadAndUnzip(
-      String zipFileUrl, String unzipOutputPath, bool isUnzipSymlinks) async {
-    final zipDownloadPath = path.join(unzipOutputPath, 'zip_download_path');
-    final zipDownloadDir = fileSystem.directory(zipDownloadPath);
-    zipDownloadDir.createSync();
+  // Future<String> _downloadAndUnzip(
+  //     String zipFileUrl, String unzipOutputPath, bool isUnzipSymlinks) async {
+  //   final zipDownloadPath = path.join(unzipOutputPath, 'zip_download_path');
+  //   final zipDownloadDir = fileSystem.directory(zipDownloadPath);
+  //   zipDownloadDir.createSync();
 
-    final zipFileBaseName = Uri.parse(zipFileUrl).pathSegments.last;
+  //   final zipFileBaseName = Uri.parse(zipFileUrl).pathSegments.last;
 
-    // processManager.runSyncWithOutput([
-    //   'curl',
-    //   '-u',
-    //   '${_globalConfig.agoraArtifactoryUser}:${_globalConfig.agoraArtifactoryPwd}',
-    //   '-o',
-    //   zipFileBaseName,
-    //   zipFileUrl,
-    // ]);
+  //   // processManager.runSyncWithOutput([
+  //   //   'curl',
+  //   //   '-u',
+  //   //   '${_globalConfig.agoraArtifactoryUser}:${_globalConfig.agoraArtifactoryPwd}',
+  //   //   '-o',
+  //   //   zipFileBaseName,
+  //   //   zipFileUrl,
+  //   // ]);
 
-    // _globalConfig.agoraArtifactoryUser;
-    // _globalConfig.agoraArtifactoryPwd;
+  //   // _globalConfig.agoraArtifactoryUser;
+  //   // _globalConfig.agoraArtifactoryPwd;
 
-    final fileDownloader = DefaultFileDownloader(_globalConfig);
-    await fileDownloader.downloadFile(
-      zipFileUrl,
-      path.join(zipDownloadPath, zipFileBaseName),
-    );
+  //   final fileDownloader = DefaultFileDownloader(_globalConfig);
+  //   await fileDownloader.downloadFile(
+  //     zipFileUrl,
+  //     path.join(zipDownloadPath, zipFileBaseName),
+  //   );
 
-    if (isUnzipSymlinks) {
-      _unzipSymlinks(
-          path.join(zipDownloadPath, zipFileBaseName), zipDownloadPath);
-    } else {
-      _unzip(path.join(zipDownloadPath, zipFileBaseName), zipDownloadPath);
-    }
+  //   if (isUnzipSymlinks) {
+  //     _unzipSymlinks(
+  //         path.join(zipDownloadPath, zipFileBaseName), zipDownloadPath);
+  //   } else {
+  //     _unzip(path.join(zipDownloadPath, zipFileBaseName), zipDownloadPath);
+  //   }
 
-    // fileSystem.file(path.join(zipDownloadPath, zipFileBaseName)).deleteSync();
+  //   // fileSystem.file(path.join(zipDownloadPath, zipFileBaseName)).deleteSync();
 
-    // iris_4.0.0_DCG_Mac_20220905_1020
+  //   // iris_4.0.0_DCG_Mac_20220905_1020
 
-    final unzipFilePath = zipDownloadDir
-        .listSync()
-        .firstWhere((element) => !element.absolute.path.endsWith('.zip'))
-        .absolute
-        .path;
+  //   final unzipFilePath = zipDownloadDir
+  //       .listSync()
+  //       .firstWhere((element) => !element.absolute.path.endsWith('.zip'))
+  //       .absolute
+  //       .path;
 
-    // _copyDirectory(fileSystem.directory(unzipFilePath),
-    //     fileSystem.directory(unzipOutputPath));
+  //   // _copyDirectory(fileSystem.directory(unzipFilePath),
+  //   //     fileSystem.directory(unzipOutputPath));
 
-    // fileSystem.directory(zipDownloadPath).deleteSync(recursive: true);
+  //   // fileSystem.directory(zipDownloadPath).deleteSync(recursive: true);
 
-    return zipDownloadPath;
-  }
+  //   return zipDownloadPath;
+  // }
 
   void _runFlutterPackagesGet(String packagePath) {
     processManager.runSyncWithOutput(
