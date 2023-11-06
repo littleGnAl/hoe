@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:cli_util/cli_logging.dart';
 import 'package:file/file.dart';
 import 'package:hoe/src/base/base_command.dart';
+import 'package:hoe/src/common/default_file_downloader.dart';
+import 'package:hoe/src/common/global_config.dart';
+import 'package:hoe/src/common/path_ext.dart';
 import 'package:path/path.dart' as path;
 import 'package:process/process.dart';
 
@@ -137,6 +140,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     }
 
     modifyIrisWebVersion(_workspace.absolute.path, irisDenpendenciesContent);
+    copyHeaders(irisDenpendenciesContent);
   }
 
   List<String> _findByRegExp(List<String> regExps, String input) {
@@ -626,5 +630,86 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
           (match) => 'const irisWebFakeUrl = \'$irisWebFakeCdn\';');
       irisWebVersionFile.writeAsStringSync(irisWebVersionFileContent);
     }
+  }
+
+  Future<void> copyHeaders(String nativeDenpendenciesContent) async {
+    if (nativeDenpendenciesContent.isEmpty) {
+      return;
+    }
+    final String androidCDNUrl =
+        findIrisAndroidMaven(nativeDenpendenciesContent).cdn;
+    if (androidCDNUrl.isEmpty) {
+      return;
+    }
+    final androidModulePath = path.join(_workspace.absolute.path, 'android');
+    final zipDownloadPath = await downloadAndUnzip(
+      processManager,
+      fileSystem,
+      GlobalConfig(),
+      androidCDNUrl,
+      androidModulePath,
+      isUnzipSymlinks: false,
+    );
+
+    final unzipFilePath = getUnzipDir(
+        fileSystem, androidCDNUrl, zipDownloadPath, 'DCG', 'Android');
+
+    // DCG/Agora_Native_SDK_for_Android_FULL/rtc/sdk/high_level_api/include
+    final nativeSdkHeadersDirPath = path.join(
+      unzipFilePath,
+      'DCG',
+      'Agora_Native_SDK_for_Android_FULL',
+      'rtc',
+      'sdk',
+      'high_level_api',
+      'include',
+    );
+    // android/src/main/cpp/third_party/include/agora_rtc
+    final destNativeSdkHeadersDirPath = path.join(
+      androidModulePath,
+      'android',
+      'src',
+      'main',
+      'cpp',
+      'third_party',
+      'include',
+      'agora_rtc',
+    );
+    final destNativeSdkHeadersDir =
+        fileSystem.directory(destNativeSdkHeadersDirPath);
+    if (destNativeSdkHeadersDir.existsSync()) {
+      destNativeSdkHeadersDir.deleteSync(recursive: true);
+    }
+
+    copyDirectory(
+      fileSystem,
+      fileSystem.directory(nativeSdkHeadersDirPath),
+      destNativeSdkHeadersDir,
+    );
+
+    // ALL_ARCHITECTURE/Release/include
+    final irisHeadersDirPath =
+        path.join(unzipFilePath, 'ALL_ARCHITECTURE', 'Release', 'include');
+    // android/src/main/cpp/third_party/include/iris
+    final destIrisHeadersDirPath = path.join(
+      androidModulePath,
+      'android',
+      'src',
+      'main',
+      'cpp',
+      'third_party',
+      'include',
+      'iris',
+    );
+    final destIrisHeadersDir = fileSystem.directory(destIrisHeadersDirPath);
+    if (destIrisHeadersDir.existsSync()) {
+      destIrisHeadersDir.deleteSync(recursive: true);
+    }
+
+    copyDirectory(
+      fileSystem,
+      fileSystem.directory(irisHeadersDirPath),
+      destIrisHeadersDir,
+    );
   }
 }

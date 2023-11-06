@@ -8,6 +8,7 @@ import 'package:hoe/src/base/process_manager_ext.dart';
 import 'package:hoe/src/common/default_file_downloader.dart';
 import 'package:hoe/src/common/global_config.dart';
 import 'package:hoe/src/common/ios_plist_config.dart';
+import 'package:hoe/src/common/path_ext.dart';
 import 'package:hoe/src/common/pubspec.dart';
 import 'package:path/path.dart' as path;
 import 'package:process/process.dart';
@@ -170,10 +171,11 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         isUnzipSymlinks: false,
       );
 
-      final unzipFilePath =
-          _getUnzipDir(irisAndroidCDNUrl, zipDownloadPath, 'DCG', 'Android');
+      final unzipFilePath = getUnzipDir(
+          fileSystem, irisAndroidCDNUrl, zipDownloadPath, 'DCG', 'Android');
 
-      _copyDirectory(
+      copyDirectory(
+          fileSystem,
           fileSystem.directory(path.join(unzipFilePath, 'DCG',
               'Agora_Native_SDK_for_Android_FULL', 'rtc', 'sdk')),
           fileSystem.directory(path.join(androidModulePath, 'libs')));
@@ -215,8 +217,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         }
       }
 
-      final unzipRtmDirPath =
-          _getUnzipDir(irisAndroidCDNUrl, zipDownloadPath, 'RTM', 'Android');
+      final unzipRtmDirPath = getUnzipDir(
+          fileSystem, irisAndroidCDNUrl, zipDownloadPath, 'RTM', 'Android');
       if (fileSystem.directory(unzipRtmDirPath).existsSync()) {
         for (final abi in abis) {
           fileSystem
@@ -261,7 +263,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       );
 
       final unzipFilePath =
-          _getUnzipDir(irisIOSCDNUrl, zipDownloadPath, 'DCG', 'iOS');
+          getUnzipDir(fileSystem, irisIOSCDNUrl, zipDownloadPath, 'DCG', 'iOS');
 
       fileSystem
           .directory(path.join(
@@ -316,7 +318,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       }
 
       final unzipRtmPath =
-          _getUnzipDir(irisIOSCDNUrl, zipDownloadPath, 'RTM', 'iOS');
+          getUnzipDir(fileSystem, irisIOSCDNUrl, zipDownloadPath, 'RTM', 'iOS');
       if (fileSystem.directory(unzipRtmPath).existsSync()) {
         processManager.runSyncWithOutput([
           'cp',
@@ -373,8 +375,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         macosModulePath,
         isUnzipSymlinks: true,
       );
-      final unzipFilePath =
-          _getUnzipDir(irisMacosCDNUrl, zipDownloadPath, 'DCG', 'MAC');
+      final unzipFilePath = getUnzipDir(
+          fileSystem, irisMacosCDNUrl, zipDownloadPath, 'DCG', 'MAC');
 
       processManager.runSyncWithOutput([
         'cp',
@@ -417,8 +419,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         ]);
       }
 
-      final unzipRtmPath =
-          _getUnzipDir(irisMacosCDNUrl, zipDownloadPath, 'RTM', 'MAC');
+      final unzipRtmPath = getUnzipDir(
+          fileSystem, irisMacosCDNUrl, zipDownloadPath, 'RTM', 'MAC');
       if (fileSystem.directory(unzipRtmPath).existsSync()) {
         processManager.runSyncWithOutput([
           'cp',
@@ -470,7 +472,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         isUnzipSymlinks: false,
       );
 
-      _copyDirectory(
+      copyDirectory(
+          fileSystem,
           fileSystem.directory(path.join(
             windowsModulePath,
             'zip_download_path',
@@ -758,7 +761,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         .directory(
             path.join(archiveDirPath, '${flutterPackageName}_example.app'))
         .createSync();
-    _copyDirectory(
+    copyDirectory(
+        fileSystem,
         fileSystem.directory(
             path.join(macosArtifactPath, '${flutterPackageName}_example.app')),
         fileSystem.directory(
@@ -769,14 +773,16 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         macosArtifactPath,
         flutterPackageName,
         '$flutterPackageName.framework.dSYM'));
-    _copyDirectory(
+    copyDirectory(
+        fileSystem,
         macosPluginDsymsDir,
         fileSystem.directory(path.join(
             archiveDirPath, 'dSYMs', '$flutterPackageName.framework.dSYM')));
 
     final macosAppDsymsDir = fileSystem.directory(
         path.join(macosArtifactPath, '${flutterPackageName}_example.app.dSYM'));
-    _copyDirectory(
+    copyDirectory(
+        fileSystem,
         macosAppDsymsDir,
         fileSystem.directory(path.join(archiveDirPath, 'dSYMs',
             '${flutterPackageName}_example.app.dSYM')));
@@ -832,7 +838,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
     _flutterBuild(path.join(_workspace.absolute.path, 'example'), 'windows');
 
-    _copyDirectory(
+    copyDirectory(
+        fileSystem,
         fileSystem.directory(path.join(_workspace.absolute.path, 'example',
             'build', 'windows', 'runner', 'Release')),
         fileSystem.directory(archiveDirPath));
@@ -928,119 +935,6 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     // return outputZipPath;
   }
 
-//   Future<void> _unzip(String zipFilePath, String outputPath) async {
-//     // Use an InputFileStream to access the zip file without storing it in memory.
-//     final inputStream = InputFileStream(zipFilePath);
-// // Decode the zip from the InputFileStream. The archive will have the contents of the
-// // zip, without having stored the data in memory.
-//     final archive = ZipDecoder().decodeBuffer(inputStream);
-//     extractArchiveToDisk(archive, outputPath);
-//     inputStream.close();
-//   }
-
-//   void _unzipSymlinks(String zipFilePath, String outputPath) {
-//     // unzip iris_artifact/iris_artifact.zip -d iris_artifact
-//     processManager.runSyncWithOutput([
-//       'ditto',
-//       '-x',
-//       '-k',
-//       zipFilePath,
-//       outputPath,
-//     ]);
-
-//     // Use an InputFileStream to access the zip file without storing it in memory.
-// //     final inputStream = InputFileStream(zipFilePath);
-// // // Decode the zip from the InputFileStream. The archive will have the contents of the
-// // // zip, without having stored the data in memory.
-// //     final archive = ZipDecoder().decodeBuffer(inputStream);
-// //     extractArchiveToDisk(archive, outputPath);
-// //     inputStream.close();
-//   }
-
-  String _getUnzipDir(
-    String zipFileUrl,
-    String zipDownloadPath,
-    String irisType, // DCG/RTM
-    String platform, // iOS/Android/macOS/Windows
-  ) {
-    final zipDownloadDir = fileSystem.directory(zipDownloadPath);
-    final zipFileBaseName = Uri.parse(zipFileUrl).pathSegments.last;
-
-    final zipDirList = zipDownloadDir.listSync();
-    bool hasWrapDir = false;
-
-    for (final dir in zipDirList) {
-      if (dir.path == zipFileBaseName) {
-        hasWrapDir = true;
-        break;
-      }
-    }
-
-    // iris_4.1.0_DCG_Mac_Video_20221122_0724
-    final version = zipFileBaseName.split('_')[1];
-
-    if (hasWrapDir) {
-      return path.join(
-        zipDownloadPath,
-        zipFileBaseName,
-        'iris_${version}_${irisType}_$platform',
-      );
-    }
-
-    return path.join(zipDownloadPath, 'iris_${version}_${irisType}_$platform');
-  }
-
-  // Future<String> _downloadAndUnzip(
-  //     String zipFileUrl, String unzipOutputPath, bool isUnzipSymlinks) async {
-  //   final zipDownloadPath = path.join(unzipOutputPath, 'zip_download_path');
-  //   final zipDownloadDir = fileSystem.directory(zipDownloadPath);
-  //   zipDownloadDir.createSync();
-
-  //   final zipFileBaseName = Uri.parse(zipFileUrl).pathSegments.last;
-
-  //   // processManager.runSyncWithOutput([
-  //   //   'curl',
-  //   //   '-u',
-  //   //   '${_globalConfig.agoraArtifactoryUser}:${_globalConfig.agoraArtifactoryPwd}',
-  //   //   '-o',
-  //   //   zipFileBaseName,
-  //   //   zipFileUrl,
-  //   // ]);
-
-  //   // _globalConfig.agoraArtifactoryUser;
-  //   // _globalConfig.agoraArtifactoryPwd;
-
-  //   final fileDownloader = DefaultFileDownloader(_globalConfig);
-  //   await fileDownloader.downloadFile(
-  //     zipFileUrl,
-  //     path.join(zipDownloadPath, zipFileBaseName),
-  //   );
-
-  //   if (isUnzipSymlinks) {
-  //     _unzipSymlinks(
-  //         path.join(zipDownloadPath, zipFileBaseName), zipDownloadPath);
-  //   } else {
-  //     _unzip(path.join(zipDownloadPath, zipFileBaseName), zipDownloadPath);
-  //   }
-
-  //   // fileSystem.file(path.join(zipDownloadPath, zipFileBaseName)).deleteSync();
-
-  //   // iris_4.0.0_DCG_Mac_20220905_1020
-
-  //   final unzipFilePath = zipDownloadDir
-  //       .listSync()
-  //       .firstWhere((element) => !element.absolute.path.endsWith('.zip'))
-  //       .absolute
-  //       .path;
-
-  //   // _copyDirectory(fileSystem.directory(unzipFilePath),
-  //   //     fileSystem.directory(unzipOutputPath));
-
-  //   // fileSystem.directory(zipDownloadPath).deleteSync(recursive: true);
-
-  //   return zipDownloadPath;
-  // }
-
   void _runFlutterPackagesGet(String packagePath) {
     processManager.runSyncWithOutput(
       ['flutter', 'packages', 'get'],
@@ -1063,24 +957,6 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         path.join(_workspace.absolute.path, 'example', 'upload_result.txt'));
     stdout.writeln(file.readAsStringSync());
     file.deleteSync();
-  }
-
-  void _copyDirectory(Directory source, Directory destination) {
-    if (!destination.existsSync()) {
-      destination.createSync(recursive: true);
-    }
-    source.listSync(recursive: false).forEach((var entity) {
-      if (entity is Directory) {
-        var newDirectory = fileSystem.directory(
-            path.join(destination.absolute.path, path.basename(entity.path)));
-        newDirectory.createSync();
-
-        _copyDirectory(entity.absolute, newDirectory);
-      } else if (entity is File) {
-        entity
-            .copySync(path.join(destination.path, path.basename(entity.path)));
-      }
-    });
   }
 
   void _flutterBuild(
@@ -1168,7 +1044,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     //     fileSystem.directory(path.join(
     //         outputPath, profileName, '${flutterPackageName}_example.ipa')));
 
-    _copyDirectory(
+    copyDirectory(
+        fileSystem,
         fileSystem.directory(path.join(
           workingDirectory,
           'build',
@@ -1264,7 +1141,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
 
     _flutterBuild(path.join(_workspace.absolute.path, 'example'), 'web');
 
-    _copyDirectory(
+    copyDirectory(
+        fileSystem,
         fileSystem.directory(
             path.join(_workspace.absolute.path, 'example', 'build', 'web')),
         fileSystem.directory(archiveDirPath));

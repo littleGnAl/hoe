@@ -86,3 +86,37 @@ Future<void> _unzip(String zipFilePath, String outputPath) async {
   extractArchiveToDisk(archive, outputPath);
   inputStream.close();
 }
+
+ String getUnzipDir(
+  FileSystem fileSystem,
+    String zipFileUrl,
+    String zipDownloadPath,
+    String irisType, // DCG/RTM
+    String platform, // iOS/Android/macOS/Windows
+  ) {
+    final zipDownloadDir = fileSystem.directory(zipDownloadPath);
+    final zipFileBaseName = Uri.parse(zipFileUrl).pathSegments.last;
+
+    final zipDirList = zipDownloadDir.listSync();
+    bool hasWrapDir = false;
+
+    for (final dir in zipDirList) {
+      if (dir.path == zipFileBaseName) {
+        hasWrapDir = true;
+        break;
+      }
+    }
+
+    // iris_4.1.0_DCG_Mac_Video_20221122_0724
+    final version = zipFileBaseName.split('_')[1];
+
+    if (hasWrapDir) {
+      return path.join(
+        zipDownloadPath,
+        zipFileBaseName,
+        'iris_${version}_${irisType}_$platform',
+      );
+    }
+
+    return path.join(zipDownloadPath, 'iris_${version}_${irisType}_$platform');
+  }
