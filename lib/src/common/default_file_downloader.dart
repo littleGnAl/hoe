@@ -17,19 +17,23 @@ class DefaultFileDownloader {
   final Dio _dio = Dio();
 
   Future<Response> downloadFile(String url, String savePath) async {
-    // final envVarMap = Platform.environment;
     final user = _globalConfig.agoraArtifactoryUser;
-    // stdout.writeln('user: $user');
-
     final pwd = _globalConfig.agoraArtifactoryPwd;
-    // stdout.writeln('pwd: $pwd');
-    return _dio.download(url, savePath,
-        options: Options(headers: {
+
+    Map<String, dynamic> headers = {};
+    if (user.isNotEmpty && pwd.isNotEmpty) {
+      headers = {
+        ...{
           'Authorization': 'Basic ' +
               base64Encode(
                 utf8.encode('$user:$pwd'),
               )
-        }), onReceiveProgress: (int count, int total) {
+        }
+      };
+    }
+
+    return _dio.download(url, savePath, options: Options(headers: headers),
+        onReceiveProgress: (int count, int total) {
       stdout.writeln(
           'Downloading $url --- ${((count / total) * 100).toStringAsFixed(1)}%');
     });
@@ -87,36 +91,36 @@ Future<void> _unzip(String zipFilePath, String outputPath) async {
   inputStream.close();
 }
 
- String getUnzipDir(
+String getUnzipDir(
   FileSystem fileSystem,
-    String zipFileUrl,
-    String zipDownloadPath,
-    String irisType, // DCG/RTM
-    String platform, // iOS/Android/macOS/Windows
-  ) {
-    final zipDownloadDir = fileSystem.directory(zipDownloadPath);
-    final zipFileBaseName = Uri.parse(zipFileUrl).pathSegments.last;
+  String zipFileUrl,
+  String zipDownloadPath,
+  String irisType, // DCG/RTM
+  String platform, // iOS/Android/macOS/Windows
+) {
+  final zipDownloadDir = fileSystem.directory(zipDownloadPath);
+  final zipFileBaseName = Uri.parse(zipFileUrl).pathSegments.last;
 
-    final zipDirList = zipDownloadDir.listSync();
-    bool hasWrapDir = false;
+  final zipDirList = zipDownloadDir.listSync();
+  bool hasWrapDir = false;
 
-    for (final dir in zipDirList) {
-      if (dir.path == zipFileBaseName) {
-        hasWrapDir = true;
-        break;
-      }
+  for (final dir in zipDirList) {
+    if (dir.path == zipFileBaseName) {
+      hasWrapDir = true;
+      break;
     }
-
-    // iris_4.1.0_DCG_Mac_Video_20221122_0724
-    final version = zipFileBaseName.split('_')[1];
-
-    if (hasWrapDir) {
-      return path.join(
-        zipDownloadPath,
-        zipFileBaseName,
-        'iris_${version}_${irisType}_$platform',
-      );
-    }
-
-    return path.join(zipDownloadPath, 'iris_${version}_${irisType}_$platform');
   }
+
+  // iris_4.1.0_DCG_Mac_Video_20221122_0724
+  final version = zipFileBaseName.split('_')[1];
+
+  if (hasWrapDir) {
+    return path.join(
+      zipDownloadPath,
+      zipFileBaseName,
+      'iris_${version}_${irisType}_$platform',
+    );
+  }
+
+  return path.join(zipDownloadPath, 'iris_${version}_${irisType}_$platform');
+}

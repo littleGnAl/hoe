@@ -82,8 +82,8 @@ class GlobalConfig {
       Platform.environment['AGORATEST2020_KEYCHAIN_PASSWORD']!;
 
   String get agoraArtifactoryUser =>
-      Platform.environment['AGORA_ARTIFACTORY_USER']!;
+      Platform.environment['AGORA_ARTIFACTORY_USER'] ?? '';
 
   String get agoraArtifactoryPwd =>
-      Platform.environment['AGORA_ARTIFACTORY_PWD']!;
+      Platform.environment['AGORA_ARTIFACTORY_PWD'] ?? '';
 }
