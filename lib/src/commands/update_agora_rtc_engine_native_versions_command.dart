@@ -650,9 +650,13 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       androidModulePath,
       isUnzipSymlinks: false,
     );
+    logger.stdout(
+        '[downloadAndUnzip] download zipDownloadPath: $zipDownloadPath');
 
     final unzipFilePath = getUnzipDir(
         fileSystem, androidCDNUrl, zipDownloadPath, 'DCG', 'Android');
+
+    logger.stdout('[getUnzipDir] unzipFilePath: $unzipFilePath');
 
     // DCG/Agora_Native_SDK_for_Android_FULL/rtc/sdk/high_level_api/include
     final nativeSdkHeadersDirPath = path.join(
@@ -667,7 +671,6 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     // android/src/main/cpp/third_party/include/agora_rtc
     final destNativeSdkHeadersDirPath = path.join(
       androidModulePath,
-      'android',
       'src',
       'main',
       'cpp',
@@ -693,7 +696,6 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     // android/src/main/cpp/third_party/include/iris
     final destIrisHeadersDirPath = path.join(
       androidModulePath,
-      'android',
       'src',
       'main',
       'cpp',
