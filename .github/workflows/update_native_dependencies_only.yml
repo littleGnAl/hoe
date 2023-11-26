@@ -1,0 +1,89 @@
+name: Update native sdk and iris dependencies only
+
+on: 
+  workflow_dispatch:
+    inputs:
+      base_branch:
+        description: The base branch to update
+        type: string
+        required: true
+        default: 'main'
+
+      native_sdk_dependencies_content:
+        description: The content of the native sdk dependencies
+        type: string
+
+      iris_dependencies_content:
+        description: The content of the iris dependencies
+        type: string
+
+      is_skip_ci:
+        type: boolean
+        description: Is skip ci
+        default: false
+
+jobs:
+  udpate_dependencies:
+    name: Update dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.0.5
+
+      - uses: actions/checkout@v3
+
+      - name: Check for update dependencies branch
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ACTION_PAT }}
+          repository: AgoraIO-Extensions/Agora-Flutter-SDK
+          ref: ${{ inputs.base_branch }}
+          path: AgoraIO-Extensions/Agora-Flutter-SDK
+
+      - name: Update native sdk and iris dependencies
+        run: |
+          PROJECT_DIR=$(pwd)/AgoraIO-Extensions/Agora-Flutter-SDK
+          NATIVE_SDK_DEPENDENCIES_CONTENT="${{ github.event.inputs.native_sdk_dependencies_content }}"
+          IRIS_DEPENDENCIES_CONTENT="${{ github.event.inputs.iris_dependencies_content }}"
+          
+          dart pub get
+          dart run bin/hoe.dart update-agora-flutter-native-dependencies \
+            --project-dir=${PROJECT_DIR} \
+            --native-sdk-dependencies-content="${NATIVE_SDK_DEPENDENCIES_CONTENT}" \
+            --iris-dependencies-content="${IRIS_DEPENDENCIES_CONTENT}"
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y%m%d')" >> "$GITHUB_OUTPUT"
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.ACTION_PAT }}
+          path: AgoraIO-Extensions/Agora-Flutter-SDK
+          commit-message: "feat: upgrade native sdk dependencies ${{ steps.date.outputs.date }}"
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: update-native-dependencies-${{ inputs.base_branch }}
+          branch-suffix: timestamp
+          base: ${{ inputs.base_branch }}
+          delete-branch: true
+          draft: false
+          title: "feat: upgrade native sdk dependencies ${{ steps.date.outputs.date }}"
+          body: |
+            Update native sdk dependencies ${{ steps.date.outputs.date }}
+            native sdk dependencies:
+            ```
+            ${{ inputs.native_sdk_dependencies_content }}
+            ```
+
+            iris dependencies:
+            ```
+            ${{ inputs.iris_dependencies_content }}
+            ```
+
+            > This pull request is trigger by bot, DO NOT MODIFY BY HAND.
+          labels: ${{ (github.event.inputs.is_skip_ci && 'version:special,ci:skip') || 'version:special' }}

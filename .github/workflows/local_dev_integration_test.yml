@@ -1,0 +1,255 @@
+name: Local dev integration test
+
+on: 
+  workflow_dispatch:
+    inputs:
+      build_branch:
+        description: flutter project branch
+        type: string
+        required: true
+        default: 'main'
+
+      setup-local-dev:
+        type: boolean
+        description: Is setup local dev
+        default: true
+
+      iris-macos-cdn-url:
+        description: iris macos cdn url
+        type: string
+
+      iris-ios-cdn-url:
+        description: iris ios cdn url
+        type: string
+
+      iris-android-cdn-url:
+        description: iris android cdn url
+        type: string
+
+      iris-windows-cdn-url:
+        description: iris windows cdn url
+        type: string
+
+jobs:
+  build_android:
+    name: Build Android
+    runs-on: macos-11
+    env:
+      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
+      AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
+      AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check out build project
+        uses: actions/checkout@v3
+        with:
+          repository: AgoraIO/Agora-Flutter-SDK
+          ref: ${{ inputs.build_branch }}
+          path: Agora-Flutter-SDK
+
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.0.0'
+
+      - name: Run build android
+        run: |
+          IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
+          echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
+          EXTRA_ARGS=""
+          if ${IS_SETUP_LOCAL_DEV} ; then
+            EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          IRIS_ANDROID_CDN_URL=${{ github.event.inputs.iris-android-cdn-url }}
+          if [ ! -z "${IRIS_ANDROID_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-android-cdn-url=${IRIS_ANDROID_CDN_URL}"
+          fi
+
+          IRIS_MACOS_CDN_URL=${{ github.event.inputs.iris-macos-cdn-url }}
+          if [ ! -z "${IRIS_MACOS_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-macos-cdn-url=${IRIS_MACOS_CDN_URL}"
+          fi
+
+          echo "Extra args: ${EXTRA_ARGS}"
+
+          mkdir -p output
+          dart pub get
+          dart run bin/hoe.dart build-agora-flutter-example \
+            --project-dir=Agora-Flutter-SDK \
+            --artifacts-output-dir=output \
+            --platforms=android,macos \
+            --apple-package-name=io.agora.agoraRtcEngineExample \
+            --flutter-package-name=agora_rtc_engine \
+            ${EXTRA_ARGS}
+      - run: flutter config --enable-macos-desktop 
+      - name: run flutter android integration tests
+        uses: reactivecircus/android-emulator-runner@v2.26.0
+        with:
+          api-level: 31
+          arch: x86_64
+          profile: Nexus 6
+          ram-size: 2048M
+          heap-size: 4096M
+          disk-size: 8192M
+          script: bash Agora-Flutter-SDK/ci/run_flutter_integration_test_android.sh
+
+  build_macos:
+    name: Build macos
+    runs-on: macos-11
+    timeout-minutes: 60
+    env:
+      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
+      AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
+      AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check out build project
+        uses: actions/checkout@v3
+        with:
+          repository: AgoraIO/Agora-Flutter-SDK
+          ref: ${{ inputs.build_branch }}
+          path: Agora-Flutter-SDK
+
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.0.0'
+
+      - name: Run build macos
+        run: |
+          IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
+          echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
+          EXTRA_ARGS=""
+          if ${IS_SETUP_LOCAL_DEV} ; then
+            EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          IRIS_MACOS_CDN_URL=${{ github.event.inputs.iris-macos-cdn-url }}
+          if [ ! -z "${IRIS_MACOS_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-macos-cdn-url=${IRIS_MACOS_CDN_URL}"
+          fi
+
+          echo "Extra args: ${EXTRA_ARGS}"
+
+          dart pub get
+          dart run bin/hoe.dart build-agora-flutter-example \
+            --project-dir=Agora-Flutter-SDK \
+            --artifacts-output-dir=output \
+            --platforms=macos \
+            --apple-package-name=io.agora.agoraRtcEngineExample \
+            --flutter-package-name=agora_rtc_engine \
+            ${EXTRA_ARGS}
+      - run: flutter config --enable-macos-desktop 
+      - run: bash Agora-Flutter-SDK/ci/run_flutter_macos_integration_test.sh
+
+  build_windows:
+    name: Build windows
+    runs-on: windows-2019
+    timeout-minutes: 60
+    env:
+      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
+      AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
+      AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check out build project
+        uses: actions/checkout@v3
+        with:
+          repository: AgoraIO/Agora-Flutter-SDK
+          ref: ${{ inputs.build_branch }}
+          path: Agora-Flutter-SDK
+
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.0.0'
+
+      - name: Run build windows
+        shell: bash
+        run: |
+          IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
+          echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
+          EXTRA_ARGS=""
+          if ${IS_SETUP_LOCAL_DEV} ; then
+            EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          IRIS_WINDOWS_CDN_URL=${{ github.event.inputs.iris-windows-cdn-url }}
+          if [ ! -z "${IRIS_WINDOWS_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-windows-cdn-url=${IRIS_WINDOWS_CDN_URL}"
+          fi
+
+          echo "Extra args: ${EXTRA_ARGS}"
+
+          dart pub get
+          dart run bin/hoe.dart build-agora-flutter-example \
+            --project-dir=Agora-Flutter-SDK \
+            --artifacts-output-dir=output \
+            --platforms=windows \
+            --apple-package-name=io.agora.agoraRtcEngineExample \
+            --flutter-package-name=agora_rtc_engine \
+            ${EXTRA_ARGS}
+
+      - run: flutter config --enable-windows-desktop
+      - run: bash Agora-Flutter-SDK/ci/run_flutter_windows_integration_test.sh
+
+  build_ios:
+    name: Build ios
+    runs-on: macos-11
+    timeout-minutes: 60
+    env:
+      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
+      AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
+      AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
+      
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check out build project
+        uses: actions/checkout@v3
+        with:
+          repository: AgoraIO/Agora-Flutter-SDK
+          ref: ${{ inputs.build_branch }}
+          path: Agora-Flutter-SDK
+
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.0.0'
+
+      - name: Run build ios
+        run: |
+          IS_SETUP_LOCAL_DEV=${{ github.event.inputs.setup-local-dev }}
+          echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
+          EXTRA_ARGS=""
+          if ${IS_SETUP_LOCAL_DEV} ; then
+            EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          IRIS_IOS_CDN_URL=${{ github.event.inputs.iris-ios-cdn-url }}
+          if [ ! -z "${IRIS_IOS_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-ios-cdn-url=${IRIS_IOS_CDN_URL}"
+          fi
+
+          echo "Extra args: ${EXTRA_ARGS}"
+
+          dart pub get
+          dart run bin/hoe.dart build-agora-flutter-example \
+            --project-dir=Agora-Flutter-SDK \
+            --artifacts-output-dir=output \
+            --platforms=ios \
+            --apple-package-name=io.agora.agoraRtcEngineExample \
+            --flutter-package-name=agora_rtc_engine \
+            ${EXTRA_ARGS}
+      - uses: futureware-tech/simulator-action@v1
+        with:
+          model: 'iPhone 13 Pro Max'
+      - run: bash Agora-Flutter-SDK/ci/run_flutter_integration_test_ios.sh

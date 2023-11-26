@@ -1,0 +1,609 @@
+name: Build flutter project example
+
+on:
+  workflow_call:
+    inputs:
+      build_branch:
+        description: flutter project branch
+        type: string
+        required: true
+        default: 'main'
+
+      setup-local-dev:
+        type: boolean
+        description: Is setup local dev
+        default: false
+
+      iris-branch:
+        description: iris branch
+        type: string
+
+      iris-macos-cdn-url:
+        description: iris macos cdn url
+        type: string
+
+      iris-ios-cdn-url:
+        description: iris ios cdn url
+        type: string
+
+      iris-android-cdn-url:
+        description: iris android cdn url
+        type: string
+
+      iris-windows-cdn-url:
+        description: iris windows cdn url
+        type: string
+
+    outputs:
+      android_artifactory_download_url:
+        description: "The android artifactory download url"
+        value: ${{ jobs.build_android.outputs.android_artifactory_download_url }}
+      macos_artifactory_download_url:
+        description: "The macos artifactory download url"
+        value: ${{ jobs.build_macos.outputs.macos_artifactory_download_url }}
+      windows_artifactory_download_url:
+        description: "The windows artifactory download url"
+        value: ${{ jobs.build_windows.outputs.windows_artifactory_download_url }}
+      ios_artifactory_download_url:
+        description: "The ios artifactory download url"
+        value: ${{ jobs.build_ios.outputs.ios_artifactory_download_url }}
+      web_artifactory_download_url:
+        description: "The web artifactory download url"
+        value: ${{ jobs.build_web.outputs.web_artifactory_download_url }}
+
+  workflow_dispatch:
+    inputs:
+      build_branch:
+        description: flutter project branch
+        type: string
+        required: true
+        default: 'main'
+
+      setup-local-dev:
+        type: boolean
+        description: Is setup local dev
+        default: false
+
+      iris-branch:
+        description: iris branch
+        type: string
+
+      iris-macos-cdn-url:
+        description: iris macos cdn url
+        type: string
+
+      iris-ios-cdn-url:
+        description: iris ios cdn url
+        type: string
+
+      iris-android-cdn-url:
+        description: iris android cdn url
+        type: string
+
+      iris-windows-cdn-url:
+        description: iris windows cdn url
+        type: string
+
+jobs:
+  build_android:
+    name: Build Android
+    runs-on: macos-12
+    env:
+      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
+      AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
+      AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
+      BITBUCKET_IRIS_GIT_URL: ${{ secrets.BITBUCKET_IRIS_GIT_URL }}
+    outputs:
+      android_artifactory_download_url: ${{ steps.android-build-step.outputs.output_android_artifactory_download_url }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check out build project
+        uses: actions/checkout@v3
+        with:
+          repository: AgoraIO/Agora-Flutter-SDK
+          ref: ${{ inputs.build_branch }}
+          path: Agora-Flutter-SDK
+
+      - name: Install bitbucket SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.BITBUCKET_SSH_KEY }}
+          name: id_rsa # optional
+          known_hosts: ${{ secrets.BITBUCKET_SSH_KNOWN_HOSTS }}
+          if_key_exists: fail # replace / ignore / fail; optional (defaults to fail)
+      - name: Clone iris
+        run: |
+          IRIS_BRANCH=${{ inputs.iris-branch }}
+          if [ ! -z "${IRIS_BRANCH}" ]; then
+            git clone ${BITBUCKET_IRIS_GIT_URL} --branch ${IRIS_BRANCH}
+          fi
+
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.10.6'
+
+      - name: Run build android
+        id: android-build-step
+        run: |
+          IS_SETUP_LOCAL_DEV=${{ inputs.setup-local-dev }}
+          echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
+          EXTRA_ARGS=""
+          if ${IS_SETUP_LOCAL_DEV} ; then
+            EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          IRIS_BRANCH=${{ inputs.iris-branch }}
+          if [ ! -z "${IRIS_BRANCH}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --local-iris-path=iris"
+          fi
+
+          IRIS_ANDROID_CDN_URL=${{ inputs.iris-android-cdn-url }}
+          if [ ! -z "${IRIS_ANDROID_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-android-cdn-url=${IRIS_ANDROID_CDN_URL}"
+          fi
+
+          echo "Extra args: ${EXTRA_ARGS}"
+
+          ls
+
+          mkdir -p output
+          dart pub get
+          dart run bin/hoe.dart build-agora-flutter-example \
+            --project-dir=Agora-Flutter-SDK \
+            --artifacts-output-dir=output \
+            --platforms=android --process-build \
+            --apple-package-name=io.agora.agoraRtcEngineExample \
+            --flutter-package-name=agora_rtc_engine \
+            ${EXTRA_ARGS}
+
+          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          DATE=$(date '+%Y-%m-%d')
+          TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
+          OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
+          
+          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
+
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
+          
+          echo "output_android_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+      - name: Test with environment variables
+        run: echo $BUILD_NAME
+        env:
+          BUILD_NAME: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          files: "output/*.zip"
+
+      - name: Upload to CDN
+        env:
+          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+        uses: ./.github/actions/upload_cdn_internal
+        with:
+          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
+          release_type: "demo-test"
+
+  build_macos:
+    name: Build macos
+    runs-on: macos-12
+    env:
+      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
+      AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
+      AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
+      BITBUCKET_IRIS_GIT_URL: ${{ secrets.BITBUCKET_IRIS_GIT_URL }}
+    outputs:
+      macos_artifactory_download_url: ${{ steps.macos-build-step.outputs.output_macos_artifactory_download_url }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check out build project
+        uses: actions/checkout@v3
+        with:
+          repository: AgoraIO/Agora-Flutter-SDK
+          ref: ${{ inputs.build_branch }}
+          path: Agora-Flutter-SDK
+
+      - name: Install bitbucket SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.BITBUCKET_SSH_KEY }}
+          name: id_rsa # optional
+          known_hosts: ${{ secrets.BITBUCKET_SSH_KNOWN_HOSTS }}
+          if_key_exists: fail # replace / ignore / fail; optional (defaults to fail)
+
+      - name: Clone iris
+        run: |
+          IRIS_BRANCH=${{ inputs.iris-branch }}
+          if [ ! -z "${IRIS_BRANCH}" ]; then
+            git clone ${BITBUCKET_IRIS_GIT_URL} --branch ${IRIS_BRANCH}
+          fi
+
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.10.6'
+
+      - name: Run build macos
+        id: macos-build-step
+        run: |
+          IS_SETUP_LOCAL_DEV=${{ inputs.setup-local-dev }}
+          echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
+          EXTRA_ARGS=""
+          if ${IS_SETUP_LOCAL_DEV} ; then
+            EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          IRIS_BRANCH=${{ inputs.iris-branch }}
+          if [ ! -z "${IRIS_BRANCH}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --local-iris-path=iris"
+          fi
+
+          IRIS_MACOS_CDN_URL=${{ inputs.iris-macos-cdn-url }}
+          if [ ! -z "${IRIS_MACOS_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-macos-cdn-url=${IRIS_MACOS_CDN_URL}"
+          fi
+
+          echo "Extra args: ${EXTRA_ARGS}"
+
+          dart pub get
+          dart run bin/hoe.dart build-agora-flutter-example \
+            --project-dir=Agora-Flutter-SDK \
+            --artifacts-output-dir=output \
+            --platforms=macos \
+            --process-build \
+            --apple-package-name=io.agora.agoraRtcEngineExample \
+            --flutter-package-name=agora_rtc_engine \
+            ${EXTRA_ARGS}
+
+          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          DATE=$(date '+%Y-%m-%d')
+          TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
+          OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
+          
+          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
+
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
+
+          echo "output_macos_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+      - name: Test with environment variables
+        run: echo $BUILD_NAME
+        env:
+          BUILD_NAME: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          files: "output/*.zip"
+
+      - name: Upload to CDN
+        env:
+          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+        uses: ./.github/actions/upload_cdn_internal
+        with:
+          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
+          release_type: "demo-test"
+
+  build_windows:
+    name: Build windows
+    runs-on: windows-2019
+    env:
+      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
+      AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
+      AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
+    outputs:
+      windows_artifactory_download_url: ${{ steps.windows-build-step.outputs.output_windows_artifactory_download_url }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check out build project
+        uses: actions/checkout@v3
+        with:
+          repository: AgoraIO/Agora-Flutter-SDK
+          ref: ${{ inputs.build_branch }}
+          path: Agora-Flutter-SDK
+
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.10.6'
+      - name: Engine version
+        shell: bash
+        run: |
+          cat ${FLUTTER_ROOT}/bin/internal/engine.version
+
+      - name: Run build windows
+        id: windows-build-step
+        shell: bash
+        run: |
+          git config --system core.longpaths true
+          
+          IS_SETUP_LOCAL_DEV=${{ inputs.setup-local-dev }}
+          echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
+          EXTRA_ARGS=""
+          if ${IS_SETUP_LOCAL_DEV} ; then
+            EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          IRIS_WINDOWS_CDN_URL=${{ inputs.iris-windows-cdn-url }}
+          if [ ! -z "${IRIS_WINDOWS_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-windows-cdn-url=${IRIS_WINDOWS_CDN_URL}"
+          fi
+
+          echo "Extra args: ${EXTRA_ARGS}"
+
+          dart pub get
+          dart run bin/hoe.dart build-agora-flutter-example \
+            --project-dir=Agora-Flutter-SDK \
+            --artifacts-output-dir=output \
+            --platforms=windows \
+            --process-build \
+            --apple-package-name=io.agora.agoraRtcEngineExample \
+            --flutter-package-name=agora_rtc_engine \
+            ${EXTRA_ARGS}
+
+          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          DATE=$(date '+%Y-%m-%d')
+          TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
+          OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
+          
+          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
+
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
+
+          echo "output_windows_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+      - name: Test with environment variables
+        run: echo $BUILD_NAME
+        env:
+          BUILD_NAME: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          files: "output/*.zip"
+
+      - name: Upload to CDN
+        env:
+          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+        uses: ./.github/actions/upload_cdn_internal
+        with:
+          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
+          release_type: "demo-test"
+
+  build_ios:
+    name: Build ios
+    runs-on: macos-12
+    env:
+      TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
+      AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
+      AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
+      # AgoraLab2020
+      AGORALAB2020_P12_BASE64: ${{ secrets.AGORALAB2020_P12_BASE64 }}
+      AGORALAB2020_P12_PWD: ${{ secrets.AGORALAB2020_P12_PWD }}
+      AGORALAB2020_PP_GPG_PWD: ${{ secrets.AGORALAB2020_PP_GPG_PWD }}
+      AGORALAB2020_KEYCHAIN_PASSWORD: ${{ secrets.AGORALAB2020_KEYCHAIN_PASSWORD }}
+      # AgoraQA2021
+      AGORAQA2021_P12_BASE64: ${{ secrets.AGORAQA2021_P12_BASE64 }}
+      AGORAQA2021_P12_PWD: ${{ secrets.AGORAQA2021_P12_PWD }}
+      AGORAQA2021_PP_GPG_PWD: ${{ secrets.AGORAQA2021_PP_GPG_PWD }}
+      AGORAQA2021_KEYCHAIN_PASSWORD: ${{ secrets.AGORAQA2021_KEYCHAIN_PASSWORD }}
+      # AgoraTest2020
+      AGORATEST2020_P12_BASE64: ${{ secrets.AGORATEST2020_P12_BASE64 }}
+      AGORATEST2020_P12_PWD: ${{ secrets.AGORATEST2020_P12_PWD }}
+      AGORATEST2020_PP_GPG_PWD: ${{ secrets.AGORATEST2020_PP_GPG_PWD }}
+      AGORATEST2020_KEYCHAIN_PASSWORD: ${{ secrets.AGORATEST2020_KEYCHAIN_PASSWORD }}
+      TEAM_LAB: ${{ secrets.TEAM_LAB }}
+      TEAM_QA: ${{ secrets.TEAM_QA }}
+      TEAM_TEST: ${{ secrets.TEAM_TEST }}
+      CODE_SIGN_IDENTITY_LAB: ${{ secrets.CODE_SIGN_IDENTITY_LAB }}
+      CODE_SIGN_IDENTITY_QA: ${{ secrets.CODE_SIGN_IDENTITY_QA }}
+      CODE_SIGN_IDENTITY_TEST: ${{ secrets.CODE_SIGN_IDENTITY_TEST }}
+    outputs:
+      ios_artifactory_download_url: ${{ steps.ios-build-step.outputs.output_ios_artifactory_download_url }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check out build project
+        uses: actions/checkout@v3
+        with:
+          repository: AgoraIO/Agora-Flutter-SDK
+          ref: ${{ inputs.build_branch }}
+          path: Agora-Flutter-SDK
+
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.10.6'
+
+      - name: Run build ios
+        id: ios-build-step
+        run: |
+          IS_SETUP_LOCAL_DEV=${{ inputs.setup-local-dev }}
+          echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
+          EXTRA_ARGS=""
+          if ${IS_SETUP_LOCAL_DEV} ; then
+            EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          IRIS_IOS_CDN_URL=${{ inputs.iris-ios-cdn-url }}
+          if [ ! -z "${IRIS_IOS_CDN_URL}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --iris-ios-cdn-url=${IRIS_IOS_CDN_URL}"
+          fi
+
+          echo "Extra args: ${EXTRA_ARGS}"
+
+          dart pub get
+          dart run bin/hoe.dart build-agora-flutter-example \
+            --project-dir=Agora-Flutter-SDK \
+            --artifacts-output-dir=output \
+            --platforms=ios \
+            --process-build \
+            --apple-package-name=io.agora.agoraRtcEngineExample \
+            --flutter-package-name=agora_rtc_engine \
+            ${EXTRA_ARGS}
+
+          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          DATE=$(date '+%Y-%m-%d')
+          TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
+          OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
+          
+          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
+
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
+
+          echo "output_ios_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+      - name: Test with environment variables
+        run: echo $BUILD_NAME
+        env:
+          BUILD_NAME: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          files: "output/*.zip"
+
+      - name: Upload to CDN
+        env:
+          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+        uses: ./.github/actions/upload_cdn_internal
+        with:
+          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
+          release_type: "demo-test"
+
+  build_web:
+    name: Build Web
+    runs-on: ubuntu-latest
+    env:
+      TEST_APP_ID: "" # Do not pass TEST_APP_ID on web
+      MUSIC_CENTER_APPID: "" # Do not pass MUSIC_CENTER_APPID on web
+    outputs:
+      web_artifactory_download_url: ${{ steps.web-build-step.outputs.output_web_artifactory_download_url }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check out build project
+        uses: actions/checkout@v3
+        with:
+          repository: AgoraIO/Agora-Flutter-SDK
+          ref: ${{ inputs.build_branch }}
+          path: Agora-Flutter-SDK
+
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.13.7'
+
+      - name: Run build web
+        id: web-build-step
+        run: |
+          IS_SETUP_LOCAL_DEV=${{ inputs.setup-local-dev }}
+          echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
+          EXTRA_ARGS=""
+          if ${IS_SETUP_LOCAL_DEV} ; then
+            EXTRA_ARGS=" --setup-local-dev"
+          fi
+
+          # TODO(littlegnal): Do not handle iris at this time
+          # IRIS_BRANCH=${{ inputs.iris-branch }}
+          # if [ ! -z "${IRIS_BRANCH}" ]; then
+          #   EXTRA_ARGS="${EXTRA_ARGS} --local-iris-path=iris"
+          # fi
+
+          # IRIS_ANDROID_CDN_URL=${{ inputs.iris-android-cdn-url }}
+          # if [ ! -z "${IRIS_ANDROID_CDN_URL}" ]; then
+          #   EXTRA_ARGS="${EXTRA_ARGS} --iris-android-cdn-url=${IRIS_ANDROID_CDN_URL}"
+          # fi
+
+          echo "Extra args: ${EXTRA_ARGS}"
+
+          ls
+
+          mkdir -p output
+          dart pub get
+          dart run bin/hoe.dart build-agora-flutter-example \
+            --project-dir=Agora-Flutter-SDK \
+            --artifacts-output-dir=output \
+            --platforms=web --process-build \
+            --apple-package-name=io.agora.agoraRtcEngineExample \
+            --flutter-package-name=agora_rtc_engine \
+            ${EXTRA_ARGS}
+
+          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          DATE=$(date '+%Y-%m-%d')
+          TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
+          echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+
+          OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
+          
+          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
+
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
+          
+          echo "output_web_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+      - name: Test with environment variables
+        run: echo $BUILD_NAME
+        env:
+          BUILD_NAME: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          files: "output/*.zip"
+
+      - name: Upload to CDN
+        env:
+          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+        uses: ./.github/actions/upload_cdn_internal
+        with:
+          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
+          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
+          release_type: "demo-test"

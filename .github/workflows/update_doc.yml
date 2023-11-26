@@ -1,0 +1,142 @@
+name: Update doc
+
+on: 
+  workflow_dispatch:
+    inputs:
+      iris-doc-ref:
+        description: iris-doc repo ref
+        type: string
+        required: true
+        default: 'main'
+
+      target_repo:
+        description: pull request target repo
+        type: string
+        required: true
+        default: 'AgoraIO-Extensions/Agora-Flutter-SDK'
+
+      target_branch:
+        description: pull request target branch
+        type: string
+        required: true
+        default: 'main'
+
+      target_branch_name_surffix:
+        description: The surffix of the branch name, e.g., if doc-update, the branch name become main-doc-update
+        type: string
+        required: true
+        default: 'doc-update'
+
+      pull_request_title:
+        description: The title of the pull request
+        type: string
+        required: true
+        default: '[AUTO] Update doc'
+
+      config:
+        description: The language config
+        type: string
+        required: true
+        default: 'fmt_config/fmt_dart.yaml'
+
+      language:
+        description: The language
+        type: string
+        required: true
+        default: 'dart'
+
+      base-template-url:
+        description: The base template url
+        type: string
+        required: true
+        default: 'https://github.com/AgoraIO/agora_doc_source/releases/download/master-build/flutter_ng_json_template_en.json'
+
+      merge-template-url:
+        description: The template url to merge
+        type: string
+        default: ''
+
+      export-file-path:
+        description: The export file path
+        type: string
+        required: true
+        default: 'lib/agora_rtc_engine.dart'
+
+jobs:
+  update_doc:
+    name: Updating DOC
+    runs-on: macos-13
+    timeout-minutes: 60
+    steps:
+      - name: Check out iris_doc
+        uses: actions/checkout@v3
+        with:
+          repository: littleGnAl/iris-doc
+          ref: ${{ inputs.iris-doc-ref }}
+          path: iris-doc
+
+      - name: Check out build project
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ACTION_PAT }}
+          repository: ${{ inputs.target_repo }}
+          ref: ${{ inputs.target_branch }}
+          path: ${{ inputs.target_repo }}
+
+      - uses: subosito/flutter-action@v1
+        if: ${{ inputs.language == 'dart' }}
+        with:
+          flutter-version: '3.13.0'
+          
+      - uses: actions/setup-node@v3
+        if: ${{ inputs.language == 'ts' }}
+        with:
+          node-version: '16.x'
+      - run: npm install -g yarn
+        if: ${{ inputs.language == 'ts' }}
+
+      - name: Run build macos
+        run: |
+          BASE_TEMPLATE_URL=${{ inputs.base-template-url }}
+          MERGE_TEMPLATE_URL=${{ inputs.merge-template-url }}
+          TEMPLATE_URL_ARGS="--template-url=${BASE_TEMPLATE_URL}"
+
+          if [ ! -z "${MERGE_TEMPLATE_URL}" ]; then
+            TEMPLATE_URL_ARGS="${TEMPLATE_URL_ARGS} --template-url=${MERGE_TEMPLATE_URL}"
+          fi
+
+          TARGET_REPO=${{ inputs.target_repo }}
+          ROOT_PATH=$(pwd)
+          EXPORT_FILE_PATH=${ROOT_PATH}/${TARGET_REPO}/${{ inputs.export-file-path }}
+          cd iris-doc
+
+          python3 -m pip install -r requirements.txt
+
+          echo ${EXPORT_FILE_PATH}
+
+          CONFIG=${{ inputs.config }}
+          python3 iris_doc.py --config="$ROOT_PATH/iris-doc/$CONFIG" --language=${{ inputs.language }} --export-file-path=${EXPORT_FILE_PATH} ${TEMPLATE_URL_ARGS}
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.ACTION_PAT }}
+          path: ${{ inputs.target_repo }}
+          commit-message: ${{ inputs.pull_request_title }}
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: "${{ inputs.target_branch }}-${{ inputs.target_branch_name_surffix }}"
+          base: ${{ inputs.target_branch }}
+          delete-branch: true
+          draft: false
+          title: ${{ inputs.pull_request_title }}
+          body: |
+            ${{ inputs.pull_request_title }}
+
+            doc source: ${{ inputs.base-template-url }}
+
+            > This pull request is trigger by bot, do not edit it directly
+          labels: |
+            ci:doc
