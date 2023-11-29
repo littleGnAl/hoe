@@ -168,36 +168,19 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          
-          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
 
-          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
-          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          GITHUB_RUN_ID=${{ github.run_id }} 
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://nightly.link/littleGnAl/hoe/actions/runs
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${GITHUB_RUN_ID}/${OUTPUT_ARTIFACT_FILE_NAME}"
           echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
-          
-          echo "output_android_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y%m%d')"
-      - name: Test with environment variables
-        run: echo $BUILD_NAME
-        env:
-          BUILD_NAME: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          echo "OUTPUT_ARTIFACT_FILE_NAME=${OUTPUT_ARTIFACT_FILE_NAME}" >> $GITHUB_ENV
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ env.TAG_NAME }}
-          files: "output/*.zip"
+          echo "output_android_artifactory_download_url=${GITHUB_RELEASE_DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
 
-      - name: Upload to CDN
-        env:
-          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-        uses: ./.github/actions/upload_cdn_internal
+      - uses: actions/upload-artifact@v3
         with:
-          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
-          release_type: "demo-test"
+          name: ${{ env.OUTPUT_ARTIFACT_FILE_NAME }}
+          path: "output/*.zip"
 
   build_macos:
     name: Build macos
@@ -277,36 +260,19 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          
-          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
 
-          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
-          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          GITHUB_RUN_ID=${{ github.run_id }} 
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://nightly.link/littleGnAl/hoe/actions/runs
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${GITHUB_RUN_ID}/${OUTPUT_ARTIFACT_FILE_NAME}"
           echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
+          echo "OUTPUT_ARTIFACT_FILE_NAME=${OUTPUT_ARTIFACT_FILE_NAME}" >> $GITHUB_ENV
 
-          echo "output_macos_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y%m%d')"
-      - name: Test with environment variables
-        run: echo $BUILD_NAME
-        env:
-          BUILD_NAME: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          echo "output_macos_artifactory_download_url=${GITHUB_RELEASE_DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - uses: actions/upload-artifact@v3
         with:
-          tag_name: ${{ env.TAG_NAME }}
-          files: "output/*.zip"
-
-      - name: Upload to CDN
-        env:
-          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-        uses: ./.github/actions/upload_cdn_internal
-        with:
-          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
-          release_type: "demo-test"
+          name: ${{ env.OUTPUT_ARTIFACT_FILE_NAME }}
+          path: "output/*.zip"
 
   build_windows:
     name: Build windows
@@ -341,7 +307,7 @@ jobs:
         shell: bash
         run: |
           git config --system core.longpaths true
-          
+
           IS_SETUP_LOCAL_DEV=${{ inputs.setup-local-dev }}
           echo "Is set up local dev: ${IS_SETUP_LOCAL_DEV}"
           EXTRA_ARGS=""
@@ -372,37 +338,19 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          
-          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
 
-          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
-          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          GITHUB_RUN_ID=${{ github.run_id }} 
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://nightly.link/littleGnAl/hoe/actions/runs
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${GITHUB_RUN_ID}/${OUTPUT_ARTIFACT_FILE_NAME}"
           echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
+          echo "OUTPUT_ARTIFACT_FILE_NAME=${OUTPUT_ARTIFACT_FILE_NAME}" >> $GITHUB_ENV
 
-          echo "output_windows_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
+          echo "output_windows_artifactory_download_url=${GITHUB_RELEASE_DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
 
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y%m%d')"
-      - name: Test with environment variables
-        run: echo $BUILD_NAME
-        env:
-          BUILD_NAME: agora_rtc_engine_example_${{ steps.date.outputs.date }}
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - uses: actions/upload-artifact@v3
         with:
-          tag_name: ${{ env.TAG_NAME }}
-          files: "output/*.zip"
-
-      - name: Upload to CDN
-        env:
-          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-        uses: ./.github/actions/upload_cdn_internal
-        with:
-          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
-          release_type: "demo-test"
+          name: ${{ env.OUTPUT_ARTIFACT_FILE_NAME }}
+          path: "output/*.zip"
 
   build_ios:
     name: Build ios
@@ -482,37 +430,19 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          
-          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
 
-          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
-          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          GITHUB_RUN_ID=${{ github.run_id }} 
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://nightly.link/littleGnAl/hoe/actions/runs
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${GITHUB_RUN_ID}/${OUTPUT_ARTIFACT_FILE_NAME}"
           echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
+          echo "OUTPUT_ARTIFACT_FILE_NAME=${OUTPUT_ARTIFACT_FILE_NAME}" >> $GITHUB_ENV
 
-          echo "output_ios_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
+          echo "output_ios_artifactory_download_url=${GITHUB_RELEASE_DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
 
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y%m%d')"
-      - name: Test with environment variables
-        run: echo $BUILD_NAME
-        env:
-          BUILD_NAME: agora_rtc_engine_example_${{ steps.date.outputs.date }}
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - uses: actions/upload-artifact@v3
         with:
-          tag_name: ${{ env.TAG_NAME }}
-          files: "output/*.zip"
-
-      - name: Upload to CDN
-        env:
-          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-        uses: ./.github/actions/upload_cdn_internal
-        with:
-          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
-          release_type: "demo-test"
+          name: ${{ env.OUTPUT_ARTIFACT_FILE_NAME }}
+          path: "output/*.zip"
 
   build_web:
     name: Build Web
@@ -577,33 +507,16 @@ jobs:
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
 
           OUTPUT_ARTIFACT_FILE_NAME=$(ls output | head -n 1)
-          
-          DOWNLOAD_URL="https://download.agora.io/demo/test/${OUTPUT_ARTIFACT_FILE_NAME}"
 
-          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://github.com/littleGnAl/hoe/releases/download
-          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${TAG_NAME}/${OUTPUT_ARTIFACT_FILE_NAME}"
+          GITHUB_RUN_ID=${{ github.run_id }} 
+          GITHUB_RELEASE_DOWNLOAD_PREFIX=https://nightly.link/littleGnAl/hoe/actions/runs
+          GITHUB_RELEASE_DOWNLOAD_URL="${GITHUB_RELEASE_DOWNLOAD_PREFIX}/${GITHUB_RUN_ID}/${OUTPUT_ARTIFACT_FILE_NAME}"
           echo "GITHUB_RELEASE_DOWNLOAD_URL=${GITHUB_RELEASE_DOWNLOAD_URL}" >> $GITHUB_ENV
-          
-          echo "output_web_artifactory_download_url=${DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y%m%d')"
-      - name: Test with environment variables
-        run: echo $BUILD_NAME
-        env:
-          BUILD_NAME: agora_rtc_engine_example_${{ steps.date.outputs.date }}
+          echo "OUTPUT_ARTIFACT_FILE_NAME=${OUTPUT_ARTIFACT_FILE_NAME}" >> $GITHUB_ENV
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ env.TAG_NAME }}
-          files: "output/*.zip"
+          echo "output_web_artifactory_download_url=${GITHUB_RELEASE_DOWNLOAD_URL}" >> "$GITHUB_OUTPUT"
 
-      - name: Upload to CDN
-        env:
-          UPLOAD_CDN_INTERNAL_JENKINS_HOOK: ${{ secrets.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-        uses: ./.github/actions/upload_cdn_internal
+      - uses: actions/upload-artifact@v3
         with:
-          upload_cdn_internal_jenkins_hook: ${{ env.UPLOAD_CDN_INTERNAL_JENKINS_HOOK }}
-          url: ${{ env.GITHUB_RELEASE_DOWNLOAD_URL }}
-          release_type: "demo-test"
+          name: ${{ env.OUTPUT_ARTIFACT_FILE_NAME }}
+          path: "output/*.zip"
