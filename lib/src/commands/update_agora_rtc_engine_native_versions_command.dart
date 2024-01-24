@@ -609,6 +609,25 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       } else {
         logger.stdout('$exampleWebIndexFilePath not found, skip...');
       }
+
+      // README.md
+      final readMeFilePath = path.join(workspacePath, 'README.md');
+
+      final readMeFile = fileSystem.file(readMeFilePath);
+      if (readMeFile.existsSync()) {
+        String readMeContent = readMeFile.readAsStringSync();
+
+        final irisWebUrlRegExp = RegExp(
+          r'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc_[0-9a-z]+_[0-9a-z]+_[0-9a-z\.-]+\.js',
+          caseSensitive: true,
+          multiLine: true,
+        );
+        readMeContent = readMeContent.replaceAllMapped(
+            irisWebUrlRegExp, (match) => irisWebCdn);
+        readMeFile.writeAsStringSync(readMeContent);
+      } else {
+        logger.stdout('$readMeFilePath not found, skip...');
+      }
     }
 
     // r'https:\/\/download\.agora\.io\/[a-z\/]+\/iris-web-rtc-fake_[0-9a-z\.-]+\.js',

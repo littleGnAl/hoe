@@ -1164,6 +1164,48 @@ const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_n423
 </html>
 ''');
 
+      final readMeFilePath =
+          path.join(fileSystem.currentDirectory.absolute.path, 'README.md');
+      final readMeFile = fileSystem.file(readMeFilePath);
+      readMeFile.createSync(recursive: true);
+      readMeFile.writeAsStringSync(r'''
+**Project structure**
+```
+<your-project>
+|__web
+   |__index.html
+   |__iris-web-rtc_<x.y.z>.js
+```
+
+```html
+<!-- <your-project>/web/index.html -->
+<!DOCTYPE html>
+<html>
+...
+<body>
+  ...
+  <script src="iris-web-rtc_<x.y.z>.js"></script>
+</body>
+</html>
+```
+Download: https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.3.0.js
+
+**For Testing Purposes**
+
+You can directly depend on the Agora CDN for testing purposes:
+```html
+<!-- <your-project>/web/index.html -->
+<!DOCTYPE html>
+<html>
+...
+<body>
+  ...
+  <script src="https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.3.0.js"></script>
+</body>
+</html>
+```
+''');
+
       final nativeDenpendenciesContent = '''
 CDN:
 https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.2.js
@@ -1200,6 +1242,45 @@ const irisWebFakeUrl = 'https://download.agora.io/staging/iris-web-rtc-fake_n423
 </html>
 ''';
       expect(exampleIndexFile.readAsStringSync(), expectedExampleIndexContent);
+
+      final expectedReadMeFileContent = r'''
+**Project structure**
+```
+<your-project>
+|__web
+   |__index.html
+   |__iris-web-rtc_<x.y.z>.js
+```
+
+```html
+<!-- <your-project>/web/index.html -->
+<!DOCTYPE html>
+<html>
+...
+<body>
+  ...
+  <script src="iris-web-rtc_<x.y.z>.js"></script>
+</body>
+</html>
+```
+Download: https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.2.js
+
+**For Testing Purposes**
+
+You can directly depend on the Agora CDN for testing purposes:
+```html
+<!-- <your-project>/web/index.html -->
+<!DOCTYPE html>
+<html>
+...
+<body>
+  ...
+  <script src="https://download.agora.io/staging/iris-web-rtc_n423_w4182_0.2.0-build.2.js"></script>
+</body>
+</html>
+```
+''';
+      expect(readMeFile.readAsStringSync(), expectedReadMeFileContent);
     });
 
     test('can modify iris-web-fake cdn', () {
