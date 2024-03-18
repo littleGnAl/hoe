@@ -223,7 +223,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   VersionLink findIrisAndroidMaven(String irisDenpendenciesContent) {
     final cdns = _findByRegExp(
       [
-        r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Android_Video_[0-9]+_[0-9]+\.zip',
+        r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Android_Video_[0-9_]+\.zip',
       ],
       irisDenpendenciesContent,
     );
@@ -241,7 +241,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   VersionLink findIrisIOSPod(String irisDenpendenciesContent) {
     final cdns = _findByRegExp(
       [
-        r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_iOS_Video_[0-9]+_[0-9]+\.zip',
+        r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_iOS_Video_[0-9_]+\.zip',
       ],
       irisDenpendenciesContent,
     );
@@ -259,7 +259,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   VersionLink findIrisMacosPod(String irisDenpendenciesContent) {
     final cdns = _findByRegExp(
       [
-        r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Mac_Video_[0-9]+_[0-9]+\.zip',
+        r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Mac_Video_[0-9_]+\.zip',
       ],
       irisDenpendenciesContent,
     );
@@ -277,7 +277,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   VersionLink findIrisWindowsCDN(String irisDenpendenciesContent) {
     final cdns = _findByRegExp(
       [
-        r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Windows_Video_[0-9]+_[0-9]+\.zip',
+        r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Windows_Video_[0-9_]+\.zip',
       ],
       irisDenpendenciesContent,
     );
