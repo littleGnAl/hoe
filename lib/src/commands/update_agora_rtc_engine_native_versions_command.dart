@@ -786,77 +786,21 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       logger.stdout('$depsSummaryFilePath not found, create it...');
       depsSummaryFile.createSync(recursive: true);
     }
-    final regexMap = {
-      'IRIS_ANDROID_CDN': _FinderHolder(
-        RegExp(r'export IRIS_ANDROID_MAVEN=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findIrisAndroidMaven,
-      ),
-      'IRIS_IOS_CDN': _FinderHolder(
-        RegExp(r'export IRIS_ANDROID_MAVEN=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findIrisIOSPod,
-      ),
-      'IRIS_MACOS_CDN': _FinderHolder(
-        RegExp(r'export IRIS_ANDROID_MAVEN=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findIrisMacosPod,
-      ),
-      'IRIS_WINDOWS_CDN': _FinderHolder(
-        RegExp(r'export IRIS_ANDROID_MAVEN=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findIrisWindowsCDN,
-      ),
-      'IRIS_ANDROID_MAVEN': _FinderHolder(
-        RegExp(r'export IRIS_ANDROID_MAVEN=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findIrisAndroidMaven,
-      ),
-      'IRIS_IOS_COCOAPODS': _FinderHolder(
-        RegExp(r'export IRIS_IOS_COCOAPODS=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findIrisIOSPod,
-      ),
-      'IRIS_MACOS_COCOAPODS': _FinderHolder(
-        RegExp(r'export IRIS_MACOS_COCOAPODS=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findIrisMacosPod,
-      ),
-      'NATIVE_CDN_URL_ANDROID': _FinderHolder(
-        RegExp(r'export NATIVE_CDN_URL_ANDROID=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findNativeAndroidCDN,
-      ),
-      'NATIVE_CDN_URL_IOS': _FinderHolder(
-        RegExp(r'export NATIVE_CDN_URL_IOS=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findNativeIOSCDN,
-      ),
-      'NATIVE_CDN_URL_MACOS': _FinderHolder(
-        RegExp(r'export NATIVE_CDN_URL_MACOS=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findNativeMacOSCDN,
-      ),
-      'NATIVE_CDN_URL_WINDOWS': _FinderHolder(
-        RegExp(r'export NATIVE_CDN_URL_WINDOWS=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findNativeWindowsCDN,
-      ),
-      'NATIVE_ANDROID_MAVEN': _FinderHolder(
-        RegExp(r'export NATIVE_ANDROID_MAVEN=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findNativeAndroidMaven,
-      ),
-      'NATIVE_IOS_COCOAPODS': _FinderHolder(
-        RegExp(r'export NATIVE_IOS_COCOAPODS=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findNativeIOSPod,
-      ),
-      'NATIVE_MACOS_COCOAPODS': _FinderHolder(
-        RegExp(r'export NATIVE_MACOS_COCOAPODS=\"(.*)\"',
-            multiLine: true, caseSensitive: true),
-        findNativeMacosPod,
-      ),
+    final regexMap = <String, Function>{
+      'IRIS_ANDROID_CDN': findIrisAndroidMaven,
+      'IRIS_IOS_CDN': findIrisIOSPod,
+      'IRIS_MACOS_CDN': findIrisMacosPod,
+      'IRIS_WINDOWS_CDN': findIrisWindowsCDN,
+      'IRIS_ANDROID_MAVEN': findIrisAndroidMaven,
+      'IRIS_IOS_COCOAPODS': findIrisIOSPod,
+      'IRIS_MACOS_COCOAPODS': findIrisMacosPod,
+      'NATIVE_CDN_URL_ANDROID': findNativeAndroidCDN,
+      'NATIVE_CDN_URL_IOS': findNativeIOSCDN,
+      'NATIVE_CDN_URL_MACOS': findNativeMacOSCDN,
+      'NATIVE_CDN_URL_WINDOWS': findNativeWindowsCDN,
+      'NATIVE_ANDROID_MAVEN': findNativeAndroidMaven,
+      'NATIVE_IOS_COCOAPODS': findNativeIOSPod,
+      'NATIVE_MACOS_COCOAPODS': findNativeMacosPod,
     };
 
     if (isNeedCreateNewFile) {
@@ -865,7 +809,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
           .where((entry) =>
               entry.key.contains('IRIS') && entry.key.contains('CDN'))
           .map((entry) => entry.value)
-          .map((value) => value.finderFunc(irisDenpendenciesContent))
+          .map((value) => value(irisDenpendenciesContent))
           .map((link) {
             return link.cdn;
           })
@@ -875,7 +819,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
           .where((entry) =>
               entry.key.contains('IRIS') && !entry.key.contains('CDN'))
           .map((entry) => entry.value)
-          .map((value) => value.finderFunc(irisDenpendenciesContent))
+          .map((value) => value(irisDenpendenciesContent))
           .map((link) {
             return link.mavenOrCocoaPods.join('\n');
           })
@@ -890,7 +834,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
           .where((entry) =>
               entry.key.contains('NATIVE') && entry.key.contains('CDN'))
           .map((entry) => entry.value)
-          .map((value) => value.finderFunc(nativeDenpendenciesContent))
+          .map((value) => value(nativeDenpendenciesContent))
           .map((link) {
             return link.cdn;
           })
@@ -900,7 +844,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
           .where((entry) =>
               entry.key.contains('NATIVE') && !entry.key.contains('CDN'))
           .map((entry) => entry.value)
-          .map((value) => value.finderFunc(nativeDenpendenciesContent))
+          .map((value) => value(nativeDenpendenciesContent))
           .map((link) {
             return link.mavenOrCocoaPods.join('\n');
           })
@@ -934,11 +878,11 @@ $nativeContent
       } else {
         denpendenciesContent = nativeDenpendenciesContent;
       }
-      VersionLink dep = value.finderFunc(denpendenciesContent);
+      VersionLink dep = value(denpendenciesContent);
       final isCDN = key.contains('CDN');
       final isMavenOrCocoaPods = !isCDN;
       if (isCDN) {
-        final sourceCDN = value.finderFunc(sourceSummaryContent).cdn;
+        final sourceCDN = value(sourceSummaryContent).cdn;
         sourceSummaryContent = sourceSummaryContent.replaceFirst(
           RegExp(sourceCDN, multiLine: true, caseSensitive: true),
           dep.cdn,
@@ -946,7 +890,7 @@ $nativeContent
       }
       if (isMavenOrCocoaPods) {
         final sourceMavenOrCocoaPods =
-            value.finderFunc(sourceSummaryContent).mavenOrCocoaPods.join('\n');
+            value(sourceSummaryContent).mavenOrCocoaPods.join('\n');
         final replaceMavenOrCocoaPods = dep.mavenOrCocoaPods.join('\n');
         sourceSummaryContent = sourceSummaryContent.replaceFirst(
           RegExp(sourceMavenOrCocoaPods, multiLine: true, caseSensitive: true),
@@ -956,10 +900,4 @@ $nativeContent
     }
     depsSummaryFile.writeAsStringSync(sourceSummaryContent);
   }
-}
-
-class _FinderHolder {
-  const _FinderHolder(this.regex, this.finderFunc);
-  final RegExp regex;
-  final VersionLink Function(String content) finderFunc;
 }
