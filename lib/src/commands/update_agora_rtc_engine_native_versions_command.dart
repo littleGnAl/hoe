@@ -891,7 +891,7 @@ $nativeContent
       VersionLink dep = value(denpendenciesContent);
       final isCDN = key.contains('CDN');
       final isMavenOrCocoaPods = !isCDN;
-      if (isCDN) {
+      if (isCDN && dep.cdn.isNotEmpty) {
         String sourceCDN = value(sourceSummaryContent).cdn;
         if (sourceCDN.isEmpty) {
           sourceCDN = '<$key>';
@@ -908,10 +908,13 @@ $nativeContent
           sourceMavenOrCocoaPods = '<$key>';
         }
         final replaceMavenOrCocoaPods = dep.mavenOrCocoaPods.join('\n');
-        sourceSummaryContent = sourceSummaryContent.replaceFirst(
-          RegExp(sourceMavenOrCocoaPods, multiLine: true, caseSensitive: true),
-          replaceMavenOrCocoaPods,
-        );
+        if (replaceMavenOrCocoaPods.isNotEmpty) {
+          sourceSummaryContent = sourceSummaryContent.replaceFirst(
+            RegExp(sourceMavenOrCocoaPods,
+                multiLine: true, caseSensitive: true),
+            replaceMavenOrCocoaPods,
+          );
+        }
       }
     }
     depsSummaryFile.writeAsStringSync(sourceSummaryContent);

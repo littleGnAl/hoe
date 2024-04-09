@@ -1741,5 +1741,85 @@ pod 'AgoraRtcEngine_Special_macOS', '4.2.6.8'
 
       expect(f.readAsStringSync(), expectedContent);
     });
+
+    test(
+        'can update deps summary file with native cdn placeholder, and empty native cdn urls',
+        () {
+      final p = path.join(fileSystem.currentDirectory.absolute.path,
+          'internal/deps_summary.txt');
+      final f = fileSystem.file(p);
+      f.createSync(recursive: true);
+      f.writeAsStringSync('''
+Iris:
+https://download.agora.io/sdk/release/iris_4.1.1.28-build.2_DCG_Android_Video_20240402_0545.zip
+https://download.agora.io/sdk/release/iris_4.1.1.28-build.2_DCG_iOS_Video_20240402_0545.zip
+https://download.agora.io/sdk/release/iris_4.1.1.28-build.2_DCG_Mac_Video_20240402_0545.zip
+https://download.agora.io/sdk/release/iris_4.1.1.28-build.2_DCG_Windows_Video_20240402_0545.zip
+implementation 'io.agora.rtc:iris-rtc:4.3.1-dev.12'
+pod 'AgoraIrisRTC_iOS', '4.3.1-dev.12'
+pod 'AgoraIrisRTC_macOS', '4.3.1-dev.12'
+
+Native:
+<NATIVE_CDN_URL_ANDROID>
+<NATIVE_CDN_URL_IOS>
+<NATIVE_CDN_URL_MACOS>
+<NATIVE_CDN_URL_WINDOWS>
+implementation 'io.agora.rtc:agora-special-full:4.2.6.8'
+implementation 'io.agora.rtc:full-screen-sharing:4.2.6.8'
+pod 'AgoraRtcEngine_Special_iOS', '4.2.6.9'
+pod 'AgoraAudio_Special_iOS', '4.2.6.9'
+pod 'AgoraRtcEngine_Special_macOS', '4.2.6.8'
+'''
+          .trim());
+
+      final irisDependenciesContent = '''
+https://download.agora.io/sdk/release/iris_4.1.1.28-build.2_DCG_Android_Video_20240402_05477.zip
+https://download.agora.io/sdk/release/iris_4.1.1.28-build.2_DCG_iOS_Video_20240402_05477.zip
+https://download.agora.io/sdk/release/iris_4.1.1.28-build.2_DCG_Mac_Video_20240402_05477.zip
+https://download.agora.io/sdk/release/iris_4.1.1.28-build.2_DCG_Windows_Video_20240402_05477.zip
+implementation 'io.agora.rtc:iris-rtc:4.3.1-dev.13'
+pod 'AgoraIrisRTC_iOS', '4.3.1-dev.13'
+pod 'AgoraIrisRTC_macOS', '4.3.1-dev.13'
+''';
+
+      final nativeSdkDependenciesContent = '''
+implementation 'io.agora.rtc:agora-special-full:4.2.6.8'
+implementation 'io.agora.rtc:full-screen-sharing:4.2.6.8'
+pod 'AgoraRtcEngine_Special_iOS', '4.2.6.9'
+pod 'AgoraAudio_Special_iOS', '4.2.6.9'
+pod 'AgoraRtcEngine_Special_macOS', '4.2.6.8'
+''';
+
+      command.createOrUpdateDepsSummary(
+        fileSystem.currentDirectory.absolute.path,
+        irisDependenciesContent,
+        nativeSdkDependenciesContent,
+      );
+
+      final expectedContent = '''
+Iris:
+https://download.agora.io/sdk/release/iris_4.1.1.28-build.2_DCG_Android_Video_20240402_05477.zip
+https://download.agora.io/sdk/release/iris_4.1.1.28-build.2_DCG_iOS_Video_20240402_05477.zip
+https://download.agora.io/sdk/release/iris_4.1.1.28-build.2_DCG_Mac_Video_20240402_05477.zip
+https://download.agora.io/sdk/release/iris_4.1.1.28-build.2_DCG_Windows_Video_20240402_05477.zip
+implementation 'io.agora.rtc:iris-rtc:4.3.1-dev.13'
+pod 'AgoraIrisRTC_iOS', '4.3.1-dev.13'
+pod 'AgoraIrisRTC_macOS', '4.3.1-dev.13'
+
+Native:
+<NATIVE_CDN_URL_ANDROID>
+<NATIVE_CDN_URL_IOS>
+<NATIVE_CDN_URL_MACOS>
+<NATIVE_CDN_URL_WINDOWS>
+implementation 'io.agora.rtc:agora-special-full:4.2.6.8'
+implementation 'io.agora.rtc:full-screen-sharing:4.2.6.8'
+pod 'AgoraRtcEngine_Special_iOS', '4.2.6.9'
+pod 'AgoraAudio_Special_iOS', '4.2.6.9'
+pod 'AgoraRtcEngine_Special_macOS', '4.2.6.8'
+'''
+          .trim();
+
+      expect(f.readAsStringSync(), expectedContent);
+    });
   });
 }
