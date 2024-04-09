@@ -140,6 +140,11 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     }
 
     modifyIrisWebVersion(_workspace.absolute.path, irisDenpendenciesContent);
+    createOrUpdateDepsSummary(
+      _workspace.absolute.path,
+      irisDenpendenciesContent,
+      nativeSdkDependenciesContent,
+    );
     copyHeaders(irisDenpendenciesContent);
   }
 
@@ -207,6 +212,39 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     );
 
     return VersionLink('', cocoapods);
+  }
+
+  VersionLink findNativeAndroidCDN(String nativeSdkDependenciesContent) {
+    final cdns = _findByRegExp(
+      [
+        r'https:\/\/download.agora.io\/sdk\/release\/Agora_Native_SDK_for_Android_rel.v[0-9a-z\.-_]+_[A-Z_]+_[0-9_]+\.zip',
+      ],
+      nativeSdkDependenciesContent,
+    );
+
+    return VersionLink(cdns.firstOrEmpty(), []);
+  }
+
+  VersionLink findNativeIOSCDN(String nativeSdkDependenciesContent) {
+    final cdns = _findByRegExp(
+      [
+        r'https:\/\/download.agora.io\/sdk\/release\/Agora_Native_SDK_for_iOS_rel.v[0-9a-z\.-_]+_[A-Z_]+_[0-9_]+\.zip',
+      ],
+      nativeSdkDependenciesContent,
+    );
+
+    return VersionLink(cdns.firstOrEmpty(), []);
+  }
+
+  VersionLink findNativeMacOSCDN(String nativeSdkDependenciesContent) {
+    final cdns = _findByRegExp(
+      [
+        r'https:\/\/download.agora.io\/sdk\/release\/Agora_Native_SDK_for_Mac_rel.v[0-9a-z\.-_]+_[A-Z_]+_[0-9_]+\.zip',
+      ],
+      nativeSdkDependenciesContent,
+    );
+
+    return VersionLink(cdns.firstOrEmpty(), []);
   }
 
   VersionLink findNativeWindowsCDN(String nativeSdkDependenciesContent) {
@@ -732,5 +770,150 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       fileSystem.directory(irisHeadersDirPath),
       destIrisHeadersDir,
     );
+  }
+
+  void createOrUpdateDepsSummary(
+    String workspacePath,
+    String irisDenpendenciesContent,
+    String nativeDenpendenciesContent,
+  ) {
+    // internal/deps_summary.txt
+    final depsSummaryFilePath =
+        path.join(workspacePath, 'internal', 'deps_summary.txt');
+    final depsSummaryFile = fileSystem.file(depsSummaryFilePath);
+    bool isNeedCreateNewFile = !depsSummaryFile.existsSync();
+    if (isNeedCreateNewFile) {
+      logger.stdout('$depsSummaryFilePath not found, create it...');
+      depsSummaryFile.createSync(recursive: true);
+    }
+    final regexMap = <String, VersionLink Function(String content)>{
+      'IRIS_ANDROID_CDN': findIrisAndroidMaven,
+      'IRIS_IOS_CDN': findIrisIOSPod,
+      'IRIS_MACOS_CDN': findIrisMacosPod,
+      'IRIS_WINDOWS_CDN': findIrisWindowsCDN,
+      'IRIS_ANDROID_MAVEN': findIrisAndroidMaven,
+      'IRIS_IOS_COCOAPODS': findIrisIOSPod,
+      'IRIS_MACOS_COCOAPODS': findIrisMacosPod,
+      'NATIVE_CDN_URL_ANDROID': findNativeAndroidCDN,
+      'NATIVE_CDN_URL_IOS': findNativeIOSCDN,
+      'NATIVE_CDN_URL_MACOS': findNativeMacOSCDN,
+      'NATIVE_CDN_URL_WINDOWS': findNativeWindowsCDN,
+      'NATIVE_ANDROID_MAVEN': findNativeAndroidMaven,
+      'NATIVE_IOS_COCOAPODS': findNativeIOSPod,
+      'NATIVE_MACOS_COCOAPODS': findNativeMacosPod,
+    };
+
+    if (isNeedCreateNewFile) {
+      // Create content
+      final irisCDNContentList = regexMap.entries
+          .where((entry) =>
+              entry.key.contains('IRIS') && entry.key.contains('CDN'))
+          .map((entry) {
+            final link = entry.value(irisDenpendenciesContent);
+            if (link.cdn.isNotEmpty) {
+              return link.cdn;
+            }
+            return '<${entry.key}>';
+          })
+          .where((element) => element.isNotEmpty)
+          .toList();
+      final irisMavenCocoaPodsContentList = regexMap.entries
+          .where((entry) =>
+              entry.key.contains('IRIS') && !entry.key.contains('CDN'))
+          .map((entry) {
+            final link = entry.value(irisDenpendenciesContent);
+            final mavenOrCocoaPods = link.mavenOrCocoaPods.join('\n');
+            if (mavenOrCocoaPods.isNotEmpty) {
+              return mavenOrCocoaPods;
+            }
+            return '<${entry.key}>';
+          })
+          .where((element) => element.isNotEmpty)
+          .toList();
+      final irisContent = [
+        ...irisCDNContentList,
+        ...irisMavenCocoaPodsContentList,
+      ].join('\n');
+
+      final nativeCDNContentList = regexMap.entries
+          .where((entry) =>
+              entry.key.contains('NATIVE') && entry.key.contains('CDN'))
+          .map((entry) {
+            final link = entry.value(nativeDenpendenciesContent);
+            if (link.cdn.isNotEmpty) {
+              return link.cdn;
+            }
+            return '<${entry.key}>';
+          })
+          .where((element) => element.isNotEmpty)
+          .toList();
+      final nativeMavenCocoaPodsContentList = regexMap.entries
+          .where((entry) =>
+              entry.key.contains('NATIVE') && !entry.key.contains('CDN'))
+          .map((entry) {
+            final link = entry.value(nativeDenpendenciesContent);
+            final mavenOrCocoaPods = link.mavenOrCocoaPods.join('\n');
+            if (mavenOrCocoaPods.isNotEmpty) {
+              return mavenOrCocoaPods;
+            }
+            return '<${entry.key}>';
+          })
+          .where((element) => element.isNotEmpty)
+          .toList();
+      final nativeContent = [
+        ...nativeCDNContentList,
+        ...nativeMavenCocoaPodsContentList,
+      ].join('\n');
+
+      final summaryContent = '''
+Iris:
+$irisContent
+
+Native:
+$nativeContent
+'''
+          .trim();
+      depsSummaryFile.writeAsStringSync(summaryContent);
+      return;
+    }
+
+    // Update Content
+    String sourceSummaryContent = depsSummaryFile.readAsStringSync();
+    for (final entry in regexMap.entries) {
+      final key = entry.key;
+      final value = entry.value;
+      String denpendenciesContent = '';
+      if (key.contains('IRIS')) {
+        denpendenciesContent = irisDenpendenciesContent;
+      } else {
+        denpendenciesContent = nativeDenpendenciesContent;
+      }
+      VersionLink dep = value(denpendenciesContent);
+      final isCDN = key.contains('CDN');
+      final isMavenOrCocoaPods = !isCDN;
+      if (isCDN) {
+        String sourceCDN = value(sourceSummaryContent).cdn;
+        if (sourceCDN.isEmpty) {
+          sourceCDN = '<$key>';
+        }
+        sourceSummaryContent = sourceSummaryContent.replaceFirst(
+          RegExp(sourceCDN, multiLine: true, caseSensitive: true),
+          dep.cdn,
+        );
+      }
+      if (isMavenOrCocoaPods) {
+        String sourceMavenOrCocoaPods =
+            value(sourceSummaryContent).mavenOrCocoaPods.join('\n');
+        if (sourceMavenOrCocoaPods.isEmpty) {
+          sourceMavenOrCocoaPods = '<$key>';
+        }
+        final replaceMavenOrCocoaPods = dep.mavenOrCocoaPods.join('\n');
+        sourceSummaryContent = sourceSummaryContent.replaceFirst(
+          RegExp(sourceMavenOrCocoaPods, multiLine: true, caseSensitive: true),
+          replaceMavenOrCocoaPods,
+        );
+      }
+    }
+    depsSummaryFile.writeAsStringSync(sourceSummaryContent);
   }
 }
