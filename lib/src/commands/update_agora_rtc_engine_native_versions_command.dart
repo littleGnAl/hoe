@@ -786,7 +786,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       logger.stdout('$depsSummaryFilePath not found, create it...');
       depsSummaryFile.createSync(recursive: true);
     }
-    final regexMap = <String, Function>{
+    final regexMap = <String, VersionLink Function(String content)>{
       'IRIS_ANDROID_CDN': findIrisAndroidMaven,
       'IRIS_IOS_CDN': findIrisIOSPod,
       'IRIS_MACOS_CDN': findIrisMacosPod,
@@ -808,20 +808,25 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       final irisCDNContentList = regexMap.entries
           .where((entry) =>
               entry.key.contains('IRIS') && entry.key.contains('CDN'))
-          .map((entry) => entry.value)
-          .map((value) => value(irisDenpendenciesContent))
-          .map((link) {
-            return link.cdn;
+          .map((entry) {
+            final link = entry.value(irisDenpendenciesContent);
+            if (link.cdn.isNotEmpty) {
+              return link.cdn;
+            }
+            return '<${entry.key}>';
           })
           .where((element) => element.isNotEmpty)
           .toList();
       final irisMavenCocoaPodsContentList = regexMap.entries
           .where((entry) =>
               entry.key.contains('IRIS') && !entry.key.contains('CDN'))
-          .map((entry) => entry.value)
-          .map((value) => value(irisDenpendenciesContent))
-          .map((link) {
-            return link.mavenOrCocoaPods.join('\n');
+          .map((entry) {
+            final link = entry.value(irisDenpendenciesContent);
+            final mavenOrCocoaPods = link.mavenOrCocoaPods.join('\n');
+            if (mavenOrCocoaPods.isNotEmpty) {
+              return mavenOrCocoaPods;
+            }
+            return '<${entry.key}>';
           })
           .where((element) => element.isNotEmpty)
           .toList();
@@ -833,20 +838,25 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       final nativeCDNContentList = regexMap.entries
           .where((entry) =>
               entry.key.contains('NATIVE') && entry.key.contains('CDN'))
-          .map((entry) => entry.value)
-          .map((value) => value(nativeDenpendenciesContent))
-          .map((link) {
-            return link.cdn;
+          .map((entry) {
+            final link = entry.value(nativeDenpendenciesContent);
+            if (link.cdn.isNotEmpty) {
+              return link.cdn;
+            }
+            return '<${entry.key}>';
           })
           .where((element) => element.isNotEmpty)
           .toList();
       final nativeMavenCocoaPodsContentList = regexMap.entries
           .where((entry) =>
               entry.key.contains('NATIVE') && !entry.key.contains('CDN'))
-          .map((entry) => entry.value)
-          .map((value) => value(nativeDenpendenciesContent))
-          .map((link) {
-            return link.mavenOrCocoaPods.join('\n');
+          .map((entry) {
+            final link = entry.value(nativeDenpendenciesContent);
+            final mavenOrCocoaPods = link.mavenOrCocoaPods.join('\n');
+            if (mavenOrCocoaPods.isNotEmpty) {
+              return mavenOrCocoaPods;
+            }
+            return '<${entry.key}>';
           })
           .where((element) => element.isNotEmpty)
           .toList();
@@ -882,15 +892,21 @@ $nativeContent
       final isCDN = key.contains('CDN');
       final isMavenOrCocoaPods = !isCDN;
       if (isCDN) {
-        final sourceCDN = value(sourceSummaryContent).cdn;
+        String sourceCDN = value(sourceSummaryContent).cdn;
+        if (sourceCDN.isEmpty) {
+          sourceCDN = '<$key>';
+        }
         sourceSummaryContent = sourceSummaryContent.replaceFirst(
           RegExp(sourceCDN, multiLine: true, caseSensitive: true),
           dep.cdn,
         );
       }
       if (isMavenOrCocoaPods) {
-        final sourceMavenOrCocoaPods =
+        String sourceMavenOrCocoaPods =
             value(sourceSummaryContent).mavenOrCocoaPods.join('\n');
+        if (sourceMavenOrCocoaPods.isEmpty) {
+          sourceMavenOrCocoaPods = '<$key>';
+        }
         final replaceMavenOrCocoaPods = dep.mavenOrCocoaPods.join('\n');
         sourceSummaryContent = sourceSummaryContent.replaceFirst(
           RegExp(sourceMavenOrCocoaPods, multiLine: true, caseSensitive: true),
