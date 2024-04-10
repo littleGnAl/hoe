@@ -977,6 +977,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         '--dart-define',
         'TEST_CHANNEL_ID=${_globalConfig.testChannelId}',
         '--dart-define',
+        'INTERNAL_TESTING=true',
+        '--dart-define',
         'MUSIC_CENTER_APPID=${_globalConfig.musicCenterAppid}',
         '--dart-define',
         'RTM_APP_ID=${_globalConfig.testAppId}',
