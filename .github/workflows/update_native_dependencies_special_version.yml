@@ -103,3 +103,4 @@ jobs:
             > This pull request is trigger by bot, you can checkout this branch and update it.
           labels: |
             version:special
+            ci:ready_release_special
