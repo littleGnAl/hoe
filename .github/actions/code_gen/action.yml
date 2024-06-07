@@ -1,10 +1,13 @@
 name: Run codegen
 
 inputs:
+  github_token:
+    description: Github token
+    required: true
+
   version:
     description: The version to run codegen
     default: 'rtc_4.3.0'
-    type: string
 
 runs:
   using: "composite"
@@ -17,7 +20,7 @@ runs:
         node-version: 'lts/*'
     - name: Reconfigure git to use HTTP authentication
       run: |
-        git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
+        git config --global url."https://${{ inputs.github_token }}@github.com/".insteadOf ssh://git@github.com/
     - name: Install LLVM and Clang
       uses: KyleMayes/install-llvm-action@v1
       with:
@@ -27,5 +30,6 @@ runs:
       with:
         channel: 'stable'
     - name: Run code-gen
+      shell: bash
       run: |
         bash scripts/code_gen.sh ${{ inputs.version }}

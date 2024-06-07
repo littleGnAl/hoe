@@ -95,6 +95,7 @@ jobs:
       - uses: littleGnAl/hoe/.github/actions/code_gen@main
         if: ${{ inputs.run_codegen }}
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           version: "${{ inputs.codegen_version }}"
 
       - name: Create Pull Request
