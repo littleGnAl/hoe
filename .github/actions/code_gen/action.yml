@@ -1,0 +1,41 @@
+name: Run codegen
+
+inputs:
+  github_token:
+    description: Github token
+    required: true
+
+  project_path:
+    description: The path of project
+    required: true
+
+  version:
+    description: The version to run codegen
+    default: 'rtc_4.3.0'
+
+runs:
+  using: "composite"
+  steps:
+    - name: enable corepack
+      shell: bash
+      run: corepack enable
+    - name: set node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'lts/*'
+    - name: Reconfigure git to use HTTP authentication
+      shell: bash
+      run: |
+        git config --global url."https://${{ inputs.github_token }}@github.com/".insteadOf ssh://git@github.com/
+    - name: Install LLVM and Clang
+      uses: KyleMayes/install-llvm-action@v1
+      with:
+        version: "15.0.6" # Need ping version to 15.x
+        directory: ${{ runner.temp }}/llvm
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+    - name: Run code-gen
+      shell: bash
+      run: |
+        bash ${{ inputs.project_path }}/scripts/code_gen.sh ${{ inputs.version }}
