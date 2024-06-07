@@ -26,6 +26,16 @@ on:
         required: true
         type: string
 
+      run_codegen:
+        type: boolean
+        description: Is run codegen
+        default: false
+
+      codegen_version:
+        description: The native sdk version for codegen, e.g., rtc_4.3.0
+        default: ''
+        type: string
+
 jobs:
   setup_base_release_branch:
     name: Set up the base branch for releasing
@@ -81,6 +91,11 @@ jobs:
             --pubspec-version=${PUBSPEC_VERSION} \
             --native-sdk-dependencies-content="${NATIVE_SDK_DEPENDENCIES_CONTENT}" \
             --iris-dependencies-content="${IRIS_DEPENDENCIES_CONTENT}"
+
+      - uses: actions/code_gen@main
+        if: ${{ inputs.run_codegen }}
+        with:
+          version: "${{ inputs.codegen_version }}"
 
       - name: Create Pull Request
         id: cpr
