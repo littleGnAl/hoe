@@ -5,6 +5,10 @@ inputs:
     description: Github token
     required: true
 
+  project_path:
+    description: The path of project
+    required: true
+
   version:
     description: The version to run codegen
     default: 'rtc_4.3.0'
@@ -34,4 +38,4 @@ runs:
     - name: Run code-gen
       shell: bash
       run: |
-        bash scripts/code_gen.sh ${{ inputs.version }}
+        bash ${{ inputs.project_path }}/scripts/code_gen.sh ${{ inputs.version }}
