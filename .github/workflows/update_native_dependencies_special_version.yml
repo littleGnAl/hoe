@@ -92,7 +92,7 @@ jobs:
             --native-sdk-dependencies-content="${NATIVE_SDK_DEPENDENCIES_CONTENT}" \
             --iris-dependencies-content="${IRIS_DEPENDENCIES_CONTENT}"
 
-      - uses: actions/code_gen
+      - uses: actions/code_gen@main
         if: ${{ inputs.run_codegen }}
         with:
           version: "${{ inputs.codegen_version }}"
