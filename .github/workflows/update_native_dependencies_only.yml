@@ -22,6 +22,16 @@ on:
         description: Is skip ci
         default: false
 
+      run_codegen:
+        type: boolean
+        description: Is run codegen
+        default: false
+
+      codegen_version:
+        description: The native sdk version for codegen, e.g., rtc_4.3.0
+        default: ''
+        type: string
+
 jobs:
   udpate_dependencies:
     name: Update dependencies
@@ -52,6 +62,13 @@ jobs:
             --project-dir=${PROJECT_DIR} \
             --native-sdk-dependencies-content="${NATIVE_SDK_DEPENDENCIES_CONTENT}" \
             --iris-dependencies-content="${IRIS_DEPENDENCIES_CONTENT}"
+
+      - uses: littleGnAl/hoe/.github/actions/code_gen@main
+        if: ${{ inputs.run_codegen }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          version: "${{ inputs.codegen_version }}"
+          project_path: AgoraIO-Extensions/Agora-Flutter-SDK
 
       - name: Get current date
         id: date
