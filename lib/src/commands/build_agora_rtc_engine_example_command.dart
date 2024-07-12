@@ -269,6 +269,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
           .directory(path.join(
             unzipFilePath,
             'DCG',
+            'libs',
             'Agora_Native_SDK_for_iOS_LITE',
             'libs',
             'ALL_ARCHITECTURE',
@@ -281,6 +282,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
         path.join(
           unzipFilePath,
           'DCG',
+          'libs',
           'Agora_Native_SDK_for_iOS_LITE',
           'libs/',
         ),

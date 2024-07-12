@@ -719,6 +719,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     final nativeSdkHeadersDirPath = path.join(
       unzipFilePath,
       'DCG',
+      'libs',
       'Agora_Native_SDK_for_Android_LITE',
       'rtc',
       'sdk',
