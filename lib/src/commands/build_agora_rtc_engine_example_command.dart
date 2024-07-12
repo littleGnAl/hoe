@@ -155,7 +155,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
             'scripts/build-iris-android.sh',
             localIrisPath,
             'Release',
-            'Agora_Native_SDK_for_Android_FULL',
+            'Agora_Native_SDK_for_Android_LITE',
           ],
           runInShell: true,
           workingDirectory: _workspace.absolute.path,
@@ -177,7 +177,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       copyDirectory(
           fileSystem,
           fileSystem.directory(path.join(unzipFilePath, 'DCG',
-              'Agora_Native_SDK_for_Android_FULL', 'rtc', 'sdk')),
+              'Agora_Native_SDK_for_Android_LITE', 'rtc', 'sdk')),
           fileSystem.directory(path.join(androidModulePath, 'libs')));
 
       fileSystem

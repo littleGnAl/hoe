@@ -715,11 +715,11 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
 
     logger.stdout('[getUnzipDir] unzipFilePath: $unzipFilePath');
 
-    // DCG/Agora_Native_SDK_for_Android_FULL/rtc/sdk/high_level_api/include
+    // DCG/Agora_Native_SDK_for_Android_LITE/rtc/sdk/high_level_api/include
     final nativeSdkHeadersDirPath = path.join(
       unzipFilePath,
       'DCG',
-      'Agora_Native_SDK_for_Android_FULL',
+      'Agora_Native_SDK_for_Android_LITE',
       'rtc',
       'sdk',
       'high_level_api',
