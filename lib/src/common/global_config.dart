@@ -26,6 +26,10 @@ class GlobalConfig {
 
   String get testToken => Platform.environment['TEST_TOKEN'] ?? '';
 
+  String get rtmAppId => Platform.environment['TEST_RTM_APP_ID'] ?? '';
+
+  String get rtmToken => Platform.environment['TEST_RTM_TOKEN'] ?? '';
+
   String get testChannelId =>
       Platform.environment['TEST_CHANNEL_ID'] ?? 'testapi';
 
