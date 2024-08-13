@@ -124,9 +124,9 @@ jobs:
         with:
           java-version: '11'
 
-      - uses: subosito/flutter-action@v1
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.6'
+          flutter-version: '3.24.0'
 
       - name: Run build android
         id: android-build-step
@@ -218,9 +218,9 @@ jobs:
             git clone ${BITBUCKET_IRIS_GIT_URL} --branch ${IRIS_BRANCH}
           fi
 
-      - uses: subosito/flutter-action@v1
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.6'
+          flutter-version: '3.24.0'
 
       - name: Run build macos
         id: macos-build-step
@@ -294,9 +294,9 @@ jobs:
           ref: ${{ inputs.build_branch }}
           path: Agora-Flutter-SDK
 
-      - uses: subosito/flutter-action@v1
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.6'
+          flutter-version: '3.24.0'
       - name: Engine version
         shell: bash
         run: |
@@ -393,9 +393,9 @@ jobs:
           ref: ${{ inputs.build_branch }}
           path: Agora-Flutter-SDK
 
-      - uses: subosito/flutter-action@v1
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.6'
+          flutter-version: '3.24.0'
 
       - name: Run build ios
         id: ios-build-step
@@ -462,9 +462,9 @@ jobs:
           ref: ${{ inputs.build_branch }}
           path: Agora-Flutter-SDK
 
-      - uses: subosito/flutter-action@v1
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.7'
+          flutter-version: '3.24.0'
 
       - name: Run build web
         id: web-build-step
