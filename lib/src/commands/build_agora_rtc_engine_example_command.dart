@@ -844,8 +844,8 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
             'build', 'windows', 'x64', 'runner', 'Release')),
         fileSystem.directory(archiveDirPath));
 
-    final pluginsDir = fileSystem.directory(path.join(
-        _workspace.absolute.path, 'example', 'build', 'windows', 'plugins'));
+    final pluginsDir = fileSystem.directory(path.join(_workspace.absolute.path,
+        'example', 'build', 'windows', 'x64', 'plugins'));
     for (final pluginEntity in pluginsDir.listSync()) {
       final pluginReleaseDir = fileSystem
           .directory(path.join(pluginEntity.absolute.path, 'Release'));
