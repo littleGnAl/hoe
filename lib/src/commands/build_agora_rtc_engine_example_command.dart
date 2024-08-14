@@ -841,7 +841,7 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
     copyDirectory(
         fileSystem,
         fileSystem.directory(path.join(_workspace.absolute.path, 'example',
-            'build', 'windows', 'runner', 'Release')),
+            'build', 'windows', 'x64', 'runner', 'Release')),
         fileSystem.directory(archiveDirPath));
 
     final pluginsDir = fileSystem.directory(path.join(
