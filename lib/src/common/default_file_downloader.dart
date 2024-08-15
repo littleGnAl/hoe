@@ -63,7 +63,7 @@ Future<String> downloadAndUnzip(
     _unzipSymlinks(processManager, path.join(zipDownloadPath, zipFileBaseName),
         zipDownloadPath);
   } else {
-    _unzip(path.join(zipDownloadPath, zipFileBaseName), zipDownloadPath);
+    await _unzip(path.join(zipDownloadPath, zipFileBaseName), zipDownloadPath);
   }
 
   return zipDownloadPath;
@@ -87,8 +87,8 @@ Future<void> _unzip(String zipFilePath, String outputPath) async {
 // Decode the zip from the InputFileStream. The archive will have the contents of the
 // zip, without having stored the data in memory.
   final archive = ZipDecoder().decodeBuffer(inputStream);
-  extractArchiveToDisk(archive, outputPath);
-  inputStream.close();
+  await extractArchiveToDisk(archive, outputPath);
+  await inputStream.close();
 }
 
 String getUnzipDir(
