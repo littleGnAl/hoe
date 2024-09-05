@@ -7,6 +7,7 @@ on:
         description: The repository to checkout, e.g., AgoraIO-Extensions/Agora-Flutter-SDK, AgoraIO-Extensions/Agora-Flutter-RTM-SDK
         type: string
         required: true
+        # Set default value `AgoraIO-Extensions/Agora-Flutter-SDK` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
         default: 'AgoraIO-Extensions/Agora-Flutter-SDK'
       
       build_branch:
@@ -43,11 +44,13 @@ on:
       apple-package-name:
         description: The ios/macos bundle id, e.g., io.agora.agoraRtcEngineExample, io.agora.agorartm.agoraRtmExample
         type: string
+        # Set default value `io.agora.agoraRtcEngineExample` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
         default: 'io.agora.agoraRtcEngineExample'
 
       flutter-package-name:
         description: The Flutter package name, e.g., agora_rtc_engine, agora_rtm
         type: string
+        # Set default value `agora_rtc_engine` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
         default: 'agora_rtc_engine'
 
     outputs:
@@ -73,6 +76,7 @@ on:
         description: The repository to checkout, e.g., AgoraIO-Extensions/Agora-Flutter-SDK, AgoraIO-Extensions/Agora-Flutter-RTM-SDK
         type: string
         required: true
+        # Set default value `AgoraIO-Extensions/Agora-Flutter-SDK` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
         default: 'AgoraIO-Extensions/Agora-Flutter-SDK'
 
       build_branch:
@@ -109,11 +113,13 @@ on:
       apple-package-name:
         description: The ios/macos bundle id, e.g., io.agora.agoraRtcEngineExample, io.agora.agorartm.agoraRtmExample
         type: string
+        # Set default value `io.agora.agoraRtcEngineExample` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
         default: 'io.agora.agoraRtcEngineExample'
 
       flutter-package-name:
         description: The Flutter package name, e.g., agora_rtc_engine, agora_rtm
         type: string
+        # Set default value `agora_rtc_engine` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
         default: 'agora_rtc_engine'
 
 jobs:
