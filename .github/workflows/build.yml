@@ -3,6 +3,13 @@ name: Build flutter project example
 on:
   workflow_call:
     inputs:
+      repository:
+        description: The repository to checkout, e.g., AgoraIO-Extensions/Agora-Flutter-SDK, AgoraIO-Extensions/Agora-Flutter-RTM-SDK
+        type: string
+        required: true
+        # Set default value `AgoraIO-Extensions/Agora-Flutter-SDK` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
+        default: 'AgoraIO-Extensions/Agora-Flutter-SDK'
+      
       build_branch:
         description: flutter project branch
         type: string
@@ -33,6 +40,18 @@ on:
       iris-windows-cdn-url:
         description: iris windows cdn url
         type: string
+
+      apple-package-name:
+        description: The ios/macos bundle id, e.g., io.agora.agoraRtcEngineExample, io.agora.agorartm.agoraRtmExample
+        type: string
+        # Set default value `io.agora.agoraRtcEngineExample` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
+        default: 'io.agora.agoraRtcEngineExample'
+
+      flutter-package-name:
+        description: The Flutter package name, e.g., agora_rtc_engine, agora_rtm
+        type: string
+        # Set default value `agora_rtc_engine` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
+        default: 'agora_rtc_engine'
 
     outputs:
       android_artifactory_download_url:
@@ -53,6 +72,13 @@ on:
 
   workflow_dispatch:
     inputs:
+      repository:
+        description: The repository to checkout, e.g., AgoraIO-Extensions/Agora-Flutter-SDK, AgoraIO-Extensions/Agora-Flutter-RTM-SDK
+        type: string
+        required: true
+        # Set default value `AgoraIO-Extensions/Agora-Flutter-SDK` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
+        default: 'AgoraIO-Extensions/Agora-Flutter-SDK'
+
       build_branch:
         description: flutter project branch
         type: string
@@ -84,12 +110,26 @@ on:
         description: iris windows cdn url
         type: string
 
+      apple-package-name:
+        description: The ios/macos bundle id, e.g., io.agora.agoraRtcEngineExample, io.agora.agorartm.agoraRtmExample
+        type: string
+        # Set default value `io.agora.agoraRtcEngineExample` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
+        default: 'io.agora.agoraRtcEngineExample'
+
+      flutter-package-name:
+        description: The Flutter package name, e.g., agora_rtc_engine, agora_rtm
+        type: string
+        # Set default value `agora_rtc_engine` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
+        default: 'agora_rtc_engine'
+
 jobs:
   build_android:
     name: Build Android
     runs-on: macos-12
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      TEST_RTM_APP_ID: ${{ secrets.TEST_RTM_APP_ID }}
+      TEST_RTM_TOKEN: ${{ secrets.TEST_RTM_TOKEN }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
       AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
       AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
@@ -102,9 +142,9 @@ jobs:
       - name: Check out build project
         uses: actions/checkout@v3
         with:
-          repository: AgoraIO/Agora-Flutter-SDK
+          repository: ${{ inputs.repository }}
           ref: ${{ inputs.build_branch }}
-          path: Agora-Flutter-SDK
+          path: ${{ inputs.repository }}
 
       - name: Install bitbucket SSH key
         uses: shimataro/ssh-key-action@v2
@@ -148,6 +188,16 @@ jobs:
             EXTRA_ARGS="${EXTRA_ARGS} --iris-android-cdn-url=${IRIS_ANDROID_CDN_URL}"
           fi
 
+          APPLE_PACKAGE_NAME=${{ inputs.apple-package-name }}
+          if [ ! -z "${APPLE_PACKAGE_NAME}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --apple-package-name=${APPLE_PACKAGE_NAME}"
+          fi
+
+          FLUTTER_PACKAGE_NAME=${{ inputs.flutter-package-name }}
+          if [ ! -z "${FLUTTER_PACKAGE_NAME}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --flutter-package-name=${FLUTTER_PACKAGE_NAME}"
+          fi
+
           echo "Extra args: ${EXTRA_ARGS}"
 
           ls
@@ -155,14 +205,12 @@ jobs:
           mkdir -p output
           dart pub get
           dart run bin/hoe.dart build-agora-flutter-example \
-            --project-dir=Agora-Flutter-SDK \
+            --project-dir=${{ inputs.repository }} \
             --artifacts-output-dir=output \
             --platforms=android --process-build \
-            --apple-package-name=io.agora.agoraRtcEngineExample \
-            --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
 
-          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          PUBSPEC_VERSION=$(grep 'version: ' ${{ inputs.repository }}/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
           DATE=$(date '+%Y-%m-%d')
           TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
@@ -187,6 +235,8 @@ jobs:
     runs-on: macos-12
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      TEST_RTM_APP_ID: ${{ secrets.TEST_RTM_APP_ID }}
+      TEST_RTM_TOKEN: ${{ secrets.TEST_RTM_TOKEN }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
       AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
       AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
@@ -199,9 +249,9 @@ jobs:
       - name: Check out build project
         uses: actions/checkout@v3
         with:
-          repository: AgoraIO/Agora-Flutter-SDK
+          repository: ${{ inputs.repository }}
           ref: ${{ inputs.build_branch }}
-          path: Agora-Flutter-SDK
+          path: ${{ inputs.repository }}
 
       - name: Install bitbucket SSH key
         uses: shimataro/ssh-key-action@v2
@@ -242,19 +292,27 @@ jobs:
             EXTRA_ARGS="${EXTRA_ARGS} --iris-macos-cdn-url=${IRIS_MACOS_CDN_URL}"
           fi
 
+          APPLE_PACKAGE_NAME=${{ inputs.apple-package-name }}
+          if [ ! -z "${APPLE_PACKAGE_NAME}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --apple-package-name=${APPLE_PACKAGE_NAME}"
+          fi
+
+          FLUTTER_PACKAGE_NAME=${{ inputs.flutter-package-name }}
+          if [ ! -z "${FLUTTER_PACKAGE_NAME}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --flutter-package-name=${FLUTTER_PACKAGE_NAME}"
+          fi
+
           echo "Extra args: ${EXTRA_ARGS}"
 
           dart pub get
           dart run bin/hoe.dart build-agora-flutter-example \
-            --project-dir=Agora-Flutter-SDK \
+            --project-dir=${{ inputs.repository }} \
             --artifacts-output-dir=output \
             --platforms=macos \
             --process-build \
-            --apple-package-name=io.agora.agoraRtcEngineExample \
-            --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
 
-          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          PUBSPEC_VERSION=$(grep 'version: ' ${{ inputs.repository }}/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
           DATE=$(date '+%Y-%m-%d')
           TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
@@ -279,6 +337,8 @@ jobs:
     runs-on: windows-2019
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      TEST_RTM_APP_ID: ${{ secrets.TEST_RTM_APP_ID }}
+      TEST_RTM_TOKEN: ${{ secrets.TEST_RTM_TOKEN }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
       AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
       AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
@@ -290,9 +350,9 @@ jobs:
       - name: Check out build project
         uses: actions/checkout@v3
         with:
-          repository: AgoraIO/Agora-Flutter-SDK
+          repository: ${{ inputs.repository }}
           ref: ${{ inputs.build_branch }}
-          path: Agora-Flutter-SDK
+          path: ${{ inputs.repository }}
 
       - uses: subosito/flutter-action@v2
         with:
@@ -320,19 +380,27 @@ jobs:
             EXTRA_ARGS="${EXTRA_ARGS} --iris-windows-cdn-url=${IRIS_WINDOWS_CDN_URL}"
           fi
 
+          APPLE_PACKAGE_NAME=${{ inputs.apple-package-name }}
+          if [ ! -z "${APPLE_PACKAGE_NAME}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --apple-package-name=${APPLE_PACKAGE_NAME}"
+          fi
+
+          FLUTTER_PACKAGE_NAME=${{ inputs.flutter-package-name }}
+          if [ ! -z "${FLUTTER_PACKAGE_NAME}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --flutter-package-name=${FLUTTER_PACKAGE_NAME}"
+          fi
+
           echo "Extra args: ${EXTRA_ARGS}"
 
           dart pub get
           dart run bin/hoe.dart build-agora-flutter-example \
-            --project-dir=Agora-Flutter-SDK \
+            --project-dir=${{ inputs.repository }} \
             --artifacts-output-dir=output \
             --platforms=windows \
             --process-build \
-            --apple-package-name=io.agora.agoraRtcEngineExample \
-            --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
 
-          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          PUBSPEC_VERSION=$(grep 'version: ' ${{ inputs.repository }}/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
           DATE=$(date '+%Y-%m-%d')
           TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
@@ -357,6 +425,8 @@ jobs:
     runs-on: macos-12
     env:
       TEST_APP_ID: ${{ secrets.TEST_APP_ID }}
+      TEST_RTM_APP_ID: ${{ secrets.TEST_RTM_APP_ID }}
+      TEST_RTM_TOKEN: ${{ secrets.TEST_RTM_TOKEN }}
       MUSIC_CENTER_APPID: ${{ secrets.MUSIC_CENTER_APPID }}
       AGORA_ARTIFACTORY_USER: ${{ secrets.AGORA_ARTIFACTORY_USER }}
       AGORA_ARTIFACTORY_PWD: ${{ secrets.AGORA_ARTIFACTORY_PWD }}
@@ -389,9 +459,9 @@ jobs:
       - name: Check out build project
         uses: actions/checkout@v3
         with:
-          repository: AgoraIO/Agora-Flutter-SDK
+          repository: ${{ inputs.repository }}
           ref: ${{ inputs.build_branch }}
-          path: Agora-Flutter-SDK
+          path: ${{ inputs.repository }}
 
       - uses: subosito/flutter-action@v2
         with:
@@ -412,19 +482,27 @@ jobs:
             EXTRA_ARGS="${EXTRA_ARGS} --iris-ios-cdn-url=${IRIS_IOS_CDN_URL}"
           fi
 
+          APPLE_PACKAGE_NAME=${{ inputs.apple-package-name }}
+          if [ ! -z "${APPLE_PACKAGE_NAME}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --apple-package-name=${APPLE_PACKAGE_NAME}"
+          fi
+
+          FLUTTER_PACKAGE_NAME=${{ inputs.flutter-package-name }}
+          if [ ! -z "${FLUTTER_PACKAGE_NAME}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} --flutter-package-name=${FLUTTER_PACKAGE_NAME}"
+          fi
+
           echo "Extra args: ${EXTRA_ARGS}"
 
           dart pub get
           dart run bin/hoe.dart build-agora-flutter-example \
-            --project-dir=Agora-Flutter-SDK \
+            --project-dir=${{ inputs.repository }} \
             --artifacts-output-dir=output \
             --platforms=ios \
             --process-build \
-            --apple-package-name=io.agora.agoraRtcEngineExample \
-            --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
 
-          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          PUBSPEC_VERSION=$(grep 'version: ' ${{ inputs.repository }}/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
           DATE=$(date '+%Y-%m-%d')
           TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
@@ -458,9 +536,9 @@ jobs:
       - name: Check out build project
         uses: actions/checkout@v3
         with:
-          repository: AgoraIO/Agora-Flutter-SDK
+          repository: ${{ inputs.repository }}
           ref: ${{ inputs.build_branch }}
-          path: Agora-Flutter-SDK
+          path: ${{ inputs.repository }}
 
       - uses: subosito/flutter-action@v2
         with:
@@ -494,14 +572,14 @@ jobs:
           mkdir -p output
           dart pub get
           dart run bin/hoe.dart build-agora-flutter-example \
-            --project-dir=Agora-Flutter-SDK \
+            --project-dir=${{ inputs.repository }} \
             --artifacts-output-dir=output \
             --platforms=web --process-build \
             --apple-package-name=io.agora.agoraRtcEngineExample \
             --flutter-package-name=agora_rtc_engine \
             ${EXTRA_ARGS}
 
-          PUBSPEC_VERSION=$(grep 'version: ' Agora-Flutter-SDK/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
+          PUBSPEC_VERSION=$(grep 'version: ' ${{ inputs.repository }}/pubspec.yaml | sed -e 's,.*: \(.*\),\1,')
           DATE=$(date '+%Y-%m-%d')
           TAG_NAME="agora_rtc_engine_example_${PUBSPEC_VERSION}_${DATE}"
           echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
