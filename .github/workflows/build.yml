@@ -6,7 +6,6 @@ on:
       repository:
         description: The repository to checkout, e.g., AgoraIO-Extensions/Agora-Flutter-SDK, AgoraIO-Extensions/Agora-Flutter-RTM-SDK
         type: string
-        required: true
         # Set default value `AgoraIO-Extensions/Agora-Flutter-SDK` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
         default: 'AgoraIO-Extensions/Agora-Flutter-SDK'
       
@@ -75,7 +74,6 @@ on:
       repository:
         description: The repository to checkout, e.g., AgoraIO-Extensions/Agora-Flutter-SDK, AgoraIO-Extensions/Agora-Flutter-RTM-SDK
         type: string
-        required: true
         # Set default value `AgoraIO-Extensions/Agora-Flutter-SDK` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
         default: 'AgoraIO-Extensions/Agora-Flutter-SDK'
 
