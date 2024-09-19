@@ -13,12 +13,8 @@ on:
         required: true
         type: string
 
-      native_sdk_dependencies_content:
-        description: The content of the native sdk dependencies
-        type: string
-
-      iris_dependencies_content:
-        description: The content of the iris dependencies
+      native_dependencies_content:
+        description: The content of the native dependencies(include iris)
         type: string
 
       base_tag_or_branch:
@@ -82,15 +78,13 @@ jobs:
         run: |
           PROJECT_DIR=$(pwd)/AgoraIO-Extensions/Agora-Flutter-SDK
           PUBSPEC_VERSION="${{ github.event.inputs.pubspec_version }}"
-          NATIVE_SDK_DEPENDENCIES_CONTENT="${{ github.event.inputs.native_sdk_dependencies_content }}"
-          IRIS_DEPENDENCIES_CONTENT="${{ github.event.inputs.iris_dependencies_content }}"
+          NATIVE_DEPENDENCIES_CONTENT="${{ github.event.inputs.native_dependencies_content }}"
           
           dart pub get
           dart run bin/hoe.dart update-agora-flutter-native-dependencies \
             --project-dir=${PROJECT_DIR} \
             --pubspec-version=${PUBSPEC_VERSION} \
-            --native-sdk-dependencies-content="${NATIVE_SDK_DEPENDENCIES_CONTENT}" \
-            --iris-dependencies-content="${IRIS_DEPENDENCIES_CONTENT}"
+            --native-dependencies-content="${NATIVE_DEPENDENCIES_CONTENT}"
 
       - uses: littleGnAl/hoe/.github/actions/code_gen@main
         if: ${{ inputs.run_codegen }}

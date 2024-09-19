@@ -416,6 +416,17 @@ https://download.agora.io/sdk/release/iris_4.1.1.205-build.1_DCG_Windows_Video_2
   });
 
   test('modifiedAndroidGradleContent', () {
+    final irisDependenciesContent = '''
+Iris:
+Dummy text Dummy text Dummy text Dummy text Dummy text
+Dummy text Dummy text Dummy text Dummy text Dummy text
+https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116_Dummy text.zip
+CDN:
+https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116.zip
+Maven:
+implementation 'io.agora.rtc:iris-rtc:4.1.1.205-build.2'
+''';
+
     final nativeSdkDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -427,17 +438,8 @@ implementation 'io.agora.rtc:full-screen-sharing:4.0.1.9'
 Cocoapods：
 pod 'AgoraAudio_Special_iOS', '4.0.1.9'
 pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
-''';
 
-    final irisDependenciesContent = '''
-Iris:
-Dummy text Dummy text Dummy text Dummy text Dummy text
-Dummy text Dummy text Dummy text Dummy text Dummy text
-https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116_Dummy text.zip
-CDN:
-https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116.zip
-Maven:
-implementation 'io.agora.rtc:iris-rtc:4.1.1.205-build.2'
+$irisDependenciesContent
 ''';
 
     final fileContent = '''
@@ -514,15 +516,13 @@ dependencies {
 }
 ''';
 
-    final result = command.modifiedAndroidGradleContent(fileContent.split('\n'),
-        nativeSdkDependenciesContent, irisDependenciesContent);
+    final result = command.modifiedAndroidGradleContent(
+        fileContent.split('\n'), nativeSdkDependenciesContent);
     expect(result, expectedFileContent);
   });
 
   test('modifiedAndroidGradleContent with empty content', () {
     final nativeSdkDependenciesContent = '';
-
-    final irisDependenciesContent = '';
 
     final fileContent = '''
 group 'io.agora.agora_rtc_ng'
@@ -561,12 +561,23 @@ dependencies {
 }
 ''';
 
-    final result = command.modifiedAndroidGradleContent(fileContent.split('\n'),
-        nativeSdkDependenciesContent, irisDependenciesContent);
+    final result = command.modifiedAndroidGradleContent(
+        fileContent.split('\n'), nativeSdkDependenciesContent);
     expect(result, fileContent);
   });
 
   test('modifiedIOSPodspecContent', () {
+    final irisDependenciesContent = '''
+Iris:
+Dummy text Dummy text Dummy text Dummy text Dummy text
+Dummy text Dummy text Dummy text Dummy text Dummy text
+https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116_Dummy text.zip
+CDN:
+https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_iOS_Video_20230312_1116.zip
+Cocoapods:
+pod 'AgoraIrisRTC_iOS', '4.1.1.205-build.2'
+''';
+
     final nativeSdkDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -578,17 +589,8 @@ implementation 'io.agora.rtc:full-screen-sharing:4.0.1.9'
 Cocoapods：
 pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
 pod 'AgoraAudio_Special_iOS', '4.1.1.3.BASIC'
-''';
 
-    final irisDependenciesContent = '''
-Iris:
-Dummy text Dummy text Dummy text Dummy text Dummy text
-Dummy text Dummy text Dummy text Dummy text Dummy text
-https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116_Dummy text.zip
-CDN:
-https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_iOS_Video_20230312_1116.zip
-Cocoapods:
-pod 'AgoraIrisRTC_iOS', '4.1.1.205-build.2'
+$irisDependenciesContent
 ''';
 
     final fileContent = '''
@@ -641,15 +643,15 @@ Pod::Spec.new do |s|
 end
 ''';
 
-    final result = command.modifiedIOSPodspecContent(fileContent.split('\n'),
-        nativeSdkDependenciesContent, irisDependenciesContent);
+    final result = command.modifiedIOSPodspecContent(
+      fileContent.split('\n'),
+      nativeSdkDependenciesContent,
+    );
     expect(result, expectedFileContent);
   });
 
   test('modifiedIOSPodspecContent with empty content', () {
     final nativeSdkDependenciesContent = '';
-
-    final irisDependenciesContent = '';
 
     final fileContent = '''
 Pod::Spec.new do |s|
@@ -676,12 +678,25 @@ Pod::Spec.new do |s|
 end
 ''';
 
-    final result = command.modifiedIOSPodspecContent(fileContent.split('\n'),
-        nativeSdkDependenciesContent, irisDependenciesContent);
+    final result = command.modifiedIOSPodspecContent(
+      fileContent.split('\n'),
+      nativeSdkDependenciesContent,
+    );
     expect(result, fileContent);
   });
 
   test('modifiedMacOSPodspecContent', () {
+    final irisDependenciesContent = '''
+Iris:
+Dummy text Dummy text Dummy text Dummy text Dummy text
+Dummy text Dummy text Dummy text Dummy text Dummy text
+https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116_Dummy text.zip
+CDN:
+https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Mac_Video_20230312_1116.zip
+Cocoapods:
+pod 'AgoraIrisRTC_macOS', '4.1.1'
+''';
+
     final nativeSdkDependenciesContent = '''
 Iris:
 Dummy text Dummy text Dummy text Dummy text Dummy text
@@ -696,17 +711,8 @@ pod 'AgoraRtcEngine_iOS', '4.1.0'
 pod 'AgoraAudio_Special_iOS', '4.0.1.9'
 pod 'AgoraRtcEngine_Special_iOS', '4.0.1.9'
 pod 'AgoraRtcEngine_macOS', '4.1.1'
-''';
 
-    final irisDependenciesContent = '''
-Iris:
-Dummy text Dummy text Dummy text Dummy text Dummy text
-Dummy text Dummy text Dummy text Dummy text Dummy text
-https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116_Dummy text.zip
-CDN:
-https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Mac_Video_20230312_1116.zip
-Cocoapods:
-pod 'AgoraIrisRTC_macOS', '4.1.1'
+$irisDependenciesContent
 ''';
 
     final fileContent = '''
@@ -761,15 +767,15 @@ A new flutter plugin project.
 end
 ''';
 
-    final result = command.modifiedMacOSPodspecContent(fileContent.split('\n'),
-        nativeSdkDependenciesContent, irisDependenciesContent);
+    final result = command.modifiedMacOSPodspecContent(
+      fileContent.split('\n'),
+      nativeSdkDependenciesContent,
+    );
     expect(result, expectedFileContent);
   });
 
   test('modifiedMacOSPodspecContent with empty content', () {
     final nativeSdkDependenciesContent = '';
-
-    final irisDependenciesContent = '';
 
     final fileContent = '''
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
@@ -797,8 +803,10 @@ A new flutter plugin project.
 end
 ''';
 
-    final result = command.modifiedMacOSPodspecContent(fileContent.split('\n'),
-        nativeSdkDependenciesContent, irisDependenciesContent);
+    final result = command.modifiedMacOSPodspecContent(
+      fileContent.split('\n'),
+      nativeSdkDependenciesContent,
+    );
     expect(result, fileContent);
   });
 
@@ -1489,11 +1497,12 @@ implementation 'io.agora.rtc:full-screen-sharing:4.2.6.8'
 pod 'AgoraRtcEngine_Special_iOS', '4.2.6.9'
 pod 'AgoraAudio_Special_iOS', '4.2.6.9'
 pod 'AgoraRtcEngine_Special_macOS', '4.2.6.8'
+
+$irisDependenciesContent
 ''';
 
       command.createOrUpdateDepsSummary(
         fileSystem.currentDirectory.absolute.path,
-        irisDependenciesContent,
         nativeSdkDependenciesContent,
       );
 
@@ -1571,11 +1580,12 @@ implementation 'io.agora.rtc:full-screen-sharing:4.2.6.8'
 pod 'AgoraRtcEngine_Special_iOS', '4.2.6.9'
 pod 'AgoraAudio_Special_iOS', '4.2.6.9'
 pod 'AgoraRtcEngine_Special_macOS', '4.2.6.8'
+
+$irisDependenciesContent
 ''';
 
       command.createOrUpdateDepsSummary(
         fileSystem.currentDirectory.absolute.path,
-        irisDependenciesContent,
         nativeSdkDependenciesContent,
       );
 
@@ -1626,11 +1636,12 @@ implementation 'io.agora.rtc:full-screen-sharing:4.2.6.8'
 pod 'AgoraRtcEngine_Special_iOS', '4.2.6.9'
 pod 'AgoraAudio_Special_iOS', '4.2.6.9'
 pod 'AgoraRtcEngine_Special_macOS', '4.2.6.8'
+
+$irisDependenciesContent
 ''';
 
       command.createOrUpdateDepsSummary(
         fileSystem.currentDirectory.absolute.path,
-        irisDependenciesContent,
         nativeSdkDependenciesContent,
       );
 
@@ -1708,11 +1719,12 @@ implementation 'io.agora.rtc:full-screen-sharing:4.2.6.8'
 pod 'AgoraRtcEngine_Special_iOS', '4.2.6.9'
 pod 'AgoraAudio_Special_iOS', '4.2.6.9'
 pod 'AgoraRtcEngine_Special_macOS', '4.2.6.8'
+
+$irisDependenciesContent
 ''';
 
       command.createOrUpdateDepsSummary(
         fileSystem.currentDirectory.absolute.path,
-        irisDependenciesContent,
         nativeSdkDependenciesContent,
       );
 
@@ -1788,11 +1800,12 @@ implementation 'io.agora.rtc:full-screen-sharing:4.2.6.8'
 pod 'AgoraRtcEngine_Special_iOS', '4.2.6.9'
 pod 'AgoraAudio_Special_iOS', '4.2.6.9'
 pod 'AgoraRtcEngine_Special_macOS', '4.2.6.8'
+
+$irisDependenciesContent
 ''';
 
       command.createOrUpdateDepsSummary(
         fileSystem.currentDirectory.absolute.path,
-        irisDependenciesContent,
         nativeSdkDependenciesContent,
       );
 

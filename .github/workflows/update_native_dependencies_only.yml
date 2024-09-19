@@ -1,20 +1,16 @@
 name: Update native sdk and iris dependencies only
 
-on: 
+on:
   workflow_dispatch:
     inputs:
       base_branch:
         description: The base branch to update
         type: string
         required: true
-        default: 'main'
+        default: "main"
 
-      native_sdk_dependencies_content:
-        description: The content of the native sdk dependencies
-        type: string
-
-      iris_dependencies_content:
-        description: The content of the iris dependencies
+      native_dependencies_content:
+        description: The content of the native dependencies(include iris)
         type: string
 
       is_skip_ci:
@@ -29,7 +25,7 @@ on:
 
       codegen_version:
         description: The native sdk version for codegen, e.g., rtc_4.3.0
-        default: ''
+        default: ""
         type: string
 
 jobs:
@@ -54,14 +50,12 @@ jobs:
       - name: Update native sdk and iris dependencies
         run: |
           PROJECT_DIR=$(pwd)/AgoraIO-Extensions/Agora-Flutter-SDK
-          NATIVE_SDK_DEPENDENCIES_CONTENT="${{ github.event.inputs.native_sdk_dependencies_content }}"
-          IRIS_DEPENDENCIES_CONTENT="${{ github.event.inputs.iris_dependencies_content }}"
-          
+          NATIVE_DEPENDENCIES_CONTENT="${{ github.event.inputs.native_dependencies_content }}"
+
           dart pub get
           dart run bin/hoe.dart update-agora-flutter-native-dependencies \
             --project-dir=${PROJECT_DIR} \
-            --native-sdk-dependencies-content="${NATIVE_SDK_DEPENDENCIES_CONTENT}" \
-            --iris-dependencies-content="${IRIS_DEPENDENCIES_CONTENT}"
+            --native-dependencies-content="${NATIVE_DEPENDENCIES_CONTENT}"
 
       - uses: littleGnAl/hoe/.github/actions/code_gen@main
         if: ${{ inputs.run_codegen }}
@@ -91,15 +85,10 @@ jobs:
           draft: false
           title: "feat: upgrade native sdk dependencies ${{ steps.date.outputs.date }}"
           body: |
-            Update native sdk dependencies ${{ steps.date.outputs.date }}
-            native sdk dependencies:
+            Update native dependencies ${{ steps.date.outputs.date }}
+            native dependencies:
             ```
-            ${{ inputs.native_sdk_dependencies_content }}
-            ```
-
-            iris dependencies:
-            ```
-            ${{ inputs.iris_dependencies_content }}
+            ${{ inputs.native_dependencies_content }}
             ```
 
             > This pull request is trigger by bot, DO NOT MODIFY BY HAND.
