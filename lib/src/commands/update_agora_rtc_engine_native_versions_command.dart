@@ -67,9 +67,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     final String projectDir = argResults?['project-dir'] ?? '';
     final String pubspecVersion = argResults?['pubspec-version'] ?? '';
     final String nativeSdkDependenciesContent =
-        argResults?['native-sdk-dependencies-content'] ?? '';
-    final String irisDenpendenciesContent =
-        argResults?['iris-dependencies-content'] ?? '';
+        argResults?['native-dependencies-content'] ?? '';
 
     _workspace = fileSystem.directory(projectDir);
     stdout.writeln(_workspace.absolute.path);
@@ -92,34 +90,31 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
     androidGradleFile.writeAsStringSync(modifiedAndroidGradleContent(
       androidGradleFile.readAsLinesSync(),
       nativeSdkDependenciesContent,
-      irisDenpendenciesContent,
     ));
 
     final iosPodspecFile = fileSystem.file(iosPodspecFilePath);
     iosPodspecFile.writeAsStringSync(modifiedIOSPodspecContent(
       iosPodspecFile.readAsLinesSync(),
       nativeSdkDependenciesContent,
-      irisDenpendenciesContent,
     ));
 
     final macosPodspecFile = fileSystem.file(macosPodspecFilePath);
     macosPodspecFile.writeAsStringSync(modifiedMacOSPodspecContent(
       macosPodspecFile.readAsLinesSync(),
       nativeSdkDependenciesContent,
-      irisDenpendenciesContent,
     ));
 
     final windowsCMakeFile = fileSystem.file(windowsCMakeFilePath);
     windowsCMakeFile.writeAsStringSync(modifiedWindowsCMakeContent(
       windowsCMakeFile.readAsLinesSync(),
-      irisDenpendenciesContent,
+      nativeSdkDependenciesContent,
     ));
 
     final artifactsVersionFile = fileSystem.file(artifactsVersionFilePath);
     if (artifactsVersionFile.existsSync()) {
       artifactsVersionFile.writeAsStringSync(modifiedArtifactsVersionContent(
         artifactsVersionFile.readAsStringSync(),
-        irisDenpendenciesContent,
+        nativeSdkDependenciesContent,
       ));
     }
 
@@ -139,13 +134,13 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       ));
     }
 
-    modifyIrisWebVersion(_workspace.absolute.path, irisDenpendenciesContent);
+    modifyIrisWebVersion(
+        _workspace.absolute.path, nativeSdkDependenciesContent);
     createOrUpdateDepsSummary(
       _workspace.absolute.path,
-      irisDenpendenciesContent,
       nativeSdkDependenciesContent,
     );
-    copyHeaders(irisDenpendenciesContent);
+    copyHeaders(nativeSdkDependenciesContent);
   }
 
   List<String> _findByRegExp(List<String> regExps, String input) {
@@ -338,14 +333,13 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   String modifiedAndroidGradleContent(
     List<String> sourceFileContentLines,
     String nativeSdkDependenciesContent,
-    String irisDenpendenciesContent,
   ) {
     final tab = '    ';
 
     return _modifiedVersFileContent(
       sourceFileContentLines,
       () => findNativeAndroidMaven(nativeSdkDependenciesContent),
-      () => findIrisAndroidMaven(irisDenpendenciesContent),
+      () => findIrisAndroidMaven(nativeSdkDependenciesContent),
       [
         r"^[\s]*(implementation|api) 'io.agora.rtc:agora[a-z-]+:[0-9a-zA-Z\.-]+'",
         r"^[\s]*(implementation|api) 'io.agora.rtc:full-[a-z-]+:[0-9a-zA-Z\.-]+'",
@@ -361,12 +355,11 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   String modifiedIOSPodspecContent(
     List<String> sourceFileContentLines,
     String nativeSdkDependenciesContent,
-    String irisDenpendenciesContent,
   ) {
     return _modifiedVersFileContent(
       sourceFileContentLines,
       () => findNativeIOSPod(nativeSdkDependenciesContent),
-      () => findIrisIOSPod(irisDenpendenciesContent),
+      () => findIrisIOSPod(nativeSdkDependenciesContent),
       [
         r"^[\s]*s.dependency 'AgoraRtc[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
         r"^[\s]*s.dependency 'AgoraAudio[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'",
@@ -406,12 +399,11 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   String modifiedMacOSPodspecContent(
     List<String> sourceFileContentLines,
     String nativeSdkDependenciesContent,
-    String irisDenpendenciesContent,
   ) {
     return _modifiedVersFileContent(
       sourceFileContentLines,
       () => findNativeMacosPod(nativeSdkDependenciesContent),
-      () => findIrisMacosPod(irisDenpendenciesContent),
+      () => findIrisMacosPod(nativeSdkDependenciesContent),
       [r"^[\s]*s.dependency 'AgoraRtc[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'"],
       [r"^[\s]*s.dependency 'AgoraIris[a-zA-Z-_]+', '[0-9a-zA-Z\.-]+'"],
       (e) {
@@ -422,7 +414,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
 
   String modifiedWindowsCMakeContent(
     List<String> sourceFileContentLines,
-    String irisDenpendenciesContent,
+    String nativeDenpendenciesContent,
   ) {
     List<String> modifiedFileContentLines = [];
 
@@ -444,7 +436,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
       caseSensitive: true,
     );
 
-    final cdn = findIrisWindowsCDN(irisDenpendenciesContent).cdn;
+    final cdn = findIrisWindowsCDN(nativeDenpendenciesContent).cdn;
     if (cdn.isEmpty) {
       return sourceFileContentLines.join('\n');
     }
@@ -474,12 +466,12 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
 
   String modifiedArtifactsVersionContent(
     String sourceFileContent,
-    String irisDenpendenciesContent,
+    String nativeDependenciesContent,
   ) {
-    final androidCDN = findIrisAndroidMaven(irisDenpendenciesContent).cdn;
-    final iosCDN = findIrisIOSPod(irisDenpendenciesContent).cdn;
-    final macOSCDN = findIrisMacosPod(irisDenpendenciesContent).cdn;
-    final windowsCDN = findIrisWindowsCDN(irisDenpendenciesContent).cdn;
+    final androidCDN = findIrisAndroidMaven(nativeDependenciesContent).cdn;
+    final iosCDN = findIrisIOSPod(nativeDependenciesContent).cdn;
+    final macOSCDN = findIrisMacosPod(nativeDependenciesContent).cdn;
+    final windowsCDN = findIrisWindowsCDN(nativeDependenciesContent).cdn;
 
     String modifiedContent = sourceFileContent;
     if (androidCDN.isNotEmpty) {
@@ -774,7 +766,6 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
 
   void createOrUpdateDepsSummary(
     String workspacePath,
-    String irisDenpendenciesContent,
     String nativeDenpendenciesContent,
   ) {
     // internal/deps_summary.txt
@@ -809,7 +800,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
           .where((entry) =>
               entry.key.contains('IRIS') && entry.key.contains('CDN'))
           .map((entry) {
-            final link = entry.value(irisDenpendenciesContent);
+            final link = entry.value(nativeDenpendenciesContent);
             if (link.cdn.isNotEmpty) {
               return link.cdn;
             }
@@ -821,7 +812,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
           .where((entry) =>
               entry.key.contains('IRIS') && !entry.key.contains('CDN'))
           .map((entry) {
-            final link = entry.value(irisDenpendenciesContent);
+            final link = entry.value(nativeDenpendenciesContent);
             final mavenOrCocoaPods = link.mavenOrCocoaPods.join('\n');
             if (mavenOrCocoaPods.isNotEmpty) {
               return mavenOrCocoaPods;
@@ -884,7 +875,7 @@ $nativeContent
       final value = entry.value;
       String denpendenciesContent = '';
       if (key.contains('IRIS')) {
-        denpendenciesContent = irisDenpendenciesContent;
+        denpendenciesContent = nativeDenpendenciesContent;
       } else {
         denpendenciesContent = nativeDenpendenciesContent;
       }
