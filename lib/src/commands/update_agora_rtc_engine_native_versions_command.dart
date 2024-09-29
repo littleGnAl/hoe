@@ -255,7 +255,7 @@ class UpdateAgoraRtcEngineNativeVersionsCommand extends BaseCommand {
   VersionLink findIrisAndroidMaven(String irisDenpendenciesContent) {
     final cdns = _findByRegExp(
       [
-        r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Android_Video_[0-9_]+\.zip',
+        r'https:\/\/download\.agora\.io\/sdk\/release\/iris_[0-9a-z\.-]+_DCG_Android_Video_[0-9_a-zA-Z]+\.zip',
       ],
       irisDenpendenciesContent,
     );

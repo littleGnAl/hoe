@@ -285,6 +285,25 @@ implementation 'io.agora.rtc:iris-rtc:4.1.1.205-build.2'
     expect(result.mavenOrCocoaPods.length, 0);
   });
 
+  test('findIrisAndroidMaven with 16K CDN url', () {
+    final irisDependenciesContent = '''
+Iris:
+Dummy text Dummy text Dummy text Dummy text Dummy text
+Dummy text Dummy text Dummy text Dummy text Dummy text
+https://download.agora.io/sdk/release/iris_4.1.1.205-build.2_DCG_Android_Video_20230312_1116_Dummy text.zip
+CDN:
+https://download.agora.io/sdk/release/iris_4.5.0-dev.4_DCG_Android_Video_16K_20240927_0549_660.zip
+Maven:
+implementation 'io.agora.rtc:iris-rtc:4.1.1.205-build.2'
+''';
+
+    final result = command.findIrisAndroidMaven(irisDependenciesContent);
+    expect(result.cdn,
+        'https://download.agora.io/sdk/release/iris_4.5.0-dev.4_DCG_Android_Video_16K_20240927_0549_660.zip');
+    expect(result.mavenOrCocoaPods[0],
+        'implementation \'io.agora.rtc:iris-rtc:4.1.1.205-build.2\'');
+  });
+
   test('findIrisIOSPod', () {
     final irisDependenciesContent = '''
 Iris:
