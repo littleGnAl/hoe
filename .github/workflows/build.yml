@@ -164,7 +164,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          flutter-version: '3.24.3'
 
       - name: Run build android
         id: android-build-step
@@ -268,7 +268,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          flutter-version: '3.24.3'
 
       - name: Run build macos
         id: macos-build-step
@@ -354,7 +354,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          flutter-version: '3.24.3'
       - name: Engine version
         shell: bash
         run: |
@@ -463,7 +463,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          flutter-version: '3.24.3'
 
       - name: Run build ios
         id: ios-build-step
@@ -540,7 +540,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          flutter-version: '3.24.3'
 
       - name: Run build web
         id: web-build-step
