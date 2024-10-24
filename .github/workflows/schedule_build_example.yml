@@ -12,7 +12,13 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        repo: ['Agora-Flutter-SDK', 'Agora-Flutter-RTM-SDK']
+        build:
+          - repo: 'Agora-Flutter-SDK'
+            apple-package-name: 'io.agora.agoraRtcEngineExample'
+            flutter-package-name: 'agora_rtc_engine'
+          - repo: 'Agora-Flutter-RTM-SDK'
+            apple-package-name: 'io.agora.agoraRtmExample'
+            flutter-package-name: 'agora_rtm'
     steps:
       - name: Schedule build examples
         uses: actions/github-script@v6
@@ -21,7 +27,7 @@ jobs:
           retries: 3
           debug: true
           script: |
-            const buildExampleRepo = `${{ matrix.repo }}`;
+            const buildExampleRepo = `${{ matrix.build.repo }}`;
             // https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#list-pull-requests
             const response = await github.request('GET /repos/{owner}/{repo}/pulls', {
               owner: 'AgoraIO-Extensions',
@@ -78,13 +84,18 @@ jobs:
               const workflow_id = "build_and_post_result_to_pr.yml"
               const ref = 'main'
 
+              const applePackageName = `${{ matrix.build.apple-package-name }}`;
+              const flutterPackageName = `${{ matrix.build.flutter-package-name }}`;
+
               // see https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event
               github.request(`POST /repos/${owner}/${repo}/actions/workflows/${workflow_id}/dispatches`, {
                 ref: ref,
                 inputs: {
                   'target_repo': `AgoraIO-Extensions/${buildExampleRepo}`,
                   'target_branch': targetBranch,
-                  'pr_number': `${prNumber}`
+                  'pr_number': `${prNumber}`,
+                  'apple-package-name': applePackageName,
+                  'flutter-package-name': flutterPackageName,
                 },
                 headers: {
                   'X-GitHub-Api-Version': '2022-11-28'

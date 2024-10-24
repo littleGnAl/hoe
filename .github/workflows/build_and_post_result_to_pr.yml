@@ -14,6 +14,18 @@ on:
         type: string
         required: true
 
+      apple-package-name:
+        description: The ios/macos bundle id, e.g., io.agora.agoraRtcEngineExample, io.agora.agorartm.agoraRtmExample
+        type: string
+        # Set default value `io.agora.agoraRtcEngineExample` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
+        default: 'io.agora.agoraRtcEngineExample'
+
+      flutter-package-name:
+        description: The Flutter package name, e.g., agora_rtc_engine, agora_rtm
+        type: string
+        # Set default value `agora_rtc_engine` to avoid introduce breaking changes to the `AgoraIO-Extensions/Agora-Flutter-SDK` repo.
+        default: 'agora_rtc_engine'
+
       pr_number:
         description: The pull request number
         type: number
@@ -24,7 +36,10 @@ jobs:
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
+      repository: ${{ github.event.inputs.target_repo }}
       build_branch: ${{ github.event.inputs.target_branch }}
+      apple-package-name: ${{ github.event.inputs.apple-package-name }}
+      flutter-package-name: ${{ github.event.inputs.flutter-package-name }}
 
   comment_pr:
     name: Comment PR
