@@ -1030,7 +1030,6 @@ class BuildAgoraRtcEngineExampleCommand extends BaseCommand {
       extraArgs: [
         '--export-options-plist',
         plistFile.absolute.path,
-        '--no-enable-impeller',
       ],
     );
 
